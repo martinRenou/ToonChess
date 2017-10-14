@@ -14,17 +14,20 @@
 #include <vector>
 
 template<typename Out>
-void split(const std::string &s, char delim, Out result) {
+void split(const std::string &s, char delim, Out result)
+{
   std::stringstream ss;
   ss.str(s);
   std::string item;
 
-  while (std::getline(ss, item, delim)) {
+  while(std::getline(ss, item, delim))
+  {
     *(result++) = item;
   }
 }
 
-std::vector<std::string> split(const std::string &s, char delim) {
+std::vector<std::string> split(const std::string &s, char delim)
+{
   std::vector<std::string> elems;
   split(s, delim, std::back_inserter(elems));
   return elems;
@@ -37,7 +40,7 @@ int main()
   std::ifstream fobj("../assets/king.obj");
   std::string line;
   std::vector<GLfloat> vertices;
-  std::vector<GLfloat> normals;
+  std::vector<GLfloat> unsortedNormals;
   std::vector<GLuint> indices;
 
   while(std::getline(fobj, line))
@@ -54,9 +57,9 @@ int main()
 
     if(splittedLine.at(0).compare("vn") == 0)
     {
-      normals.push_back(std::stof(splittedLine.at(1)));
-      normals.push_back(std::stof(splittedLine.at(2)));
-      normals.push_back(std::stof(splittedLine.at(3)));
+      unsortedNormals.push_back(std::stof(splittedLine.at(1)));
+      unsortedNormals.push_back(std::stof(splittedLine.at(2)));
+      unsortedNormals.push_back(std::stof(splittedLine.at(3)));
       continue;
     }
 
