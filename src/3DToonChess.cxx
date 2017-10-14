@@ -14,28 +14,40 @@
 #include <vector>
 
 template<typename Out>
-void split(const std::string &s, char delim, Out result)
-{
+void split(const std::string &s, char delim, Out result){
   std::stringstream ss;
   ss.str(s);
   std::string item;
 
-  while(std::getline(ss, item, delim))
-  {
+  while(std::getline(ss, item, delim)){
     *(result++) = item;
   }
 }
 
-std::vector<std::string> split(const std::string &s, char delim)
-{
+std::vector<std::string> split(const std::string &s, char delim){
   std::vector<std::string> elems;
   split(s, delim, std::back_inserter(elems));
   return elems;
 }
 
+void extractFloatVec3(std::vector<std::string> *line, std::vector<GLfloat> *vector){
+  for(int i = 1; i <=3; i++){
+    vector->push_back(
+      std::stof(line->at(i))
+    );
+  }
+}
 
-int main()
-{
+void extractFace(std::vector<std::string> *line, std::vector<GLuint> *indices){
+  for(int i = 1; i <= 3; i++){
+    indices->push_back(
+      std::stoi(split(line->at(i), '/').at(0)) - 1
+    );
+  }
+}
+
+
+int main(){
   // Read obj file
   std::ifstream fobj("../assets/king.obj");
   std::string line;
@@ -43,45 +55,21 @@ int main()
   std::vector<GLfloat> unsortedNormals;
   std::vector<GLuint> indices;
 
-  while(std::getline(fobj, line))
-  {
+  while(std::getline(fobj, line)){
     std::vector<std::string> splittedLine = split(line, ' ');
 
-    if(splittedLine.at(0).compare("v") == 0)
-    {
-      vertices.push_back(std::stof(splittedLine.at(1)));
-      vertices.push_back(std::stof(splittedLine.at(2)));
-      vertices.push_back(std::stof(splittedLine.at(3)));
+    if(splittedLine.at(0).compare("v") == 0){
+      extractFloatVec3(&splittedLine, &vertices);
       continue;
     }
 
-    if(splittedLine.at(0).compare("vn") == 0)
-    {
-      unsortedNormals.push_back(std::stof(splittedLine.at(1)));
-      unsortedNormals.push_back(std::stof(splittedLine.at(2)));
-      unsortedNormals.push_back(std::stof(splittedLine.at(3)));
+    if(splittedLine.at(0).compare("vn") == 0){
+      extractFloatVec3(&splittedLine, &unsortedNormals);
       continue;
     }
 
-    if(splittedLine.at(0).compare("f") == 0)
-    {
-      std::vector<std::string> splittedPoint = split(
-        splittedLine.at(1),
-        '/'
-      );
-      indices.push_back(std::stoi(splittedPoint.at(0)) - 1);
-
-      std::vector<std::string> splittedPoint2 = split(
-        splittedLine.at(2),
-        '/'
-      );
-      indices.push_back(std::stoi(splittedPoint2.at(0)) - 1);
-
-      std::vector<std::string> splittedPoint3 = split(
-        splittedLine.at(3),
-        '/'
-      );
-      indices.push_back(std::stoi(splittedPoint3.at(0)) - 1);
+    if(splittedLine.at(0).compare("f") == 0){
+      extractFace(&splittedLine, &indices);
       continue;
     }
   }
@@ -132,17 +120,13 @@ int main()
 
   // Render loop
   bool running = true;
-  while (running)
-  {
+  while(running){
     sf::Event event;
-    while (window.pollEvent(event))
-    {
-      if (event.type == sf::Event::Closed)
-      {
+    while(window.pollEvent(event)){
+      if(event.type == sf::Event::Closed){
         running = false;
       }
-      else if (event.type == sf::Event::Resized)
-      {
+      else if(event.type == sf::Event::Resized){
         width = event.size.width;
         height = event.size.height;
 
