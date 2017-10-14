@@ -91,8 +91,10 @@ int main()
   settings.majorVersion = 3;
   settings.minorVersion = 0;
 
+  int width(800);
+  int height(600);
   sf::Window window(
-      sf::VideoMode(800, 600),
+      sf::VideoMode(width, height),
       "3DToonChess",
       sf::Style::Default,
       settings
@@ -103,7 +105,7 @@ int main()
   // Create projection matrix
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(70, (double)800/600, 1, 1000);
+  gluPerspective(70, (double)width/height, 1, 1000);
 
   // Vertex buffers
   GLuint vertexBufferId;
@@ -138,7 +140,13 @@ int main()
       }
       else if (event.type == sf::Event::Resized)
       {
-        glViewport(0, 0, event.size.width, event.size.height);
+        width = event.size.width;
+        height = event.size.height;
+
+        glViewport(0, 0, width, height);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        gluPerspective(70, (double)width/height, 1, 1000);
       }
     }
 
