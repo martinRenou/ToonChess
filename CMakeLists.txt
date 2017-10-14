@@ -12,9 +12,15 @@ project (3DToonChess)
 set (3DToonChess_VERSION_MAJOR 0)
 set (3DToonChess_VERSION_MINOR 1)
 
+# Add headers
+set (
+  HEADERS_FILES
+  ${CMAKE_SOURCE_DIR}/src/mesh/Mesh
+)
+
 # Define sources and executable
 set(EXECUTABLE_NAME "3DToonChess")
-add_executable(${EXECUTABLE_NAME} src/3DToonChess.cxx)
+add_executable(${EXECUTABLE_NAME} src/3DToonChess.cxx ${HEADERS_FILES})
 
 # Detect and add SFML
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})

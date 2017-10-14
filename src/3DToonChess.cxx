@@ -7,72 +7,13 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <string>
-#include <vector>
-
-template<typename Out>
-void split(const std::string &s, char delim, Out result){
-  std::stringstream ss;
-  ss.str(s);
-  std::string item;
-
-  while(std::getline(ss, item, delim)){
-    *(result++) = item;
-  }
-}
-
-std::vector<std::string> split(const std::string &s, char delim){
-  std::vector<std::string> elems;
-  split(s, delim, std::back_inserter(elems));
-  return elems;
-}
-
-void extractFloatVec3(std::vector<std::string> *line, std::vector<GLfloat> *vector){
-  for(int i = 1; i <=3; i++){
-    vector->push_back(
-      std::stof(line->at(i))
-    );
-  }
-}
-
-void extractFace(std::vector<std::string> *line, std::vector<GLuint> *indices){
-  for(int i = 1; i <= 3; i++){
-    indices->push_back(
-      std::stoi(split(line->at(i), '/').at(0)) - 1
-    );
-  }
-}
+#include "mesh/Mesh.hxx"
 
 
 int main(){
-  // Read obj file
-  std::ifstream fobj("../assets/king.obj");
-  std::string line;
-  std::vector<GLfloat> vertices;
-  std::vector<GLfloat> unsortedNormals;
-  std::vector<GLuint> indices;
-
-  while(std::getline(fobj, line)){
-    std::vector<std::string> splittedLine = split(line, ' ');
-
-    if(splittedLine.at(0).compare("v") == 0){
-      extractFloatVec3(&splittedLine, &vertices);
-      continue;
-    }
-
-    if(splittedLine.at(0).compare("vn") == 0){
-      extractFloatVec3(&splittedLine, &unsortedNormals);
-      continue;
-    }
-
-    if(splittedLine.at(0).compare("f") == 0){
-      extractFace(&splittedLine, &indices);
-      continue;
-    }
-  }
+  // Create and load king mesh
+  Mesh* king = new Mesh("../assets/king.obj");
+  king->load();
 
   // Create window
   sf::ContextSettings settings;
@@ -104,8 +45,8 @@ int main(){
   glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
   glBufferData(
     GL_ARRAY_BUFFER,
-    vertices.size()*sizeof(GLfloat),
-    vertices.data(),
+    king->vertices.size()*sizeof(GLfloat),
+    king->vertices.data(),
     GL_STATIC_DRAW);
 
   // Index buffer
@@ -114,8 +55,8 @@ int main(){
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId);
   glBufferData(
     GL_ELEMENT_ARRAY_BUFFER,
-    indices.size()*sizeof(GLuint),
-    indices.data(),
+    king->indices.size()*sizeof(GLuint),
+    king->indices.data(),
     GL_STATIC_DRAW);
 
   // Render loop
@@ -160,7 +101,7 @@ int main(){
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId);
     glDrawElements(
       GL_TRIANGLES,
-      indices.size(),
+      king->indices.size(),
       GL_UNSIGNED_INT,
       (void*)0
     );
