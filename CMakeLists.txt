@@ -14,13 +14,13 @@ set (3DToonChess_VERSION_MINOR 1)
 
 # Add headers
 set (
-  HEADERS_FILES
-  ${CMAKE_SOURCE_DIR}/src/mesh/Mesh
+  CXX_FILES
+  ${CMAKE_SOURCE_DIR}/src/mesh/Mesh.cxx
 )
 
 # Define sources and executable
 set(EXECUTABLE_NAME "3DToonChess")
-add_executable(${EXECUTABLE_NAME} src/3DToonChess.cxx ${HEADERS_FILES})
+add_executable(${EXECUTABLE_NAME} src/3DToonChess.cxx ${CXX_FILES})
 
 # Detect and add SFML
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
@@ -48,10 +48,3 @@ endif()
 
 # Install target
 install(TARGETS ${EXECUTABLE_NAME} DESTINATION bin)
-
-# CPack packaging
-include(InstallRequiredSystemLibraries)
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/COPYING")
-set(CPACK_PACKAGE_VERSION_MAJOR "${3DToonChess_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${3DToonChess_VERSION_MINOR}")
-include(CPack)
