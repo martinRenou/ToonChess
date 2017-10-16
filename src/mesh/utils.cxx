@@ -17,8 +17,9 @@ std::vector<std::string> split(const std::string &s, char delim){
   return elems;
 }
 
-void extractFloatVec3(std::vector<std::string> *line, std::vector<GLfloat> *vector){
-  for(int i = 1; i <=3; i++){
+void extractFloatVec3(
+    std::vector<std::string> *line, std::vector<GLfloat> *vector){
+  for(int i = 1; i <= 3; i++){
     vector->push_back(
       std::stof(line->at(i))
     );
