@@ -1,10 +1,10 @@
 #ifndef MESH_HXX_
 #define MESH_HXX_
 
-#include <string>
-#include <vector>
+#include <GL/gl.h>
 
-#include "utils.hxx"
+#include <vector>
+#include <string>
 
 class Mesh {
   public:

@@ -1,5 +1,11 @@
 #include "utils.hxx"
 
+#include <GL/gl.h>
+
+#include <sstream>
+#include <string>
+#include <vector>
+
 template<typename Out>
 void split(const std::string &s, char delim, Out result){
   std::stringstream ss;
