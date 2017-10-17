@@ -39,7 +39,7 @@ int main(){
   glLoadIdentity();
   gluPerspective(70, (double)width/height, 1, 1000);
 
-  // Vertex buffers
+  // Vertex buffer
   GLuint vertexBufferId;
   glGenBuffers(1, &vertexBufferId);
   glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
@@ -47,6 +47,16 @@ int main(){
     GL_ARRAY_BUFFER,
     king->vertices.size()*sizeof(GLfloat),
     king->vertices.data(),
+    GL_STATIC_DRAW);
+
+  // Normal buffer
+  GLuint normalBufferId;
+  glGenBuffers(1, &normalBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, normalBufferId);
+  glBufferData(
+    GL_ARRAY_BUFFER,
+    king->normals.size()*sizeof(GLfloat),
+    king->normals.data(),
     GL_STATIC_DRAW);
 
   // Index buffer
@@ -88,10 +98,18 @@ int main(){
 
     glEnableClientState(GL_VERTEX_ARRAY);
 
-    // Draw
+    // Send vertices
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
     glVertexPointer(
       3,
+      GL_FLOAT,
+      0,
+      (void*)0
+    );
+
+    // Send normals
+    glBindBuffer(GL_ARRAY_BUFFER, normalBufferId);
+    glNormalPointer(
       GL_FLOAT,
       0,
       (void*)0
@@ -114,6 +132,7 @@ int main(){
   }
 
   glDeleteBuffers(1, &vertexBufferId);
+  glDeleteBuffers(1, &normalBufferId);
   glDeleteBuffers(1, &indexBufferId);
 
   return 0;

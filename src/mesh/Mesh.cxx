@@ -18,6 +18,8 @@ void Mesh::load(){
   this->normals.clear();
   this->indices.clear();
 
+  std::vector<GLfloat> unsortedNormals;
+
   while(std::getline(fobj, line)){
     std::vector<std::string> splittedLine = split(line, ' ');
 
@@ -27,12 +29,13 @@ void Mesh::load(){
     }
 
     if(splittedLine.at(0).compare("vn") == 0){
-      extractFloatVec3(&splittedLine, &this->normals);
+      extractFloatVec3(&splittedLine, &unsortedNormals);
       continue;
     }
 
     if(splittedLine.at(0).compare("f") == 0){
       extractFace(&splittedLine, &this->indices);
+      extractNormal(&splittedLine, &unsortedNormals, &this->normals);
       continue;
     }
   }

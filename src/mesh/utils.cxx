@@ -39,3 +39,13 @@ void extractFace(std::vector<std::string> *line, std::vector<GLuint> *indices){
     );
   }
 }
+
+void extractNormal(
+    std::vector<std::string> *line,
+    std::vector<GLfloat> *unsortedNormals,
+    std::vector<GLfloat> *normals){
+  for(int i = 1; i <= 3; i++){
+    int normalIndex = std::stoi(split(line->at(i), '/').at(2)) - 1;
+    normals->push_back(unsortedNormals->at(normalIndex));
+  }
+}
