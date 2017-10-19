@@ -46,6 +46,9 @@ void extractNormal(
     std::vector<GLfloat> *normals){
   for(int i = 1; i <= 3; i++){
     int normalIndex = std::stoi(split(line->at(i), '/').at(2)) - 1;
-    normals->push_back(unsortedNormals->at(normalIndex));
+
+    for(int j = 0; j <= 2; j++){
+      normals->push_back(unsortedNormals->at(3 * normalIndex + j));
+    }
   }
 }
