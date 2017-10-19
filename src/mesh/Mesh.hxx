@@ -7,16 +7,23 @@
 #include <string>
 
 class Mesh {
-  public:
+  private:
+    std::string filePath;
+
     std::vector<GLfloat> vertices;
     std::vector<GLfloat> normals;
     std::vector<GLuint> indices;
 
-    std::string filePath;
+    GLuint vertexBufferId;
+    GLuint normalBufferId;
+    GLuint indexBufferId;
 
+  public:
     Mesh(std::string filePath);
 
-    void load();
+    void initBuffers();
+    void draw();
+    void clearBuffers();
 };
 
 #endif
