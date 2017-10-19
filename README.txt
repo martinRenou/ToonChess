@@ -18,3 +18,6 @@ And run it!
 
 Or install it globally:
 # sudo make install
+
+How to run tests:
+# ./tests
