@@ -33,6 +33,7 @@ int main(){
   );
   window.setVerticalSyncEnabled(true);
   glEnable(GL_DEPTH_TEST);
+  glClearColor(0.69, 0.73, 1, 1);
 
   // Create projection matrix
   glMatrixMode(GL_PROJECTION);
