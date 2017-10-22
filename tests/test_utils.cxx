@@ -7,6 +7,12 @@
 
 #include "../src/utils.hxx"
 
+TEST(load_file, txt) {
+  std::string out = loadFile("../tests/testFixtures/test.txt");
+
+  EXPECT_EQ("Hello\nWorld !\n!\n", out);
+}
+
 TEST(split, with_spaces) {
   std::vector<std::string> out = split("v 1.0 2.5 3.2", ' ');
 
