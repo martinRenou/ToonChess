@@ -5,7 +5,7 @@
 #include <vector>
 #include <string>
 
-#include "../../src/utils.hxx"
+#include "../src/utils.hxx"
 
 TEST(split, with_spaces) {
   std::vector<std::string> out = split("v 1.0 2.5 3.2", ' ');
