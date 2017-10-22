@@ -43,3 +43,17 @@ TEST(mesh, indices) {
   EXPECT_EQ(7, test->indices.at(34));
   EXPECT_EQ(3, test->indices.at(35));
 }
+
+TEST(mesh, normals) {
+  Mesh* test = new Mesh("../tests/testFixtures/test.obj");
+
+  test->initBuffers();
+
+  EXPECT_EQ(0.0f, test->normals.at(0));
+  EXPECT_EQ(0.0f, test->normals.at(1));
+  EXPECT_EQ(-1.32f, test->normals.at(2));
+
+  EXPECT_EQ(-1.26f, test->normals.at(18));
+  EXPECT_EQ(0.0f, test->normals.at(19));
+  EXPECT_EQ(0.0f, test->normals.at(20));
+}
