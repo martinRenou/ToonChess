@@ -16,8 +16,8 @@ Install 3DToonChess
 And run it!
 # ./3DToonChess
 
-Or install it globally:
-# sudo make install
-
 How to run tests:
 # ./tests
+
+Known issues:
+- I should distribute the assets correctly with the "make install" command

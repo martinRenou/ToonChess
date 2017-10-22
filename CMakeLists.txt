@@ -19,10 +19,16 @@ set (
   ${CMAKE_SOURCE_DIR}/src/utils.cxx
 )
 
+set (
+  ASSETS
+  ${CMAKE_SOURCE_DIR}/assets/king.obj
+)
+
 # Define sources and executable
 set(EXECUTABLE_NAME "3DToonChess")
-add_executable(${EXECUTABLE_NAME} src/3DToonChess.cxx ${CXX_FILES})
+add_executable(${EXECUTABLE_NAME} src/3DToonChess.cxx ${CXX_FILES} ${ASSETS})
 
+set_source_files_properties(${ASSETS} PROPERTIES HEADER_FILE_ONLY TRUE)
 
 # Download and unpack googletest
 configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
@@ -76,6 +82,3 @@ if (GLUT_FOUND)
   target_link_libraries(${EXECUTABLE_NAME} ${GLUT_LIBRARIES} )
   target_link_libraries(${TEST_NAME} ${GLUT_LIBRARIES} )
 endif()
-
-# Install target
-install(TARGETS ${EXECUTABLE_NAME} DESTINATION bin)
