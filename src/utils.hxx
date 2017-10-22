@@ -6,6 +6,8 @@
 #include <vector>
 #include <string>
 
+std::string loadFile(std::string path);
+
 template<typename Out>
 void split(const std::string &s, char delim, Out result);
 

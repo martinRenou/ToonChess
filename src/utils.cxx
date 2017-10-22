@@ -3,8 +3,18 @@
 #include <GL/gl.h>
 
 #include <sstream>
+#include <fstream>
 #include <string>
 #include <vector>
+
+std::string loadFile(std::string path){
+  std::ifstream in(path);
+  std::string s(
+    (std::istreambuf_iterator<char>(in)),
+    std::istreambuf_iterator<char>()
+  );
+  return s;
+}
 
 template<typename Out>
 void split(const std::string &s, char delim, Out result){

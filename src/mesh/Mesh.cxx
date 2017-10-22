@@ -7,7 +7,7 @@
 #include <fstream>
 
 #include "Mesh.hxx"
-#include "utils.hxx"
+#include "../utils.hxx"
 
 Mesh::Mesh(std::string filePath){
   this->filePath = filePath;
