@@ -25,6 +25,8 @@ void Mesh::initBuffers(){
   std::vector<GLfloat> unsortedNormals;
 
   while(std::getline(fobj, line)){
+    if(line.size() == 0) continue;
+
     std::vector<std::string> splittedLine = split(line, ' ');
 
     if(splittedLine.at(0).compare("v") == 0){

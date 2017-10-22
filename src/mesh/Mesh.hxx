@@ -7,7 +7,7 @@
 #include <string>
 
 class Mesh {
-  private:
+  public:
     std::string filePath;
 
     std::vector<GLfloat> vertices;
@@ -18,7 +18,6 @@ class Mesh {
     GLuint normalBufferId;
     GLuint indexBufferId;
 
-  public:
     Mesh(std::string filePath);
 
     void initBuffers();
