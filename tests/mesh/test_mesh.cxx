@@ -6,6 +6,8 @@ TEST(mesh, init) {
   Mesh* test = new Mesh("../tests/testFixtures/test.obj");
 
   EXPECT_EQ("../tests/testFixtures/test.obj", test->filePath);
+
+  delete test;
 }
 
 TEST(mesh, vertices) {
@@ -24,6 +26,8 @@ TEST(mesh, vertices) {
   EXPECT_EQ(1.0, test->vertices.at(21));
   EXPECT_EQ(1.0, test->vertices.at(22));
   EXPECT_EQ(1.0, test->vertices.at(23));
+
+  delete test;
 }
 
 TEST(mesh, indices) {
@@ -42,6 +46,8 @@ TEST(mesh, indices) {
   EXPECT_EQ(1, test->indices.at(33));
   EXPECT_EQ(7, test->indices.at(34));
   EXPECT_EQ(3, test->indices.at(35));
+
+  delete test;
 }
 
 TEST(mesh, normals) {
@@ -56,4 +62,6 @@ TEST(mesh, normals) {
   EXPECT_EQ(-1.26f, test->normals.at(18));
   EXPECT_EQ(0.0f, test->normals.at(19));
   EXPECT_EQ(0.0f, test->normals.at(20));
+
+  delete test;
 }
