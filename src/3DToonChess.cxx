@@ -33,7 +33,7 @@ int main(){
   glEnable(GL_DEPTH_TEST);
   // Enable backface culling
   glEnable(GL_CULL_FACE);
-  glClearColor(0.69, 0.73, 1, 1);
+  glClearColor(1, 1, 1, 1);
 
   // Create projection matrix
   glMatrixMode(GL_PROJECTION);
