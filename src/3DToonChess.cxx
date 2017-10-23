@@ -1,7 +1,11 @@
+#define GL_GLEXT_PROTOTYPES
+
 #include <GL/glu.h>
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
+
+#include <iostream>
 
 #include "mesh/Mesh.hxx"
 #include "shader/Shader.hxx"
@@ -40,8 +44,55 @@ int main(){
   );
   bool compilationIsSuccess = toonVertexShader->compile();
   if(!compilationIsSuccess){
+    delete toonVertexShader;
     return 1;
   }
+
+  Shader* toonFragmentShader = new Shader(
+    "../shaders/toonFragmentShader.glsl",
+    GL_FRAGMENT_SHADER
+  );
+  compilationIsSuccess = toonFragmentShader->compile();
+  if(!compilationIsSuccess){
+    delete toonVertexShader;
+    delete toonFragmentShader;
+    return 1;
+  }
+
+  // Create and link Shader program
+  GLuint toonShaderProgram = glCreateProgram();
+  glAttachShader(toonShaderProgram, toonVertexShader->id);
+  glAttachShader(toonShaderProgram, toonFragmentShader->id);
+
+  glLinkProgram(toonShaderProgram);
+
+  //Note the different functions here: glGetProgram* instead of glGetShader*.
+  GLint isLinked = 0;
+  glGetProgramiv(toonShaderProgram, GL_LINK_STATUS, (int *)&isLinked);
+  if(isLinked == GL_FALSE){
+    GLint maxLength = 0;
+    glGetProgramiv(toonShaderProgram, GL_INFO_LOG_LENGTH, &maxLength);
+
+    // Display linking error
+    std::vector<GLchar> infoLog(maxLength);
+    glGetProgramInfoLog(toonShaderProgram, maxLength, &maxLength, &infoLog[0]);
+
+    std::cout << "Unable to link program: " << std::endl
+      << &infoLog[0] << std::endl;
+
+    glDeleteProgram(toonShaderProgram);
+
+    // Don't leak shaders either.
+    delete toonVertexShader;
+    delete toonFragmentShader;
+
+    return 1;
+  }
+
+  glDetachShader(toonShaderProgram, toonVertexShader->id);
+  glDetachShader(toonShaderProgram, toonFragmentShader->id);
+
+  glUseProgram(toonShaderProgram);
 
   // Create and load king mesh
   Mesh* king = new Mesh("../assets/king.obj");
@@ -72,7 +123,7 @@ int main(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    gluLookAt(10, -10, 10, 0, 0, 0, 0, 0, 1);
+    gluLookAt(10, -10, 10, 0, 0, 0, 0, 1, 0);
 
     king->draw();
 

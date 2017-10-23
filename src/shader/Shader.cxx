@@ -40,8 +40,6 @@ bool Shader::compile(){
     std::cout << "Unable to compile Shader: " << this->filePath << std::endl
       << &errorLog[0] << std::endl;
 
-    glDeleteShader(this->id);
-
     return false;
   }
 
