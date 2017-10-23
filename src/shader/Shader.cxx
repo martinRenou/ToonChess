@@ -47,5 +47,7 @@ bool Shader::compile(){
 }
 
 Shader::~Shader(){
+  std::cout << "Delete Shader: " << this->filePath << std::endl;
+
   glDeleteShader(this->id);
 }

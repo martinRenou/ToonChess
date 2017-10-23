@@ -5,9 +5,8 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-#include <iostream>
-
 #include "mesh/Mesh.hxx"
+#include "shader/ShaderProgram.hxx"
 #include "shader/Shader.hxx"
 
 
@@ -45,57 +44,24 @@ int main(){
     "../shaders/toonVertexShader.glsl",
     GL_VERTEX_SHADER
   );
-  bool compilationIsSuccess = toonVertexShader->compile();
-  if(!compilationIsSuccess){
-    delete toonVertexShader;
-    return 1;
-  }
 
   Shader* toonFragmentShader = new Shader(
     "../shaders/toonFragmentShader.glsl",
     GL_FRAGMENT_SHADER
   );
-  compilationIsSuccess = toonFragmentShader->compile();
+
+  std::vector<Shader*> shaders = {toonVertexShader, toonFragmentShader};
+  ShaderProgram* toonShaderProgram = new ShaderProgram(shaders);
+
+  // Try to compile shaders
+  bool compilationIsSuccess = toonShaderProgram->compile();
   if(!compilationIsSuccess){
-    delete toonVertexShader;
-    delete toonFragmentShader;
-    return 1;
-  }
-
-  // Create and link Shader program
-  GLuint toonShaderProgram = glCreateProgram();
-  glAttachShader(toonShaderProgram, toonVertexShader->id);
-  glAttachShader(toonShaderProgram, toonFragmentShader->id);
-
-  glLinkProgram(toonShaderProgram);
-
-  //Note the different functions here: glGetProgram* instead of glGetShader*.
-  GLint isLinked = 0;
-  glGetProgramiv(toonShaderProgram, GL_LINK_STATUS, (int *)&isLinked);
-  if(isLinked == GL_FALSE){
-    GLint maxLength = 0;
-    glGetProgramiv(toonShaderProgram, GL_INFO_LOG_LENGTH, &maxLength);
-
-    // Display linking error
-    std::vector<GLchar> infoLog(maxLength);
-    glGetProgramInfoLog(toonShaderProgram, maxLength, &maxLength, &infoLog[0]);
-
-    std::cout << "Unable to link program: " << std::endl
-      << &infoLog[0] << std::endl;
-
-    glDeleteProgram(toonShaderProgram);
-
-    // Don't leak shaders either.
-    delete toonVertexShader;
-    delete toonFragmentShader;
+    delete toonShaderProgram;
 
     return 1;
   }
 
-  glDetachShader(toonShaderProgram, toonVertexShader->id);
-  glDetachShader(toonShaderProgram, toonFragmentShader->id);
-
-  glUseProgram(toonShaderProgram);
+  glUseProgram(toonShaderProgram->id);
 
   // Create and load king mesh
   Mesh* king = new Mesh("../assets/king.obj");
@@ -136,7 +102,7 @@ int main(){
   }
 
   delete king;
-  delete toonVertexShader;
+  delete toonShaderProgram;
 
   return 0;
 }

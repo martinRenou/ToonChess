@@ -17,6 +17,7 @@ set (
   CXX_FILES
   ${CMAKE_SOURCE_DIR}/src/mesh/Mesh.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/Shader.cxx
+  ${CMAKE_SOURCE_DIR}/src/shader/ShaderProgram.cxx
   ${CMAKE_SOURCE_DIR}/src/utils.cxx
 )
 
