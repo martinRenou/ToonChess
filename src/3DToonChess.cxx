@@ -29,7 +29,10 @@ int main(){
       settings
   );
   window.setVerticalSyncEnabled(true);
+  // Enable depth test
   glEnable(GL_DEPTH_TEST);
+  // Enable backface culling
+  glEnable(GL_CULL_FACE);
   glClearColor(0.69, 0.73, 1, 1);
 
   // Create projection matrix
