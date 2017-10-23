@@ -16,6 +16,7 @@ set (3DToonChess_VERSION_MINOR 1)
 set (
   CXX_FILES
   ${CMAKE_SOURCE_DIR}/src/mesh/Mesh.cxx
+  ${CMAKE_SOURCE_DIR}/src/shader/Shader.cxx
   ${CMAKE_SOURCE_DIR}/src/utils.cxx
 )
 

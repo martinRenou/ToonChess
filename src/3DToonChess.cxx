@@ -4,6 +4,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "mesh/Mesh.hxx"
+#include "shader/Shader.hxx"
 
 
 int main(){
@@ -31,6 +32,16 @@ int main(){
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   gluPerspective(70, (double)width/height, 1, 1000);
+
+  // Load shaders
+  Shader* toonVertexShader = new Shader(
+    "../shaders/toonVertexShader.glsl",
+    GL_VERTEX_SHADER
+  );
+  bool compilationIsSuccess = toonVertexShader->compile();
+  if(!compilationIsSuccess){
+    return 1;
+  }
 
   // Create and load king mesh
   Mesh* king = new Mesh("../assets/king.obj");
@@ -69,6 +80,8 @@ int main(){
 
     window.display();
   }
+
+  delete toonVertexShader;
 
   return 0;
 }
