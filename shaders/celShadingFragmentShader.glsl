@@ -1,6 +1,6 @@
 varying vec3 normal;
 
-vec3 lightDir = normalize(vec3(1.0, -1.0, 1.0));
+vec3 lightDir = normalize(vec3(1.0, -1.0, -1.0));
 
 vec4 applyCelShading(vec4 color){
   float intensity = dot(lightDir, normalize(normal));

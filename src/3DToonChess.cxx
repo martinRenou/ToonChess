@@ -40,28 +40,29 @@ int main(){
   gluPerspective(70, (double)width/height, 1, 1000);
 
   // Load shaders
-  Shader* toonVertexShader = new Shader(
-    "../shaders/toonVertexShader.glsl",
+  Shader* celShadingVertexShader = new Shader(
+    "../shaders/celShadingVertexShader.glsl",
     GL_VERTEX_SHADER
   );
 
-  Shader* toonFragmentShader = new Shader(
-    "../shaders/toonFragmentShader.glsl",
+  Shader* celShadingFragmentShader = new Shader(
+    "../shaders/celShadingFragmentShader.glsl",
     GL_FRAGMENT_SHADER
   );
 
-  std::vector<Shader*> shaders = {toonVertexShader, toonFragmentShader};
-  ShaderProgram* toonShaderProgram = new ShaderProgram(shaders);
+  std::vector<Shader*> celShadingShaders = {
+    celShadingVertexShader, celShadingFragmentShader};
+  ShaderProgram* celShadingShaderProgram = new ShaderProgram(celShadingShaders);
 
   // Try to compile shaders
-  bool compilationIsSuccess = toonShaderProgram->compile();
+  bool compilationIsSuccess = celShadingShaderProgram->compile();
   if(!compilationIsSuccess){
-    delete toonShaderProgram;
+    delete celShadingShaderProgram;
 
     return 1;
   }
 
-  glUseProgram(toonShaderProgram->id);
+  glUseProgram(celShadingShaderProgram->id);
 
   // Create and load king mesh
   Mesh* king = new Mesh("../assets/king.obj");
@@ -102,7 +103,7 @@ int main(){
   }
 
   delete king;
-  delete toonShaderProgram;
+  delete celShadingShaderProgram;
 
   return 0;
 }
