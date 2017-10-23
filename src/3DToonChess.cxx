@@ -39,7 +39,7 @@ int main(){
   glLoadIdentity();
   gluPerspective(70, (double)width/height, 1, 1000);
 
-  // Load shaders
+  // Load cel-shading shaders
   Shader* celShadingVertexShader = new Shader(
     "../shaders/celShadingVertexShader.glsl",
     GL_VERTEX_SHADER
@@ -62,7 +62,29 @@ int main(){
     return 1;
   }
 
-  glUseProgram(celShadingShaderProgram->id);
+  // Load black border shaders
+  Shader* blackBorderVertexShader = new Shader(
+    "../shaders/blackBorderVertexShader.glsl",
+    GL_VERTEX_SHADER
+  );
+
+  Shader* blackBorderFragmentShader = new Shader(
+    "../shaders/blackBorderFragmentShader.glsl",
+    GL_FRAGMENT_SHADER
+  );
+
+  std::vector<Shader*> blackBorderShaders = {
+    blackBorderVertexShader, blackBorderFragmentShader};
+  ShaderProgram* blackBorderShaderProgram = new ShaderProgram(
+    blackBorderShaders);
+
+  // Try to compile shaders
+  compilationIsSuccess = blackBorderShaderProgram->compile();
+  if(!compilationIsSuccess){
+    delete blackBorderShaderProgram;
+
+    return 1;
+  }
 
   // Create and load king mesh
   Mesh* king = new Mesh("../assets/king.obj");
@@ -95,6 +117,14 @@ int main(){
 
     gluLookAt(10, -10, 10, 0, 0, 0, 1, 0, 0);
 
+    // Display black borders
+    glUseProgram(blackBorderShaderProgram->id);
+    glCullFace(GL_FRONT);
+    king->draw();
+
+    // Display cel-shading mesh
+    glUseProgram(celShadingShaderProgram->id);
+    glCullFace(GL_BACK);
     king->draw();
 
     glFlush();
@@ -104,6 +134,7 @@ int main(){
 
   delete king;
   delete celShadingShaderProgram;
+  delete blackBorderShaderProgram;
 
   return 0;
 }
