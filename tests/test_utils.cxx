@@ -42,15 +42,32 @@ TEST(extract_float_vec, can_extract) {
   EXPECT_EQ(6.2f, out[2]);
 }
 
-TEST(extract_face, can_extract) {
+TEST(extract_vertices, can_extract) {
   std::vector<std::string> in = {"f", "4/2/1", "1/12/21", "6/12/3"};
-  std::vector<GLuint> out;
+  std::vector<GLfloat> out;
 
-  extractFace(&in, &out);
+  std::vector<GLfloat> unsortedVertices = {
+    1.2f, 5.3f, 6.2f,
+    0.2f, 0.3f, 0.2f,
+    56.2f, 56.3f, 56.2f,
+    -1.2f, 1.3f, 4.2f,
+    221.2f, 222.3f, 223.2f,
+    4.2f, 6.3f, 3.2f
+  };
 
-  EXPECT_EQ(3, out[0]);
-  EXPECT_EQ(0, out[1]);
-  EXPECT_EQ(5, out[2]);
+  extractVertices(&in, &unsortedVertices, &out);
+
+  EXPECT_EQ(-1.2f, out[0]);
+  EXPECT_EQ(1.3f, out[1]);
+  EXPECT_EQ(4.2f, out[2]);
+
+  EXPECT_EQ(1.2f, out[3]);
+  EXPECT_EQ(5.3f, out[4]);
+  EXPECT_EQ(6.2f, out[5]);
+
+  EXPECT_EQ(4.2f, out[6]);
+  EXPECT_EQ(6.3f, out[7]);
+  EXPECT_EQ(3.2f, out[8]);
 }
 
 TEST(extract_normal, can_extract) {
@@ -64,7 +81,7 @@ TEST(extract_normal, can_extract) {
     -1.2f, 1.3f, 4.2f,
   };
 
-  extractNormal(&in, &unsortedNormals, &out);
+  extractNormals(&in, &unsortedNormals, &out);
 
   EXPECT_EQ(1.2f, out[0]);
   EXPECT_EQ(5.3f, out[1]);

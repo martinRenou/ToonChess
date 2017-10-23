@@ -16,9 +16,12 @@ std::vector<std::string> split(const std::string &s, char delim);
 void extractFloatVec3(
   std::vector<std::string> *line, std::vector<GLfloat> *vector);
 
-void extractFace(std::vector<std::string> *line, std::vector<GLuint> *indices);
+void extractVertices(
+    std::vector<std::string> *line,
+    std::vector<GLfloat> *unsortedVertices,
+    std::vector<GLfloat> *vertices);
 
-void extractNormal(
+void extractNormals(
     std::vector<std::string> *line,
     std::vector<GLfloat> *unsortedNormals,
     std::vector<GLfloat> *normals);

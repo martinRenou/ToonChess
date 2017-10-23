@@ -42,15 +42,20 @@ void extractFloatVec3(
   }
 }
 
-void extractFace(std::vector<std::string> *line, std::vector<GLuint> *indices){
+void extractVertices(
+    std::vector<std::string> *line,
+    std::vector<GLfloat> *unsortedVertices,
+    std::vector<GLfloat> *vertices){
   for(int i = 1; i <= 3; i++){
-    indices->push_back(
-      std::stoi(split(line->at(i), '/').at(0)) - 1
-    );
+    int vertexIndex = std::stoi(split(line->at(i), '/').at(0)) - 1;
+
+    for(int j = 0; j <= 2; j++){
+      vertices->push_back(unsortedVertices->at(3 * vertexIndex + j));
+    }
   }
 }
 
-void extractNormal(
+void extractNormals(
     std::vector<std::string> *line,
     std::vector<GLfloat> *unsortedNormals,
     std::vector<GLfloat> *normals){

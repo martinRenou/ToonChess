@@ -22,6 +22,7 @@ void Mesh::initBuffers(){
   this->normals.clear();
   this->indices.clear();
 
+  std::vector<GLfloat> unsortedVertices;
   std::vector<GLfloat> unsortedNormals;
 
   while(std::getline(fobj, line)){
@@ -30,7 +31,7 @@ void Mesh::initBuffers(){
     std::vector<std::string> splittedLine = split(line, ' ');
 
     if(splittedLine.at(0).compare("v") == 0){
-      extractFloatVec3(&splittedLine, &this->vertices);
+      extractFloatVec3(&splittedLine, &unsortedVertices);
       continue;
     }
 
@@ -40,8 +41,12 @@ void Mesh::initBuffers(){
     }
 
     if(splittedLine.at(0).compare("f") == 0){
-      extractFace(&splittedLine, &this->indices);
-      extractNormal(&splittedLine, &unsortedNormals, &this->normals);
+      extractVertices(&splittedLine, &unsortedVertices, &this->vertices);
+      extractNormals(&splittedLine, &unsortedNormals, &this->normals);
+
+      for(int i = 0; i <= 2; i++){
+        this->indices.push_back(this->indices.size());
+      }
       continue;
     }
   }
