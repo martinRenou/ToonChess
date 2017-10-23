@@ -18,6 +18,3 @@ And run it!
 
 How to run tests:
 # ./tests
-
-Known issues:
-- I should distribute the assets correctly with the "make install" command
