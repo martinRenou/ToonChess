@@ -82,6 +82,7 @@ void Mesh::initBuffers(){
 
 void Mesh::draw(){
   glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_NORMAL_ARRAY);
 
   // Send vertices
   glBindBuffer(GL_ARRAY_BUFFER, this->vertexBufferId);
@@ -114,6 +115,7 @@ void Mesh::draw(){
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_NORMAL_ARRAY);
 }
 
 Mesh::~Mesh(){
