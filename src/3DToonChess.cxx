@@ -126,7 +126,7 @@ int main(){
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    gluLookAt(10, -10, 10, 0, 0, 0, 0, 1, 0);
+    gluLookAt(10, -10, 10, 0, 0, 0, 1, 0, 0);
 
     king->draw();
 
