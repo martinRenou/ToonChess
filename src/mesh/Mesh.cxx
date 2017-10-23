@@ -116,7 +116,7 @@ void Mesh::draw(){
   glDisableClientState(GL_VERTEX_ARRAY);
 }
 
-void Mesh::clearBuffers(){
+Mesh::~Mesh(){
   glDeleteBuffers(1, &this->vertexBufferId);
   glDeleteBuffers(1, &this->normalBufferId);
   glDeleteBuffers(1, &this->indexBufferId);

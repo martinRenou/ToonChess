@@ -81,6 +81,7 @@ int main(){
     window.display();
   }
 
+  delete king;
   delete toonVertexShader;
 
   return 0;
