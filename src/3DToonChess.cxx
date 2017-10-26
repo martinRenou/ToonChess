@@ -105,6 +105,7 @@ int main(){
   // Try to compile shaders
   compilationIsSuccess = blackBorderShaderProgram->compile();
   if(!compilationIsSuccess){
+    delete celShadingShaderProgram;
     delete blackBorderShaderProgram;
 
     return 1;
@@ -198,6 +199,11 @@ int main(){
   }
 
   delete king;
+  delete queen;
+  delete jester;
+  delete knight;
+  delete tower;
+  delete pawn;
   delete celShadingShaderProgram;
   delete blackBorderShaderProgram;
 
