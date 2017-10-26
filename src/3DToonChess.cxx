@@ -118,11 +118,11 @@ int main(){
   Mesh* queen = new Mesh("../assets/queen.obj");
   queen->initBuffers();
 
-  Mesh* jester = new Mesh("../assets/jester.obj");
-  jester->initBuffers();
+  Mesh* bishop = new Mesh("../assets/bishop.obj");
+  bishop->initBuffers();
 
-  Mesh* tower = new Mesh("../assets/tower.obj");
-  tower->initBuffers();
+  Mesh* rook = new Mesh("../assets/rook.obj");
+  rook->initBuffers();
 
   Mesh* knight = new Mesh("../assets/knight.obj");
   knight->initBuffers();
@@ -169,7 +169,7 @@ int main(){
     );
 
     displayToonMesh(
-      jester, blackBorderShaderProgram->id, celShadingShaderProgram->id,
+      bishop, blackBorderShaderProgram->id, celShadingShaderProgram->id,
       -2.0, 0.0, 0.0,
       angle, 0, 0, 1
     );
@@ -181,7 +181,7 @@ int main(){
     );
 
     displayToonMesh(
-      tower, blackBorderShaderProgram->id, celShadingShaderProgram->id,
+      rook, blackBorderShaderProgram->id, celShadingShaderProgram->id,
       6.0, 0.0, 0.0,
       angle, 0, 0, 1
     );
@@ -199,9 +199,9 @@ int main(){
 
   delete king;
   delete queen;
-  delete jester;
+  delete bishop;
   delete knight;
-  delete tower;
+  delete rook;
   delete pawn;
   delete celShadingShaderProgram;
   delete blackBorderShaderProgram;
