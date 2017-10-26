@@ -9,6 +9,30 @@
 #include "shader/ShaderProgram.hxx"
 #include "shader/Shader.hxx"
 
+void displayToonMesh(
+    Mesh* mesh, GLuint blackBorderProgramID, GLuint celShadingProgramID,
+    GLfloat tx, GLfloat ty, GLfloat tz,
+    GLfloat angle, GLfloat rx, GLfloat ry, GLfloat rz){
+  glPushMatrix();
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glTranslatef(tx, ty, tz);
+  glRotatef(angle, rx, ry, rz);
+
+  // Display black borders
+  glUseProgram(blackBorderProgramID);
+  glCullFace(GL_FRONT);
+  mesh->draw();
+
+  // Display cel-shading mesh
+  glUseProgram(celShadingProgramID);
+  glCullFace(GL_BACK);
+  mesh->draw();
+
+  glPopMatrix();
+}
+
 
 int main(){
   // Create window
@@ -86,11 +110,27 @@ int main(){
     return 1;
   }
 
-  // Create and load king mesh
+  // Create and load meshes
   Mesh* king = new Mesh("../assets/king.obj");
   king->initBuffers();
 
+  Mesh* queen = new Mesh("../assets/queen.obj");
+  queen->initBuffers();
+
+  Mesh* jester = new Mesh("../assets/jester.obj");
+  jester->initBuffers();
+
+  Mesh* tower = new Mesh("../assets/tower.obj");
+  tower->initBuffers();
+
+  Mesh* knight = new Mesh("../assets/knight.obj");
+  knight->initBuffers();
+
+  Mesh* pawn = new Mesh("../assets/pawn.obj");
+  pawn->initBuffers();
+
   // Render loop
+  float angle = 0.0;
   bool running = true;
   while(running){
     sf::Event event;
@@ -112,20 +152,45 @@ int main(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     //
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+    gluLookAt(0, 15, 8, 0, 0, 0, 0, 0, 1);
 
-    gluLookAt(10, 10, 10, 0, 0, 0, 1, 0, 0);
+    angle += 0.5;
 
-    // Display black borders
-    glUseProgram(blackBorderShaderProgram->id);
-    glCullFace(GL_FRONT);
-    king->draw();
+    displayToonMesh(
+      king, blackBorderShaderProgram->id, celShadingShaderProgram->id,
+      -10.0, 0.0, 0.0,
+      angle, 0, 0, 1
+    );
 
-    // Display cel-shading mesh
-    glUseProgram(celShadingShaderProgram->id);
-    glCullFace(GL_BACK);
-    king->draw();
+    displayToonMesh(
+      queen, blackBorderShaderProgram->id, celShadingShaderProgram->id,
+      -6.0, 0.0, 0.0,
+      angle, 0, 0, 1
+    );
+
+    displayToonMesh(
+      jester, blackBorderShaderProgram->id, celShadingShaderProgram->id,
+      -2.0, 0.0, 0.0,
+      angle, 0, 0, 1
+    );
+
+    displayToonMesh(
+      knight, blackBorderShaderProgram->id, celShadingShaderProgram->id,
+      2.0, 0.0, 0.0,
+      angle, 0, 0, 1
+    );
+
+    displayToonMesh(
+      tower, blackBorderShaderProgram->id, celShadingShaderProgram->id,
+      6.0, 0.0, 0.0,
+      angle, 0, 0, 1
+    );
+
+    displayToonMesh(
+      pawn, blackBorderShaderProgram->id, celShadingShaderProgram->id,
+      10.0, 0.0, 0.0,
+      angle, 0, 0, 1
+    );
 
     glFlush();
 
