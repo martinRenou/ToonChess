@@ -1,3 +1,5 @@
+<p align="center"><img width="700" src="./3DToonChess.png"></p>
+
 - How to install
 
 Install sfml if you don't have it
