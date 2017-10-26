@@ -152,7 +152,6 @@ int main(){
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    //
     gluLookAt(0, 15, 8, 0, 0, 0, 0, 0, 1);
 
     angle += 0.5;
