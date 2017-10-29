@@ -26,8 +26,4 @@ void extractNormals(
     std::vector<GLfloat> *unsortedNormals,
     std::vector<GLfloat> *normals);
 
-std::vector<int> uciFormatToPosition(std::string position);
-
-std::string positionToUciFormat(int positionX, int positionY);
-
 #endif

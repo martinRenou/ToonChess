@@ -6,32 +6,32 @@
 #include <SFML/Graphics.hpp>
 
 #include "mesh/Mesh.hxx"
+
 #include "shader/ShaderProgram.hxx"
 #include "shader/Shader.hxx"
 
-void displayToonMesh(
-    Mesh* mesh, GLuint blackBorderProgramID, GLuint celShadingProgramID,
-    GLfloat tx, GLfloat ty, GLfloat tz,
-    GLfloat angle, GLfloat rx, GLfloat ry, GLfloat rz){
-  glPushMatrix();
+#include "chessBoard/chessBoard.hxx"
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glTranslatef(tx, ty, tz);
-  glRotatef(angle, rx, ry, rz);
+int board[8][8] = {
+  ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK,
+  KNIGHT, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT,
+  BISHOP, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*BISHOP,
+  KING, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KING,
+  QUEEN, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*QUEEN,
+  BISHOP, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*BISHOP,
+  KNIGHT, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT,
+  ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK,
+};
 
-  // Display black borders
-  glUseProgram(blackBorderProgramID);
-  glCullFace(GL_FRONT);
-  mesh->draw();
-
-  // Display cel-shading mesh
-  glUseProgram(celShadingProgramID);
-  glCullFace(GL_BACK);
-  mesh->draw();
-
-  glPopMatrix();
-}
+void displayPiece(int piece, int positionX, int positionY);
+ShaderProgram* blackBorderShaderProgram;
+ShaderProgram* celShadingShaderProgram;
+Mesh* king;
+Mesh* queen;
+Mesh* bishop;
+Mesh* knight;
+Mesh* rook;
+Mesh* pawn;
 
 
 int main(){
@@ -76,7 +76,7 @@ int main(){
 
   std::vector<Shader*> celShadingShaders = {
     celShadingVertexShader, celShadingFragmentShader};
-  ShaderProgram* celShadingShaderProgram = new ShaderProgram(celShadingShaders);
+  celShadingShaderProgram = new ShaderProgram(celShadingShaders);
 
   // Try to compile shaders
   bool compilationIsSuccess = celShadingShaderProgram->compile();
@@ -99,7 +99,7 @@ int main(){
 
   std::vector<Shader*> blackBorderShaders = {
     blackBorderVertexShader, blackBorderFragmentShader};
-  ShaderProgram* blackBorderShaderProgram = new ShaderProgram(
+  blackBorderShaderProgram = new ShaderProgram(
     blackBorderShaders);
 
   // Try to compile shaders
@@ -112,26 +112,25 @@ int main(){
   }
 
   // Create and load meshes
-  Mesh* king = new Mesh("../assets/king.obj");
+  king = new Mesh("../assets/king.obj");
   king->initBuffers();
 
-  Mesh* queen = new Mesh("../assets/queen.obj");
+  queen = new Mesh("../assets/queen.obj");
   queen->initBuffers();
 
-  Mesh* bishop = new Mesh("../assets/bishop.obj");
+  bishop = new Mesh("../assets/bishop.obj");
   bishop->initBuffers();
 
-  Mesh* rook = new Mesh("../assets/rook.obj");
+  rook = new Mesh("../assets/rook.obj");
   rook->initBuffers();
 
-  Mesh* knight = new Mesh("../assets/knight.obj");
+  knight = new Mesh("../assets/knight.obj");
   knight->initBuffers();
 
-  Mesh* pawn = new Mesh("../assets/pawn.obj");
+  pawn = new Mesh("../assets/pawn.obj");
   pawn->initBuffers();
 
   // Render loop
-  float angle = 0.0;
   bool running = true;
   while(running){
     sf::Event event;
@@ -146,51 +145,22 @@ int main(){
         glViewport(0, 0, width, height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(70, (double)width/height, 1, 1000);
+        gluPerspective(50, (double)width/height, 1, 1000);
       }
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    gluLookAt(0, 15, 8, 0, 0, 0, 0, 0, 1);
+    gluLookAt(0, -40, 20, 0, 0, 0, 0, 0, 1);
 
-    angle += 0.5;
+    // Display all pieces
+    for(int x = 0; x < 8; x++){
+      for(int y = 0; y < 8; y++){
+        if(board[x][y] == EMPTY) continue;
 
-    displayToonMesh(
-      king, blackBorderShaderProgram->id, celShadingShaderProgram->id,
-      -10.0, 0.0, 0.0,
-      angle, 0, 0, 1
-    );
-
-    displayToonMesh(
-      queen, blackBorderShaderProgram->id, celShadingShaderProgram->id,
-      -6.0, 0.0, 0.0,
-      angle, 0, 0, 1
-    );
-
-    displayToonMesh(
-      bishop, blackBorderShaderProgram->id, celShadingShaderProgram->id,
-      -2.0, 0.0, 0.0,
-      angle, 0, 0, 1
-    );
-
-    displayToonMesh(
-      knight, blackBorderShaderProgram->id, celShadingShaderProgram->id,
-      2.0, 0.0, 0.0,
-      angle, 0, 0, 1
-    );
-
-    displayToonMesh(
-      rook, blackBorderShaderProgram->id, celShadingShaderProgram->id,
-      6.0, 0.0, 0.0,
-      angle, 0, 0, 1
-    );
-
-    displayToonMesh(
-      pawn, blackBorderShaderProgram->id, celShadingShaderProgram->id,
-      10.0, 0.0, 0.0,
-      angle, 0, 0, 1
-    );
+        displayPiece(board[x][y], x, y);
+      }
+    }
 
     glFlush();
 
@@ -208,3 +178,46 @@ int main(){
 
   return 0;
 }
+
+void displayPiece(int piece, int positionX, int positionY){
+  Mesh* mesh;
+  switch (abs(piece)) {
+    case KING:
+      mesh = king;
+      break;
+    case QUEEN:
+      mesh = queen;
+      break;
+    case BISHOP:
+      mesh = bishop;
+      break;
+    case KNIGHT:
+      mesh = knight;
+      break;
+    case ROOK:
+      mesh = rook;
+      break;
+    case PAWN:
+      mesh = pawn;
+      break;
+  }
+
+  glPushMatrix();
+
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+  glTranslatef(4 * positionX - 16, 4 * positionY - 16, 0);
+  // glRotatef(0, 0, 0, 0);
+
+  // Display black borders
+  glUseProgram(blackBorderShaderProgram->id);
+  glCullFace(GL_FRONT);
+  mesh->draw();
+
+  // Display cel-shading mesh
+  glUseProgram(celShadingShaderProgram->id);
+  glCullFace(GL_BACK);
+  mesh->draw();
+
+  glPopMatrix();
+};
