@@ -9,6 +9,42 @@
 #include "Mesh.hxx"
 #include "../utils.hxx"
 
+
+void extractFloatVec3(
+    std::vector<std::string> *line, std::vector<GLfloat> *vector){
+  for(int i = 1; i <= 3; i++){
+    vector->push_back(
+      std::stof(line->at(i))
+    );
+  }
+}
+
+void extractVertices(
+    std::vector<std::string> *line,
+    std::vector<GLfloat> *unsortedVertices,
+    std::vector<GLfloat> *vertices){
+  for(int i = 1; i <= 3; i++){
+    int vertexIndex = std::stoi(split(line->at(i), '/').at(0)) - 1;
+
+    for(int j = 0; j <= 2; j++){
+      vertices->push_back(unsortedVertices->at(3 * vertexIndex + j));
+    }
+  }
+}
+
+void extractNormals(
+    std::vector<std::string> *line,
+    std::vector<GLfloat> *unsortedNormals,
+    std::vector<GLfloat> *normals){
+  for(int i = 1; i <= 3; i++){
+    int normalIndex = std::stoi(split(line->at(i), '/').at(2)) - 1;
+
+    for(int j = 0; j <= 2; j++){
+      normals->push_back(unsortedNormals->at(3 * normalIndex + j));
+    }
+  }
+}
+
 Mesh::Mesh(std::string filePath){
   this->filePath = filePath;
 }

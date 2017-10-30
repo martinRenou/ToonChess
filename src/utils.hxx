@@ -6,24 +6,20 @@
 #include <vector>
 #include <string>
 
+/* Function used to load files like shader source code
+  \param path The path to the file that you want to load
+  \return the string containing the content of the file
+*/
 std::string loadFile(std::string path);
 
 template<typename Out>
 void split(const std::string &s, char delim, Out result);
 
+/* Function used to split string into a list of strings using a delimiter
+  \param s The string that you want to split
+  \param delim The delimiter used to split the string
+  \return a vector of substrings
+*/
 std::vector<std::string> split(const std::string &s, char delim);
-
-void extractFloatVec3(
-  std::vector<std::string> *line, std::vector<GLfloat> *vector);
-
-void extractVertices(
-    std::vector<std::string> *line,
-    std::vector<GLfloat> *unsortedVertices,
-    std::vector<GLfloat> *vertices);
-
-void extractNormals(
-    std::vector<std::string> *line,
-    std::vector<GLfloat> *unsortedNormals,
-    std::vector<GLfloat> *normals);
 
 #endif
