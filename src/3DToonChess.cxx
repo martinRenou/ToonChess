@@ -26,6 +26,7 @@ int board[8][8] = {
 void displayPiece(int piece, int positionX, int positionY);
 ShaderProgram* blackBorderShaderProgram;
 ShaderProgram* celShadingShaderProgram;
+GLuint pieceColor;
 Mesh* king;
 Mesh* queen;
 Mesh* bishop;
@@ -61,7 +62,7 @@ int main(){
   // Create projection matrix
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(70, (double)width/height, 1, 1000);
+  gluPerspective(50, (double)width/height, 1, 1000);
 
   // Load cel-shading shaders
   Shader* celShadingVertexShader = new Shader(
@@ -85,6 +86,9 @@ int main(){
 
     return 1;
   }
+
+  pieceColor = glGetUniformLocation(
+    celShadingShaderProgram->id, "pieceColor");
 
   // Load black border shaders
   Shader* blackBorderVertexShader = new Shader(
@@ -207,7 +211,9 @@ void displayPiece(int piece, int positionX, int positionY){
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
   glTranslatef(4 * positionX - 16, 4 * positionY - 16, 0);
-  // glRotatef(0, 0, 0, 0);
+  piece > 0 ?
+    glRotatef(-90, 0, 0, 1) :
+    glRotatef(90, 0, 0, 1);
 
   // Display black borders
   glUseProgram(blackBorderShaderProgram->id);
@@ -216,6 +222,13 @@ void displayPiece(int piece, int positionX, int positionY){
 
   // Display cel-shading mesh
   glUseProgram(celShadingShaderProgram->id);
+  piece > 0 ?
+    glUniform4f(
+      pieceColor,
+      1.0, 0.93, 0.70, 1.0) :
+    glUniform4f(
+      pieceColor,
+      0.51, 0.08, 0.08, 1.0);
   glCullFace(GL_BACK);
   mesh->draw();
 
