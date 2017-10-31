@@ -5,24 +5,25 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "mesh/Mesh.hxx"
+#include "mesh/meshes.hxx"
 
 #include "shader/ShaderProgram.hxx"
 #include "shader/Shader.hxx"
 
 #include "chessBoard/chessBoard.hxx"
 
-void displayPiece(int piece, int positionX, int positionY);
+/* Display a mesh in the 3D scene
+  \param piece The piece to display, must be one of those values: KING, QUEEN,
+    BISHOP, KNIGHT, ROOK, PAWN
+  \param positionX The position of the piece on the board on the X axis
+  \param positionY The position of the piece on the board on the Y axis
+  \param meshes The map of meshes
+*/
+void displayPiece(int piece, int positionX, int positionY,
+  std::map<int, Mesh*>* meshes);
 ShaderProgram* blackBorderShaderProgram;
 ShaderProgram* celShadingShaderProgram;
 GLuint pieceColor;
-Mesh* king;
-Mesh* queen;
-Mesh* bishop;
-Mesh* knight;
-Mesh* rook;
-Mesh* pawn;
-
 
 int main(){
   // Create window
@@ -104,25 +105,10 @@ int main(){
     return 1;
   }
 
-  // Create and load meshes
-  king = new Mesh("../assets/king.obj");
-  king->initBuffers();
+  // Load meshes
+  std::map<int, Mesh*> meshes = initMeshes();
 
-  queen = new Mesh("../assets/queen.obj");
-  queen->initBuffers();
-
-  bishop = new Mesh("../assets/bishop.obj");
-  bishop->initBuffers();
-
-  rook = new Mesh("../assets/rook.obj");
-  rook->initBuffers();
-
-  knight = new Mesh("../assets/knight.obj");
-  knight->initBuffers();
-
-  pawn = new Mesh("../assets/pawn.obj");
-  pawn->initBuffers();
-
+  // Define board
   int board[8][8] = {
     ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK,
     KNIGHT, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT,
@@ -160,9 +146,7 @@ int main(){
     // Display all pieces
     for(int x = 0; x < 8; x++){
       for(int y = 0; y < 8; y++){
-        if(board[x][y] == EMPTY) continue;
-
-        displayPiece(board[x][y], x, y);
+        displayPiece(board[x][y], x, y, &meshes);
       }
     }
 
@@ -171,40 +155,19 @@ int main(){
     window.display();
   }
 
-  delete king;
-  delete queen;
-  delete bishop;
-  delete knight;
-  delete rook;
-  delete pawn;
+  deleteMeshes(&meshes);
   delete celShadingShaderProgram;
   delete blackBorderShaderProgram;
 
   return 0;
 }
 
-void displayPiece(int piece, int positionX, int positionY){
-  Mesh* mesh;
-  switch (abs(piece)) {
-    case KING:
-      mesh = king;
-      break;
-    case QUEEN:
-      mesh = queen;
-      break;
-    case BISHOP:
-      mesh = bishop;
-      break;
-    case KNIGHT:
-      mesh = knight;
-      break;
-    case ROOK:
-      mesh = rook;
-      break;
-    case PAWN:
-      mesh = pawn;
-      break;
-  }
+void displayPiece(int piece, int positionX, int positionY,
+    std::map<int, Mesh*>* meshes){
+  if(piece == EMPTY) return;
+
+  // Get mesh object
+  Mesh* mesh = meshes->at(abs(piece));
 
   glPushMatrix();
 
