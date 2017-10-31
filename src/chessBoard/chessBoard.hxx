@@ -4,17 +4,6 @@
 #include <vector>
 #include <string>
 
-const int EMPTY = 0;
-const int KING = 1;
-const int QUEEN = 2;
-const int BISHOP = 3;
-const int KNIGHT = 4;
-const int ROOK = 5;
-const int PAWN = 6;
-
-const int USER = 1;
-const int AI = -1;
-
 /* Conversion function: converts a position in UCI format (e.g. "h3") into a
 list of integers
   \param position The position in the UCI format

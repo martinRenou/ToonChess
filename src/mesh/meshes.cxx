@@ -1,9 +1,8 @@
-#include "meshes.hxx"
+#include <map>
 
 #include "Mesh.hxx"
-#include "../chessBoard/chessBoard.hxx"
 
-#include <map>
+#include "meshes.hxx"
 
 std::map<int, Mesh*> initMeshes(){
   // Create and load meshes
