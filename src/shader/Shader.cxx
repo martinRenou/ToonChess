@@ -11,10 +11,8 @@
 
 #include "Shader.hxx"
 
-Shader::Shader(std::string filePath, GLenum type){
-  this->filePath = filePath;
-  this->type = type;
-}
+Shader::Shader(std::string filePath, GLenum type) :
+  filePath{filePath}, type{type}{}
 
 void Shader::compile(){
   // Create the shader

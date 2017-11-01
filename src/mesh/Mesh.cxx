@@ -45,9 +45,7 @@ void extractNormals(
   }
 }
 
-Mesh::Mesh(std::string filePath){
-  this->filePath = filePath;
-}
+Mesh::Mesh(std::string filePath) : filePath{filePath}{}
 
 void Mesh::initBuffers(){
   // Read obj file

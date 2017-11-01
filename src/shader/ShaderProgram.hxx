@@ -18,7 +18,7 @@ class ShaderProgram {
     /* Constructor
       \param shaders The list of shaders to use in this program
     */
-    ShaderProgram(std::vector<Shader*> shaders);
+    explicit ShaderProgram(std::vector<Shader*> shaders);
 
     /* Compile method, this will compile and link the shaders together
       \throw CompilationException if a shader compilation is not a success

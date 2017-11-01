@@ -64,7 +64,7 @@ class Mesh {
     /* Constructor
       \param filePath The path of the .obj file containing the mesh
     */
-    Mesh(std::string filePath);
+    explicit Mesh(std::string filePath);
 
     /* Initialization of the buffer objects */
     void initBuffers();
