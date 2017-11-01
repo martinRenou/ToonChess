@@ -27,9 +27,9 @@ class Shader {
     Shader(std::string filePath, GLenum type);
 
     /* Compilation method, this will load the GLSL code and compile it
-      \return True if the compilation went fine, false otherwise
+      \throw CompilationException if the compilation failed
     */
-    bool compile();
+    void compile();
 
     /* Destructor, this will remove the shader from memory */
     ~Shader();

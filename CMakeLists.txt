@@ -18,8 +18,11 @@ set (
   ${CMAKE_SOURCE_DIR}/src/mesh/Mesh.cxx
   ${CMAKE_SOURCE_DIR}/src/mesh/meshes.cxx
   ${CMAKE_SOURCE_DIR}/src/chessBoard/chessBoard.cxx
+  ${CMAKE_SOURCE_DIR}/src/shader/CompilationException.cxx
+  ${CMAKE_SOURCE_DIR}/src/shader/LinkingException.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/Shader.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/ShaderProgram.cxx
+  ${CMAKE_SOURCE_DIR}/src/shader/shaderPrograms.cxx
   ${CMAKE_SOURCE_DIR}/src/utils.cxx
 )
 

@@ -21,9 +21,10 @@ class ShaderProgram {
     ShaderProgram(std::vector<Shader*> shaders);
 
     /* Compile method, this will compile and link the shaders together
-      \return True if linking went fine, false otherwise
+      \throw CompilationException if a shader compilation is not a success
+      \throw LinkingException if the linking of shaders is not a success
     */
-    bool compile();
+    void compile();
 
     /* Destructor, this will remove the shaders from memory */
     ~ShaderProgram();

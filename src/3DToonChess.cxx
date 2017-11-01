@@ -5,24 +5,28 @@
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
 
-#include "mesh/meshes.hxx"
+#include <exception>
+#include <map>
+#include <iostream>
 
+#include "mesh/Mesh.hxx"
+#include "mesh/meshes.hxx"
 #include "shader/ShaderProgram.hxx"
-#include "shader/Shader.hxx"
+#include "shader/shaderPrograms.hxx"
 
 #include "chessBoard/chessBoard.hxx"
 
 /* Display a mesh in the 3D scene
   \param piece The piece to display, must be one of those values: KING, QUEEN,
-    BISHOP, KNIGHT, ROOK, PAWN
+    BISHOP, KNIGHT, ROOK, PAWN, EMPTY. If this is EMPTY, nothing will be
+    displayed
   \param positionX The position of the piece on the board on the X axis
   \param positionY The position of the piece on the board on the Y axis
   \param meshes The map of meshes
+  \param programs The map of shader programs
 */
 void displayPiece(int piece, int positionX, int positionY,
-  std::map<int, Mesh*>* meshes);
-ShaderProgram* blackBorderShaderProgram;
-ShaderProgram* celShadingShaderProgram;
+  std::map<int, Mesh*>* meshes, std::map<int, ShaderProgram*>* programs);
 GLuint pieceColor;
 
 int main(){
@@ -54,56 +58,16 @@ int main(){
   glLoadIdentity();
   gluPerspective(50, (double)width/height, 1, 1000);
 
-  // Load cel-shading shaders
-  Shader* celShadingVertexShader = new Shader(
-    "../shaders/celShadingVertexShader.glsl",
-    GL_VERTEX_SHADER
-  );
-
-  Shader* celShadingFragmentShader = new Shader(
-    "../shaders/celShadingFragmentShader.glsl",
-    GL_FRAGMENT_SHADER
-  );
-
-  std::vector<Shader*> celShadingShaders = {
-    celShadingVertexShader, celShadingFragmentShader};
-  celShadingShaderProgram = new ShaderProgram(celShadingShaders);
-
-  // Try to compile shaders
-  bool compilationIsSuccess = celShadingShaderProgram->compile();
-  if(!compilationIsSuccess){
-    delete celShadingShaderProgram;
-
+  // Load and compile shaders
+  std::map<int, ShaderProgram*> programs;
+  try{
+    programs = initPrograms();
+  } catch(const std::exception& e){
+    std::cerr << e.what() << "\n";
     return 1;
   }
-
   pieceColor = glGetUniformLocation(
-    celShadingShaderProgram->id, "pieceColor");
-
-  // Load black border shaders
-  Shader* blackBorderVertexShader = new Shader(
-    "../shaders/blackBorderVertexShader.glsl",
-    GL_VERTEX_SHADER
-  );
-
-  Shader* blackBorderFragmentShader = new Shader(
-    "../shaders/blackBorderFragmentShader.glsl",
-    GL_FRAGMENT_SHADER
-  );
-
-  std::vector<Shader*> blackBorderShaders = {
-    blackBorderVertexShader, blackBorderFragmentShader};
-  blackBorderShaderProgram = new ShaderProgram(
-    blackBorderShaders);
-
-  // Try to compile shaders
-  compilationIsSuccess = blackBorderShaderProgram->compile();
-  if(!compilationIsSuccess){
-    delete celShadingShaderProgram;
-    delete blackBorderShaderProgram;
-
-    return 1;
-  }
+    programs.at(CEL_SHADING)->id, "pieceColor");
 
   // Load meshes
   std::map<int, Mesh*> meshes = initMeshes();
@@ -146,7 +110,7 @@ int main(){
     // Display all pieces
     for(int x = 0; x < 8; x++){
       for(int y = 0; y < 8; y++){
-        displayPiece(board[x][y], x, y, &meshes);
+        displayPiece(board[x][y], x, y, &meshes, &programs);
       }
     }
 
@@ -156,14 +120,13 @@ int main(){
   }
 
   deleteMeshes(&meshes);
-  delete celShadingShaderProgram;
-  delete blackBorderShaderProgram;
+  deletePrograms(&programs);
 
   return 0;
 }
 
 void displayPiece(int piece, int positionX, int positionY,
-    std::map<int, Mesh*>* meshes){
+    std::map<int, Mesh*>* meshes, std::map<int, ShaderProgram*>* programs){
   if(piece == EMPTY) return;
 
   // Get mesh object
@@ -179,12 +142,12 @@ void displayPiece(int piece, int positionX, int positionY,
     glRotatef(90, 0, 0, 1);
 
   // Display black borders
-  glUseProgram(blackBorderShaderProgram->id);
+  glUseProgram(programs->at(BLACK_BORDER)->id);
   glCullFace(GL_FRONT);
   mesh->draw();
 
   // Display cel-shading mesh
-  glUseProgram(celShadingShaderProgram->id);
+  glUseProgram(programs->at(CEL_SHADING)->id);
   piece > 0 ?
     glUniform4f(
       pieceColor,

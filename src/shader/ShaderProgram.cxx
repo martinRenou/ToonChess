@@ -3,9 +3,10 @@
 #include <GL/glu.h>
 
 #include <vector>
-#include <iostream>
+#include <exception>
 
 #include "Shader.hxx"
+#include "LinkingException.hxx"
 
 #include "ShaderProgram.hxx"
 
@@ -20,20 +21,15 @@ ShaderProgram::ShaderProgram(std::vector<Shader*> shaders){
   this->shaders = shaders;
 }
 
-bool ShaderProgram::compile(){
+void ShaderProgram::compile(){
   // Compile shaders one by one
-  bool compilationIsSuccess(true);
   for(unsigned int i = 0; i < this->shaders.size(); i++){
-    compilationIsSuccess = this->shaders.at(i)->compile();
-
-    if(!compilationIsSuccess) break;
-  }
-
-  // If one shader failed to compile, remove all shaders and return false
-  if(!compilationIsSuccess){
-    deleteShaders(&this->shaders);
-
-    return false;
+    try{
+      this->shaders.at(i)->compile();
+    } catch(const std::exception& e){
+      // If one shader failed to compile, just forward the exception
+      throw;
+    }
   }
 
   // Create shader program
@@ -57,21 +53,16 @@ bool ShaderProgram::compile(){
     std::vector<GLchar> infoLog(maxLength);
     glGetProgramInfoLog(this->id, maxLength, &maxLength, &infoLog[0]);
 
-    std::cout << "Unable to link program: " << std::endl
-      << &infoLog[0] << std::endl;
-
     // Don't leak shaders either
     deleteShaders(&this->shaders);
 
-    return false;
+    throw LinkingException(&infoLog[0]);
   }
 
   // Detach shaders from the program
   for(unsigned int i = 0; i < this->shaders.size(); i++){
     glDetachShader(this->id, this->shaders.at(i)->id);
   }
-
-  return true;
 }
 
 ShaderProgram::~ShaderProgram(){

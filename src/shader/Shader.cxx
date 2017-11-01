@@ -7,6 +7,7 @@
 #include <iostream>
 
 #include "../utils.hxx"
+#include "CompilationException.hxx"
 
 #include "Shader.hxx"
 
@@ -15,7 +16,7 @@ Shader::Shader(std::string filePath, GLenum type){
   this->type = type;
 }
 
-bool Shader::compile(){
+void Shader::compile(){
   // Create the shader
   this->id = glCreateShader(this->type);
 
@@ -37,13 +38,8 @@ bool Shader::compile(){
     std::vector<GLchar> errorLog(maxLength);
     glGetShaderInfoLog(this->id, maxLength, &maxLength, &errorLog[0]);
 
-    std::cout << "Unable to compile Shader: " << this->filePath << std::endl
-      << &errorLog[0] << std::endl;
-
-    return false;
+    throw CompilationException(this->filePath, &errorLog[0]);
   }
-
-  return true;
 }
 
 Shader::~Shader(){
