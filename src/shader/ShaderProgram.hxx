@@ -26,6 +26,18 @@ class ShaderProgram {
     */
     void compile();
 
+    /* Set a vec4 uniform value, given its name. The program must be bind with
+      glUseProgram before using this method, otherwise there will be undefined
+      behavior depending on the context
+      \param name The uniform name
+      \param x First component of the vec4
+      \param y Second component of the vec4
+      \param z Third component of the vec4
+      \param w Fourth component of the vec4
+    */
+    void setUniform4f(
+      std::string name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+
     /* Destructor, this will remove the shaders from memory */
     ~ShaderProgram();
 };

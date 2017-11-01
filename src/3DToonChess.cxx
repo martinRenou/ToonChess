@@ -27,7 +27,6 @@
 */
 void displayPiece(int piece, int positionX, int positionY,
   std::map<int, Mesh*>* meshes, std::map<int, ShaderProgram*>* programs);
-GLuint pieceColor;
 
 int main(){
   // Create window
@@ -66,8 +65,6 @@ int main(){
     std::cerr << e.what() << "\n";
     return 1;
   }
-  pieceColor = glGetUniformLocation(
-    programs.at(CEL_SHADING)->id, "pieceColor");
 
   // Load meshes
   std::map<int, Mesh*> meshes = initMeshes();
@@ -149,12 +146,10 @@ void displayPiece(int piece, int positionX, int positionY,
   // Display cel-shading mesh
   glUseProgram(programs->at(CEL_SHADING)->id);
   piece > 0 ?
-    glUniform4f(
-      pieceColor,
-      1.0, 0.93, 0.70, 1.0) :
-    glUniform4f(
-      pieceColor,
-      0.51, 0.08, 0.08, 1.0);
+    programs->at(CEL_SHADING)->setUniform4f(
+      "pieceColor", 1.0, 0.93, 0.70, 1.0) :
+    programs->at(CEL_SHADING)->setUniform4f(
+      "pieceColor", 0.51, 0.08, 0.08, 1.0);
   glCullFace(GL_BACK);
   mesh->draw();
 

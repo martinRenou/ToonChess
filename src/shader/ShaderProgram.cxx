@@ -3,6 +3,7 @@
 #include <GL/glu.h>
 
 #include <vector>
+#include <string>
 #include <exception>
 
 #include "Shader.hxx"
@@ -62,6 +63,13 @@ void ShaderProgram::compile(){
     glDetachShader(this->id, this->shaders.at(i)->id);
   }
 }
+
+void ShaderProgram::setUniform4f(
+    std::string name, GLfloat x, GLfloat y, GLfloat z, GLfloat w){
+  GLuint location = glGetUniformLocation(this->id, name.c_str());
+
+  glUniform4f(location, x, y, z, w);
+};
 
 ShaderProgram::~ShaderProgram(){
   deleteShaders(&this->shaders);
