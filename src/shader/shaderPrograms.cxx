@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include "ShaderProgram.hxx"
+#include "../constants.hxx"
 
 #include "shaderPrograms.hxx"
 

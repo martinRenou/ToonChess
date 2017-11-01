@@ -5,9 +5,6 @@
 
 #include "ShaderProgram.hxx"
 
-const int BLACK_BORDER = 100;
-const int CEL_SHADING = 101;
-
 /* Initialize the shader programs
   \return A map with index of the mesh as key and ShaderProgram instances as
     value

@@ -14,6 +14,8 @@
 #include "shader/ShaderProgram.hxx"
 #include "shader/shaderPrograms.hxx"
 
+#include "constants.hxx"
+
 #include "chessBoard/chessBoard.hxx"
 
 /* Display a mesh in the 3D scene

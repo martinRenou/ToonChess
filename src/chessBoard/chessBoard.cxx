@@ -3,6 +3,7 @@
 
 #include "chessBoard.hxx"
 
+#include "../constants.hxx"
 #include "../mesh/meshes.hxx"
 
 std::string uciGrid[8][8] = {
