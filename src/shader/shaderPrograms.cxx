@@ -7,18 +7,18 @@
 
 std::map<int, ShaderProgram*> initPrograms(){
   // Load cel-shading shaders
-  Shader* celShadingVertexShader = new Shader(
-    "../shaders/celShadingVertexShader.glsl",
+  Shader* celShadingVS = new Shader(
+    "../shaders/celShadingVS.glsl",
     GL_VERTEX_SHADER
   );
 
-  Shader* celShadingFragmentShader = new Shader(
-    "../shaders/celShadingFragmentShader.glsl",
+  Shader* celShadingFS = new Shader(
+    "../shaders/celShadingFS.glsl",
     GL_FRAGMENT_SHADER
   );
 
   std::vector<Shader*> celShadingShaders = {
-    celShadingVertexShader, celShadingFragmentShader};
+    celShadingVS, celShadingFS};
   ShaderProgram* celShadingShaderProgram = new ShaderProgram(celShadingShaders);
 
   // Try to compile shaders
@@ -31,18 +31,18 @@ std::map<int, ShaderProgram*> initPrograms(){
   }
 
   // Load black border shaders
-  Shader* blackBorderVertexShader = new Shader(
-    "../shaders/blackBorderVertexShader.glsl",
+  Shader* blackBorderVS = new Shader(
+    "../shaders/blackBorderVS.glsl",
     GL_VERTEX_SHADER
   );
 
-  Shader* blackBorderFragmentShader = new Shader(
-    "../shaders/blackBorderFragmentShader.glsl",
+  Shader* blackBorderFS = new Shader(
+    "../shaders/blackBorderFS.glsl",
     GL_FRAGMENT_SHADER
   );
 
   std::vector<Shader*> blackBorderShaders = {
-    blackBorderVertexShader, blackBorderFragmentShader};
+    blackBorderVS, blackBorderFS};
   ShaderProgram* blackBorderShaderProgram = new ShaderProgram(
     blackBorderShaders);
 
