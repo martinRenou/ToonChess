@@ -17,5 +17,6 @@ const int AI = -1;
 // Shaders
 const int BLACK_BORDER = 100;
 const int CEL_SHADING = 101;
+const int COLOR_PICKING = 102;
 
 #endif

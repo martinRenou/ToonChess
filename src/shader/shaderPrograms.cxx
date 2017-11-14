@@ -29,26 +29,35 @@ std::map<int, ShaderProgram*> initPrograms(){
     "../shaders/celShadingFS.glsl"
   );
 
-  // Load black border shaders
+  // Load black border shader program
   ShaderProgram* blackBorderShaderProgram = createProgram(
     "../shaders/blackBorderVS.glsl",
     "../shaders/blackBorderFS.glsl"
+  );
+
+  // Load color-picking shader program
+  ShaderProgram* colorPickingShaderProgram = createProgram(
+    "../shaders/colorPickingVS.glsl",
+    "../shaders/colorPickingFS.glsl"
   );
 
   // Try to compile shaders
   try{
     celShadingShaderProgram->compile();
     blackBorderShaderProgram->compile();
+    colorPickingShaderProgram->compile();
   } catch(const std::exception& e){
-    // If something went wrong, delete the program and forward the exception
+    // If something went wrong, delete the programs and forward the exception
     delete celShadingShaderProgram;
     delete blackBorderShaderProgram;
+    delete colorPickingShaderProgram;
     throw;
   }
 
   std::map<int, ShaderProgram*> programs = {
     {CEL_SHADING, celShadingShaderProgram},
     {BLACK_BORDER, blackBorderShaderProgram},
+    {COLOR_PICKING, colorPickingShaderProgram},
   };
 
   return programs;
@@ -57,6 +66,7 @@ std::map<int, ShaderProgram*> initPrograms(){
 void deletePrograms(std::map<int, ShaderProgram*>* programs){
   delete programs->at(CEL_SHADING);
   delete programs->at(BLACK_BORDER);
+  delete programs->at(COLOR_PICKING);
 
   programs->clear();
 };
