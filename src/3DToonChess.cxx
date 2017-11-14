@@ -18,17 +18,15 @@
 
 #include "chessBoard/chessBoard.hxx"
 
-/* Display a mesh in the 3D scene
-  \param piece The piece to display, must be one of those values: KING, QUEEN,
-    BISHOP, KNIGHT, ROOK, PAWN, EMPTY. If this is EMPTY, nothing will be
-    displayed
-  \param positionX The position of the piece on the board on the X axis
-  \param positionY The position of the piece on the board on the Y axis
+/* Makes a cel-shading render in the current frameBuffer
+  \param board The current board
   \param meshes The map of meshes
   \param programs The map of shader programs
 */
-void displayPiece(int piece, int positionX, int positionY,
-  std::map<int, Mesh*>* meshes, std::map<int, ShaderProgram*>* programs);
+void celShadingRender(
+  int board[][8],
+  std::map<int, Mesh*>* meshes,
+  std::map<int, ShaderProgram*>* programs);
 
 int main(){
   // Create window
@@ -107,11 +105,7 @@ int main(){
     gluLookAt(0, -40, 20, 0, 0, 0, 0, 0, 1);
 
     // Display all pieces
-    for(int x = 0; x < 8; x++){
-      for(int y = 0; y < 8; y++){
-        displayPiece(board[x][y], x, y, &meshes, &programs);
-      }
-    }
+    celShadingRender(board, &meshes, &programs);
 
     glFlush();
 
@@ -124,36 +118,43 @@ int main(){
   return 0;
 }
 
-void displayPiece(int piece, int positionX, int positionY,
-    std::map<int, Mesh*>* meshes, std::map<int, ShaderProgram*>* programs){
-  if(piece == EMPTY) return;
+void celShadingRender(
+    int board[][8], std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs){
+  for(int x = 0; x < 8; x++){
+    for(int y = 0; y < 8; y++){
+      int piece = board[x][y];
 
-  // Get mesh object
-  Mesh* mesh = meshes->at(abs(piece));
+      if(piece == EMPTY) continue;
 
-  glPushMatrix();
+      // Get mesh object
+      Mesh* mesh = meshes->at(abs(piece));
 
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
-  glTranslatef(4 * positionX - 16, 4 * positionY - 16, 0);
-  piece > 0 ?
-    glRotatef(-90, 0, 0, 1) :
-    glRotatef(90, 0, 0, 1);
+      glPushMatrix();
 
-  // Display black borders
-  glUseProgram(programs->at(BLACK_BORDER)->id);
-  glCullFace(GL_FRONT);
-  mesh->draw();
+      glMatrixMode(GL_MODELVIEW);
+      glLoadIdentity();
+      glTranslatef(4 * x - 16, 4 * y - 16, 0);
+      piece > 0 ?
+        glRotatef(-90, 0, 0, 1) :
+        glRotatef(90, 0, 0, 1);
 
-  // Display cel-shading mesh
-  glUseProgram(programs->at(CEL_SHADING)->id);
-  piece > 0 ?
-    programs->at(CEL_SHADING)->setUniform4f(
-      "pieceColor", 1.0, 0.93, 0.70, 1.0) :
-    programs->at(CEL_SHADING)->setUniform4f(
-      "pieceColor", 0.51, 0.08, 0.08, 1.0);
-  glCullFace(GL_BACK);
-  mesh->draw();
+      // Display black borders
+      glUseProgram(programs->at(BLACK_BORDER)->id);
+      glCullFace(GL_FRONT);
+      mesh->draw();
 
-  glPopMatrix();
+      // Display cel-shading mesh
+      glUseProgram(programs->at(CEL_SHADING)->id);
+      piece > 0 ?
+        programs->at(CEL_SHADING)->setUniform4f(
+          "pieceColor", 1.0, 0.93, 0.70, 1.0) :
+        programs->at(CEL_SHADING)->setUniform4f(
+          "pieceColor", 0.51, 0.08, 0.08, 1.0);
+      glCullFace(GL_BACK);
+      mesh->draw();
+
+      glPopMatrix();
+    }
+  }
 };
