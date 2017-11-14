@@ -5,52 +5,42 @@
 
 #include "shaderPrograms.hxx"
 
-std::map<int, ShaderProgram*> initPrograms(){
-  // Load cel-shading shaders
-  Shader* celShadingVS = new Shader(
-    "../shaders/celShadingVS.glsl",
+ShaderProgram* createProgram(
+    std::string vertexShaderPath, std::string fragmentShaderPath){
+  Shader* vertexShader = new Shader(
+    vertexShaderPath,
     GL_VERTEX_SHADER
   );
 
-  Shader* celShadingFS = new Shader(
-    "../shaders/celShadingFS.glsl",
+  Shader* fragmentShader = new Shader(
+    fragmentShaderPath,
     GL_FRAGMENT_SHADER
   );
 
-  std::vector<Shader*> celShadingShaders = {
-    celShadingVS, celShadingFS};
-  ShaderProgram* celShadingShaderProgram = new ShaderProgram(celShadingShaders);
+  std::vector<Shader*> shaders = {vertexShader, fragmentShader};
+
+  return new ShaderProgram(shaders);
+}
+
+std::map<int, ShaderProgram*> initPrograms(){
+  // Load cel-shading program
+  ShaderProgram* celShadingShaderProgram = createProgram(
+    "../shaders/celShadingVS.glsl",
+    "../shaders/celShadingFS.glsl"
+  );
+
+  // Load black border shaders
+  ShaderProgram* blackBorderShaderProgram = createProgram(
+    "../shaders/blackBorderVS.glsl",
+    "../shaders/blackBorderFS.glsl"
+  );
 
   // Try to compile shaders
   try{
     celShadingShaderProgram->compile();
-  } catch(const std::exception& e){
-    // If something went wrong, delete the program and forward the exception
-    delete celShadingShaderProgram;
-    throw;
-  }
-
-  // Load black border shaders
-  Shader* blackBorderVS = new Shader(
-    "../shaders/blackBorderVS.glsl",
-    GL_VERTEX_SHADER
-  );
-
-  Shader* blackBorderFS = new Shader(
-    "../shaders/blackBorderFS.glsl",
-    GL_FRAGMENT_SHADER
-  );
-
-  std::vector<Shader*> blackBorderShaders = {
-    blackBorderVS, blackBorderFS};
-  ShaderProgram* blackBorderShaderProgram = new ShaderProgram(
-    blackBorderShaders);
-
-  // Try to compile shaders
-  try{
     blackBorderShaderProgram->compile();
   } catch(const std::exception& e){
-    // If something went wrong, delete the programs and forward the exception
+    // If something went wrong, delete the program and forward the exception
     delete celShadingShaderProgram;
     delete blackBorderShaderProgram;
     throw;
