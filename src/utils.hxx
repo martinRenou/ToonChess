@@ -22,4 +22,13 @@ void split(const std::string &s, char delim, Out result);
 */
 std::vector<std::string> split(const std::string &s, char delim);
 
+/* Function used to display OpenGL errors
+  \param file The name of current file
+  \param line The line where displayGLErrors is called
+  \return a boolean which is true if there is errors, false otherwise
+*/
+bool _displayGLErrors(const char *file, int line);
+
+#define displayGLErrors() _displayGLErrors(__FILE__,__LINE__)
+
 #endif
