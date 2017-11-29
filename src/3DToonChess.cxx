@@ -15,6 +15,7 @@
 #include "shader/shaderPrograms.hxx"
 
 #include "constants.hxx"
+#include "utils.hxx"
 
 #include "chessBoard/chessBoard.hxx"
 
@@ -27,6 +28,10 @@ void celShadingRender(
   int board[][8],
   std::map<int, Mesh*>* meshes,
   std::map<int, ShaderProgram*>* programs);
+
+void colorPickingRender(
+    int board[][8], std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs);
 
 int main(){
   // Create window
@@ -53,6 +58,7 @@ int main(){
   glClearColor(1, 1, 1, 1);
 
   // Create projection matrix
+  glViewport(0, 0, width, height);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
   gluPerspective(50, (double)width/height, 1, 1000);
@@ -104,7 +110,7 @@ int main(){
 
     gluLookAt(0, -40, 20, 0, 0, 0, 0, 0, 1);
 
-    // Display all pieces
+    // Display all pieces on the screen using the cel-shading effect
     celShadingRender(board, &meshes, &programs);
 
     glFlush();
@@ -134,7 +140,7 @@ void celShadingRender(
 
       glMatrixMode(GL_MODELVIEW);
       glLoadIdentity();
-      glTranslatef(4 * x - 16, 4 * y - 16, 0);
+      glTranslatef(x * 4 - 14, y * 4 - 14, 0);
       piece > 0 ?
         glRotatef(-90, 0, 0, 1) :
         glRotatef(90, 0, 0, 1);
@@ -154,7 +160,46 @@ void celShadingRender(
       glCullFace(GL_BACK);
       mesh->draw();
 
-      glPopMatrix();
+      GLint stackDepth;
+      glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);
+
+      if(stackDepth != 1) glPopMatrix();
+    }
+  }
+};
+
+void colorPickingRender(
+    int board[][8], std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs){
+  for(int x = 0; x < 8; x++){
+    for(int y = 0; y < 8; y++){
+      int piece = board[x][y];
+
+      if(piece == EMPTY || piece < 0) continue;
+
+      // Get mesh object
+      Mesh* mesh = meshes->at(abs(piece));
+
+      glPushMatrix();
+
+      glMatrixMode(GL_MODELVIEW);
+      glLoadIdentity();
+      glTranslatef(x * 4 - 14, y * 4 - 14, 0);
+      piece > 0 ?
+        glRotatef(-90, 0, 0, 1) :
+        glRotatef(90, 0, 0, 1);
+
+      // Display colored piece
+      glUseProgram(programs->at(COLOR_PICKING)->id);
+      programs->at(COLOR_PICKING)->setUniform4f(
+        "pieceColor", x/8.0, y/8.0, 0.0, 1.0);
+      glCullFace(GL_BACK);
+      mesh->draw();
+
+      GLint stackDepth;
+      glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);
+
+      if(stackDepth != 1) glPopMatrix();
     }
   }
 };
