@@ -33,6 +33,12 @@ void colorPickingRender(
     int board[][8], std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs);
 
+struct Pixel {
+  GLfloat r;
+  GLfloat g;
+  GLfloat b;
+};
+
 int main(){
   // Create window
   sf::ContextSettings settings;
@@ -89,6 +95,8 @@ int main(){
 
   // Render loop
   bool running = true;
+  int selectedPixelX = 0, selectedPixelY = 0;
+  bool selecting = false;
   while(running){
     sf::Event event;
     while(window.pollEvent(event)){
@@ -104,6 +112,14 @@ int main(){
         glLoadIdentity();
         gluPerspective(50, (double)width/height, 1, 1000);
       }
+      else if (event.type == sf::Event::MouseButtonReleased){
+        if (event.mouseButton.button == sf::Mouse::Left){
+          selectedPixelX = event.mouseButton.x;
+          selectedPixelY = height - event.mouseButton.y;
+
+          selecting = true;
+        }
+      }
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -114,6 +130,25 @@ int main(){
     celShadingRender(board, &meshes, &programs);
 
     glFlush();
+
+    if(selecting){
+      std::cout << "selecting: " <<
+        selectedPixelX << ":" << selectedPixelY << std::endl;
+
+      // Get pixel color at clicked position
+      Pixel pixel;
+      glReadPixels(
+        selectedPixelX, selectedPixelY,
+        1, 1,
+        GL_RGB, GL_FLOAT,
+        &pixel
+      );
+
+      std::cout << "pixel color: " <<
+        pixel.r << ":" << pixel.g << ":" << pixel.b << std::endl << std::endl;
+
+      selecting = false;
+    }
 
     window.display();
   }
@@ -189,7 +224,7 @@ void colorPickingRender(
         glRotatef(-90, 0, 0, 1) :
         glRotatef(90, 0, 0, 1);
 
-      // Display colored piece
+      // Display colored piece (color depending on the position of the piece)
       glUseProgram(programs->at(COLOR_PICKING)->id);
       programs->at(COLOR_PICKING)->setUniform4f(
         "pieceColor", x/8.0, y/8.0, 0.0, 1.0);
