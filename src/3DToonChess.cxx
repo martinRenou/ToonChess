@@ -95,6 +95,15 @@ int main(){
     GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderBuffer
   );
 
+  // Create render buffer for depth test
+  GLuint depthRenderBuffer;
+  glGenRenderbuffers(1, &depthRenderBuffer);
+  glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+  glFramebufferRenderbuffer(
+    GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer
+  );
+
   if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
     std::cout << "Error while creating the FBO for color picking" << std::endl;
 
@@ -104,23 +113,6 @@ int main(){
     return 1;
   }
 
-  glClearColor(0.7, 0.6, 0.5, 0.5);
-  glClear(GL_COLOR_BUFFER_BIT);
-
-  Pixel pixel;
-  glReadPixels(
-    5, 5,
-    1, 1,
-    GL_RGB, GL_FLOAT,
-    &pixel
-  );
-
-  std::cout << "pixel color: " <<
-    pixel.r << ":" << pixel.g << ":" << pixel.b << std::endl << std::endl;
-
-  displayGLErrors();
-
-  glClearColor(1, 1, 1, 1);
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   //
@@ -173,9 +165,11 @@ int main(){
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(board, &meshes, &programs);
 
-    glFlush();
-
     if(selecting){
+      glBindFramebuffer(GL_FRAMEBUFFER, colorPickingFBO);
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+      colorPickingRender(board, &meshes, &programs);
+
       std::cout << "selecting: " <<
         selectedPixelX << ":" << selectedPixelY << std::endl;
 
@@ -191,8 +185,11 @@ int main(){
       std::cout << "pixel color: " <<
         pixel.r << ":" << pixel.g << ":" << pixel.b << std::endl << std::endl;
 
+      glBindFramebuffer(GL_FRAMEBUFFER, 0);
       selecting = false;
     }
+
+    glFlush();
 
     window.display();
   }
