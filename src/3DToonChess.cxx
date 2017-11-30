@@ -81,6 +81,50 @@ int main(){
   // Load meshes
   std::map<int, Mesh*> meshes = initMeshes();
 
+  // Create frameBuffer object for color picking
+  GLuint colorPickingFBO = 0;
+  glGenFramebuffers(1, &colorPickingFBO);
+  glBindFramebuffer(GL_FRAMEBUFFER, colorPickingFBO);
+
+  // Create render buffer for color
+  GLuint colorRenderBuffer;
+  glGenRenderbuffers(1, &colorRenderBuffer);
+  glBindRenderbuffer(GL_RENDERBUFFER, colorRenderBuffer);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height);
+  glFramebufferRenderbuffer(
+    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderBuffer
+  );
+
+  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+    std::cout << "Error while creating the FBO for color picking" << std::endl;
+
+    deleteMeshes(&meshes);
+    deletePrograms(&programs);
+
+    return 1;
+  }
+
+  glClearColor(0.7, 0.6, 0.5, 0.5);
+  glClear(GL_COLOR_BUFFER_BIT);
+
+  Pixel pixel;
+  glReadPixels(
+    5, 5,
+    1, 1,
+    GL_RGB, GL_FLOAT,
+    &pixel
+  );
+
+  std::cout << "pixel color: " <<
+    pixel.r << ":" << pixel.g << ":" << pixel.b << std::endl << std::endl;
+
+  displayGLErrors();
+
+  glClearColor(1, 1, 1, 1);
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  //
+
   // Define board
   int board[8][8] = {
     ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK,
