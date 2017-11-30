@@ -4,7 +4,6 @@
 
 #include <string>
 #include <vector>
-#include <iostream>
 
 #include "../utils.hxx"
 #include "CompilationException.hxx"
@@ -41,7 +40,5 @@ void Shader::compile(){
 }
 
 Shader::~Shader(){
-  std::cout << "Delete Shader: " << this->filePath << std::endl;
-
   glDeleteShader(this->id);
 }
