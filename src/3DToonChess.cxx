@@ -8,6 +8,7 @@
 #include <exception>
 #include <map>
 #include <iostream>
+#include "math.h"
 
 #include "mesh/Mesh.hxx"
 #include "mesh/meshes.hxx"
@@ -23,11 +24,13 @@
   \param board The current board
   \param meshes The map of meshes
   \param programs The map of shader programs
+  \param selectedPiecePosition The position of the selected piece on the board
 */
 void celShadingRender(
   int board[][8],
   std::map<int, Mesh*>* meshes,
-  std::map<int, ShaderProgram*>* programs);
+  std::map<int, ShaderProgram*>* programs,
+  sf::Vector2i* selectedPiecePosition);
 
 void colorPickingRender(
     int board[][8], std::map<int, Mesh*>* meshes,
@@ -131,7 +134,8 @@ int main(){
 
   // Render loop
   bool running = true;
-  int selectedPixelX = 0, selectedPixelY = 0;
+  sf::Vector2i selectedPixelPosition = {0, 0};
+  sf::Vector2i  selectedPiecePosition = {-1, -1};
   bool selecting = false;
   while(running){
     sf::Event event;
@@ -150,8 +154,8 @@ int main(){
       }
       else if (event.type == sf::Event::MouseButtonReleased){
         if (event.mouseButton.button == sf::Mouse::Left){
-          selectedPixelX = event.mouseButton.x;
-          selectedPixelY = height - event.mouseButton.y;
+          selectedPixelPosition.x = event.mouseButton.x;
+          selectedPixelPosition.y = height - event.mouseButton.y;
 
           selecting = true;
         }
@@ -163,27 +167,28 @@ int main(){
     gluLookAt(0, -40, 20, 0, 0, 0, 0, 0, 1);
 
     // Display all pieces on the screen using the cel-shading effect
-    celShadingRender(board, &meshes, &programs);
+    celShadingRender(board, &meshes, &programs, &selectedPiecePosition);
 
     if(selecting){
+      // Do the color picking rendering
       glBindFramebuffer(GL_FRAMEBUFFER, colorPickingFBO);
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
       colorPickingRender(board, &meshes, &programs);
 
-      std::cout << "selecting: " <<
-        selectedPixelX << ":" << selectedPixelY << std::endl;
-
       // Get pixel color at clicked position
       Pixel pixel;
       glReadPixels(
-        selectedPixelX, selectedPixelY,
+        selectedPixelPosition.x, selectedPixelPosition.y,
         1, 1,
         GL_RGB, GL_FLOAT,
         &pixel
       );
 
-      std::cout << "pixel color: " <<
-        pixel.r << ":" << pixel.g << ":" << pixel.b << std::endl << std::endl;
+      // Get piece position according to picked color
+      int selectedX = (int)round(pixel.r*8);
+      int selectedY = (int)round(pixel.g*8);
+      selectedPiecePosition.x = (selectedX == 8) ? -1 : selectedX;
+      selectedPiecePosition.y = (selectedY == 8) ? -1 : selectedY;
 
       glBindFramebuffer(GL_FRAMEBUFFER, 0);
       selecting = false;
@@ -202,7 +207,8 @@ int main(){
 
 void celShadingRender(
     int board[][8], std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs){
+    std::map<int, ShaderProgram*>* programs,
+    sf::Vector2i* selectedPiecePosition){
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = board[x][y];
@@ -228,11 +234,17 @@ void celShadingRender(
 
       // Display cel-shading mesh
       glUseProgram(programs->at(CEL_SHADING)->id);
+      // Use color for user or AI pieces
       piece > 0 ?
         programs->at(CEL_SHADING)->setUniform4f(
           "pieceColor", 1.0, 0.93, 0.70, 1.0) :
         programs->at(CEL_SHADING)->setUniform4f(
           "pieceColor", 0.51, 0.08, 0.08, 1.0);
+      // Change color if it's the selected piece
+      if(selectedPiecePosition->x == x && selectedPiecePosition->y == y){
+        programs->at(CEL_SHADING)->setUniform4f(
+          "pieceColor", 0.47, 0.70, 0.22, 1.0);
+      }
       glCullFace(GL_BACK);
       mesh->draw();
 
