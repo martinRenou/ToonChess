@@ -213,40 +213,56 @@ void celShadingRender(
     for(int y = 0; y < 8; y++){
       int piece = board[x][y];
 
-      if(piece == EMPTY) continue;
-
-      // Get mesh object
-      Mesh* mesh = meshes->at(abs(piece));
-
       glPushMatrix();
 
       glMatrixMode(GL_MODELVIEW);
       glLoadIdentity();
       glTranslatef(x * 4 - 14, y * 4 - 14, 0);
-      piece > 0 ?
-        glRotatef(-90, 0, 0, 1) :
-        glRotatef(90, 0, 0, 1);
 
-      // Display black borders
+      // Display the board cell
       glUseProgram(programs->at(BLACK_BORDER)->id);
       glCullFace(GL_FRONT);
-      mesh->draw();
+      meshes->at(BOARDCELL)->draw();
 
-      // Display cel-shading mesh
       glUseProgram(programs->at(CEL_SHADING)->id);
-      // Use color for user or AI pieces
-      piece > 0 ?
+      (x + y) % 2 == 0 ?
         programs->at(CEL_SHADING)->setUniform4f(
-          "pieceColor", 1.0, 0.93, 0.70, 1.0) :
+          "pieceColor", 0.70, 0.60, 0.41, 1.0) :
         programs->at(CEL_SHADING)->setUniform4f(
-          "pieceColor", 0.51, 0.08, 0.08, 1.0);
-      // Change color if it's the selected piece
-      if(selectedPiecePosition->x == x && selectedPiecePosition->y == y){
-        programs->at(CEL_SHADING)->setUniform4f(
-          "pieceColor", 0.47, 0.70, 0.22, 1.0);
-      }
+          "pieceColor", 1.0, 1.0, 1.0, 1.0);
       glCullFace(GL_BACK);
-      mesh->draw();
+      meshes->at(BOARDCELL)->draw();
+
+      if(piece != EMPTY){
+        // Get piece mesh object
+        Mesh* mesh = meshes->at(abs(piece));
+
+        // Rotate it depending on the team
+        piece > 0 ?
+          glRotatef(-90, 0, 0, 1) :
+          glRotatef(90, 0, 0, 1);
+
+        // Display black borders
+        glUseProgram(programs->at(BLACK_BORDER)->id);
+        glCullFace(GL_FRONT);
+        mesh->draw();
+
+        // Display cel-shading mesh
+        glUseProgram(programs->at(CEL_SHADING)->id);
+        // Use color for user or AI pieces
+        piece > 0 ?
+          programs->at(CEL_SHADING)->setUniform4f(
+            "pieceColor", 1.0, 0.93, 0.70, 1.0) :
+          programs->at(CEL_SHADING)->setUniform4f(
+            "pieceColor", 0.51, 0.08, 0.08, 1.0);
+        // Change color if it's the selected piece
+        if(selectedPiecePosition->x == x && selectedPiecePosition->y == y){
+          programs->at(CEL_SHADING)->setUniform4f(
+            "pieceColor", 0.47, 0.70, 0.22, 1.0);
+        }
+        glCullFace(GL_BACK);
+        mesh->draw();
+      }
 
       GLint stackDepth;
       glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);

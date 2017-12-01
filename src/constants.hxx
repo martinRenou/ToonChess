@@ -10,6 +10,9 @@ const int KNIGHT = 4;
 const int ROOK = 5;
 const int PAWN = 6;
 
+// Board cell
+const int BOARDCELL = 7;
+
 // Players
 const int USER = 1;
 const int AI = -1;

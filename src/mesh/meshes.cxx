@@ -25,6 +25,9 @@ std::map<int, Mesh*> initMeshes(){
   Mesh* pawn = new Mesh("../assets/pawn.obj");
   pawn->initBuffers();
 
+  Mesh* boardCell = new Mesh("../assets/boardCell.obj");
+  boardCell->initBuffers();
+
   std::map<int, Mesh*> meshes = {
     {KING, king},
     {QUEEN, queen},
@@ -32,6 +35,7 @@ std::map<int, Mesh*> initMeshes(){
     {ROOK, rook},
     {KNIGHT, knight},
     {PAWN, pawn},
+    {BOARDCELL, boardCell},
   };
 
   return meshes;
@@ -44,6 +48,7 @@ void deleteMeshes(std::map<int, Mesh*>* meshes){
     delete meshes->at(ROOK);
     delete meshes->at(KNIGHT);
     delete meshes->at(PAWN);
+    delete meshes->at(BOARDCELL);
 
     meshes->clear();
 };
