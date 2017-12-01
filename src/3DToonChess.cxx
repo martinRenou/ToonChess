@@ -279,26 +279,31 @@ void colorPickingRender(
     for(int y = 0; y < 8; y++){
       int piece = board[x][y];
 
-      if(piece == EMPTY || piece < 0) continue;
-
-      // Get mesh object
-      Mesh* mesh = meshes->at(abs(piece));
-
       glPushMatrix();
 
       glMatrixMode(GL_MODELVIEW);
       glLoadIdentity();
       glTranslatef(x * 4 - 14, y * 4 - 14, 0);
-      piece > 0 ?
-        glRotatef(-90, 0, 0, 1) :
-        glRotatef(90, 0, 0, 1);
 
-      // Display colored piece (color depending on the position of the piece)
       glUseProgram(programs->at(COLOR_PICKING)->id);
       programs->at(COLOR_PICKING)->setUniform4f(
         "pieceColor", x/8.0, y/8.0, 0.0, 1.0);
       glCullFace(GL_BACK);
-      mesh->draw();
+
+      // Display board cell
+      meshes->at(BOARDCELL)->draw();
+
+      if(piece != EMPTY && piece > 0){
+        // Get mesh object
+        Mesh* mesh = meshes->at(abs(piece));
+
+        piece > 0 ?
+          glRotatef(-90, 0, 0, 1) :
+          glRotatef(90, 0, 0, 1);
+
+        // Display colored piece (color depending on the position of the piece)
+        mesh->draw();
+      }
 
       GLint stackDepth;
       glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);
