@@ -26,7 +26,7 @@ class ShaderProgram {
     */
     void compile();
 
-    /* Set a vec4 uniform value, given its name. The program must be bind with
+    /* Set a vec4 uniform value, given its name. The program must be bound with
       glUseProgram before using this method, otherwise there will be undefined
       behavior depending on the context
       \param name The uniform name
@@ -37,6 +37,14 @@ class ShaderProgram {
     */
     void setUniform4f(
       std::string name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+
+    /* Set a bool uniform value, given its name. The program must be bound with
+      glUseProgram before using this method, otherwise there will be undefined
+      behavior depending on the context
+      \param name The uniform name
+      \param value The boolean value
+    */
+    void setUniformBool(std::string name, bool value);
 
     /* Destructor, this will remove the shaders from memory */
     ~ShaderProgram();

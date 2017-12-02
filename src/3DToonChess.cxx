@@ -168,6 +168,9 @@ void celShadingRender(
 
       // Display the board cell
       glUseProgram(programs->at(BLACK_BORDER)->id);
+      (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
+        programs->at(CEL_SHADING)->setUniformBool("selected", true) :
+        programs->at(CEL_SHADING)->setUniformBool("selected", false);
       glCullFace(GL_FRONT);
       meshes->at(BOARDCELL)->draw();
 
@@ -177,6 +180,10 @@ void celShadingRender(
           "pieceColor", 0.70, 0.60, 0.41, 1.0) :
         programs->at(CEL_SHADING)->setUniform4f(
           "pieceColor", 1.0, 1.0, 1.0, 1.0);
+      // Move it if it's the selected piece
+      (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
+        programs->at(CEL_SHADING)->setUniformBool("selected", true) :
+        programs->at(CEL_SHADING)->setUniformBool("selected", false);
       glCullFace(GL_BACK);
       meshes->at(BOARDCELL)->draw();
 
@@ -191,6 +198,9 @@ void celShadingRender(
 
         // Display black borders
         glUseProgram(programs->at(BLACK_BORDER)->id);
+        (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
+          programs->at(CEL_SHADING)->setUniformBool("selected", true) :
+          programs->at(CEL_SHADING)->setUniformBool("selected", false);
         glCullFace(GL_FRONT);
         mesh->draw();
 
@@ -202,11 +212,10 @@ void celShadingRender(
             "pieceColor", 1.0, 0.93, 0.70, 1.0) :
           programs->at(CEL_SHADING)->setUniform4f(
             "pieceColor", 0.51, 0.08, 0.08, 1.0);
-        // Change color if it's the selected piece
-        if(selectedPiecePosition->x == x && selectedPiecePosition->y == y){
-          programs->at(CEL_SHADING)->setUniform4f(
-            "pieceColor", 0.47, 0.70, 0.22, 1.0);
-        }
+        // Move it if it's the selected piece
+        (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
+          programs->at(CEL_SHADING)->setUniformBool("selected", true) :
+          programs->at(CEL_SHADING)->setUniformBool("selected", false);
         glCullFace(GL_BACK);
         mesh->draw();
       }

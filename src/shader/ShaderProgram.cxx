@@ -71,6 +71,12 @@ void ShaderProgram::setUniform4f(
   glUniform4f(location, x, y, z, w);
 };
 
+void ShaderProgram::setUniformBool(std::string name, bool value){
+  GLuint location = glGetUniformLocation(this->id, name.c_str());
+
+  glUniform1i(location, value);
+};
+
 ShaderProgram::~ShaderProgram(){
   deleteShaders(&this->shaders);
 
