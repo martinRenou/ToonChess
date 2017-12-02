@@ -15,6 +15,8 @@
 #include "shader/ShaderProgram.hxx"
 #include "shader/shaderPrograms.hxx"
 
+#include "ColorPicking/ColorPicking.hxx"
+
 #include "constants.hxx"
 #include "utils.hxx"
 
@@ -31,16 +33,6 @@ void celShadingRender(
   std::map<int, Mesh*>* meshes,
   std::map<int, ShaderProgram*>* programs,
   sf::Vector2i* selectedPiecePosition);
-
-void colorPickingRender(
-    int board[][8], std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs);
-
-struct Pixel {
-  GLfloat r;
-  GLfloat g;
-  GLfloat b;
-};
 
 int main(){
   // Create window
@@ -84,41 +76,9 @@ int main(){
   // Load meshes
   std::map<int, Mesh*> meshes = initMeshes();
 
-  // Create frameBuffer object for color picking
-  GLuint colorPickingFBO = 0;
-  glGenFramebuffers(1, &colorPickingFBO);
-  glBindFramebuffer(GL_FRAMEBUFFER, colorPickingFBO);
-
-  // Create render buffer for color
-  GLuint colorRenderBuffer;
-  glGenRenderbuffers(1, &colorRenderBuffer);
-  glBindRenderbuffer(GL_RENDERBUFFER, colorRenderBuffer);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height);
-  glFramebufferRenderbuffer(
-    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_RENDERBUFFER, colorRenderBuffer
-  );
-
-  // Create render buffer for depth test
-  GLuint depthRenderBuffer;
-  glGenRenderbuffers(1, &depthRenderBuffer);
-  glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
-  glFramebufferRenderbuffer(
-    GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer
-  );
-
-  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-    std::cout << "Error while creating the FBO for color picking" << std::endl;
-
-    deleteMeshes(&meshes);
-    deletePrograms(&programs);
-
-    return 1;
-  }
-
-  glBindRenderbuffer(GL_RENDERBUFFER, 0);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  //
+  // Initialize color picking
+  ColorPicking* colorPicking = new ColorPicking(width, height);
+  colorPicking->initBuffers();
 
   // Define board
   int board[8][8] = {
@@ -151,6 +111,9 @@ int main(){
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
         gluPerspective(50, (double)width/height, 1, 1000);
+
+        // Resize the buffers for color picking
+        colorPicking->resizeBuffers(width, height);
       }
       else if (event.type == sf::Event::MouseButtonReleased){
         if (event.mouseButton.button == sf::Mouse::Left){
@@ -170,27 +133,10 @@ int main(){
     celShadingRender(board, &meshes, &programs, &selectedPiecePosition);
 
     if(selecting){
-      // Do the color picking rendering
-      glBindFramebuffer(GL_FRAMEBUFFER, colorPickingFBO);
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-      colorPickingRender(board, &meshes, &programs);
-
-      // Get pixel color at clicked position
-      Pixel pixel;
-      glReadPixels(
-        selectedPixelPosition.x, selectedPixelPosition.y,
-        1, 1,
-        GL_RGB, GL_FLOAT,
-        &pixel
+      selectedPiecePosition = colorPicking->getClickedPiecePosition(
+        selectedPixelPosition, board, &meshes, &programs
       );
 
-      // Get piece position according to picked color
-      int selectedX = (int)round(pixel.r*8);
-      int selectedY = (int)round(pixel.g*8);
-      selectedPiecePosition.x = (selectedX == 8) ? -1 : selectedX;
-      selectedPiecePosition.y = (selectedY == 8) ? -1 : selectedY;
-
-      glBindFramebuffer(GL_FRAMEBUFFER, 0);
       selecting = false;
     }
 
@@ -261,47 +207,6 @@ void celShadingRender(
             "pieceColor", 0.47, 0.70, 0.22, 1.0);
         }
         glCullFace(GL_BACK);
-        mesh->draw();
-      }
-
-      GLint stackDepth;
-      glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);
-
-      if(stackDepth != 1) glPopMatrix();
-    }
-  }
-};
-
-void colorPickingRender(
-    int board[][8], std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs){
-  for(int x = 0; x < 8; x++){
-    for(int y = 0; y < 8; y++){
-      int piece = board[x][y];
-
-      glPushMatrix();
-
-      glMatrixMode(GL_MODELVIEW);
-      glLoadIdentity();
-      glTranslatef(x * 4 - 14, y * 4 - 14, 0);
-
-      glUseProgram(programs->at(COLOR_PICKING)->id);
-      programs->at(COLOR_PICKING)->setUniform4f(
-        "pieceColor", x/8.0, y/8.0, 0.0, 1.0);
-      glCullFace(GL_BACK);
-
-      // Display board cell
-      meshes->at(BOARDCELL)->draw();
-
-      if(piece != EMPTY && piece > 0){
-        // Get mesh object
-        Mesh* mesh = meshes->at(abs(piece));
-
-        piece > 0 ?
-          glRotatef(-90, 0, 0, 1) :
-          glRotatef(90, 0, 0, 1);
-
-        // Display colored piece (color depending on the position of the piece)
         mesh->draw();
       }
 
