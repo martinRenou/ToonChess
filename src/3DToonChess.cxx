@@ -147,6 +147,7 @@ int main(){
 
   deleteMeshes(&meshes);
   deletePrograms(&programs);
+  delete colorPicking;
 
   return 0;
 }
