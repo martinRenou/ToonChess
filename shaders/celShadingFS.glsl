@@ -1,5 +1,6 @@
 varying vec3 normal;
-varying vec4 color;
+
+uniform vec4 pieceColor;
 
 vec3 lightDir = normalize(vec3(-1.0, 0.0, -1.0));
 
@@ -17,5 +18,5 @@ vec4 applyCelShading(vec4 color){
 }
 
 void main(void){
-  gl_FragColor = applyCelShading(color);
+  gl_FragColor = applyCelShading(pieceColor);
 }
