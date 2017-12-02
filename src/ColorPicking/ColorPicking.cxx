@@ -27,6 +27,9 @@ struct Pixel {
 void colorPickingRender(
     int board[][8], std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs){
+  glUseProgram(programs->at(COLOR_PICKING)->id);
+  glCullFace(GL_BACK);
+
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = board[x][y];
@@ -37,10 +40,8 @@ void colorPickingRender(
       glLoadIdentity();
       glTranslatef(x * 4 - 14, y * 4 - 14, 0);
 
-      glUseProgram(programs->at(COLOR_PICKING)->id);
       programs->at(COLOR_PICKING)->setUniform4f(
         "pieceColor", x/8.0, y/8.0, 0.0, 1.0);
-      glCullFace(GL_BACK);
 
       // Display board cell
       meshes->at(BOARDCELL)->draw();

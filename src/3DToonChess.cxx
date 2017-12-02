@@ -156,35 +156,24 @@ void celShadingRender(
     int board[][8], std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
     sf::Vector2i* selectedPiecePosition){
+  glPushMatrix();
+
+  // Render all the black borders
+  glUseProgram(programs->at(BLACK_BORDER)->id);
+  glCullFace(GL_FRONT);
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = board[x][y];
-
-      glPushMatrix();
 
       glMatrixMode(GL_MODELVIEW);
       glLoadIdentity();
       glTranslatef(x * 4 - 14, y * 4 - 14, 0);
 
-      // Display the board cell
-      glUseProgram(programs->at(BLACK_BORDER)->id);
       (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
         programs->at(CEL_SHADING)->setUniformBool("selected", true) :
         programs->at(CEL_SHADING)->setUniformBool("selected", false);
-      glCullFace(GL_FRONT);
-      meshes->at(BOARDCELL)->draw();
 
-      glUseProgram(programs->at(CEL_SHADING)->id);
-      (x + y) % 2 == 0 ?
-        programs->at(CEL_SHADING)->setUniform4f(
-          "pieceColor", 0.70, 0.60, 0.41, 1.0) :
-        programs->at(CEL_SHADING)->setUniform4f(
-          "pieceColor", 1.0, 1.0, 1.0, 1.0);
-      // Move it if it's the selected piece
-      (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
-        programs->at(CEL_SHADING)->setUniformBool("selected", true) :
-        programs->at(CEL_SHADING)->setUniformBool("selected", false);
-      glCullFace(GL_BACK);
+      // Draw board cell
       meshes->at(BOARDCELL)->draw();
 
       if(piece != EMPTY){
@@ -196,34 +185,62 @@ void celShadingRender(
           glRotatef(-90, 0, 0, 1) :
           glRotatef(90, 0, 0, 1);
 
-        // Display black borders
-        glUseProgram(programs->at(BLACK_BORDER)->id);
-        (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
-          programs->at(CEL_SHADING)->setUniformBool("selected", true) :
-          programs->at(CEL_SHADING)->setUniformBool("selected", false);
-        glCullFace(GL_FRONT);
         mesh->draw();
+      }
+    }
+  }
+
+  // Render all meshes with cell shading
+  glUseProgram(programs->at(CEL_SHADING)->id);
+  glCullFace(GL_BACK);
+  for(int x = 0; x < 8; x++){
+    for(int y = 0; y < 8; y++){
+      int piece = board[x][y];
+
+      glMatrixMode(GL_MODELVIEW);
+      glLoadIdentity();
+      glTranslatef(x * 4 - 14, y * 4 - 14, 0);
+
+      // Draw the board cell
+      (x + y) % 2 == 0 ?
+        programs->at(CEL_SHADING)->setUniform4f(
+          "pieceColor", 0.70, 0.60, 0.41, 1.0) :
+        programs->at(CEL_SHADING)->setUniform4f(
+          "pieceColor", 1.0, 1.0, 1.0, 1.0);
+
+      (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
+        programs->at(CEL_SHADING)->setUniformBool("selected", true) :
+        programs->at(CEL_SHADING)->setUniformBool("selected", false);
+
+      meshes->at(BOARDCELL)->draw();
+
+      if(piece != EMPTY){
+        // Get piece mesh object
+        Mesh* mesh = meshes->at(abs(piece));
+
+        // Rotate it depending on the team
+        piece > 0 ?
+          glRotatef(-90, 0, 0, 1) :
+          glRotatef(90, 0, 0, 1);
 
         // Display cel-shading mesh
-        glUseProgram(programs->at(CEL_SHADING)->id);
-        // Use color for user or AI pieces
         piece > 0 ?
           programs->at(CEL_SHADING)->setUniform4f(
             "pieceColor", 1.0, 0.93, 0.70, 1.0) :
           programs->at(CEL_SHADING)->setUniform4f(
             "pieceColor", 0.51, 0.08, 0.08, 1.0);
-        // Move it if it's the selected piece
+
         (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
           programs->at(CEL_SHADING)->setUniformBool("selected", true) :
           programs->at(CEL_SHADING)->setUniformBool("selected", false);
-        glCullFace(GL_BACK);
+
         mesh->draw();
       }
-
-      GLint stackDepth;
-      glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);
-
-      if(stackDepth != 1) glPopMatrix();
     }
   }
+
+  GLint stackDepth;
+  glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);
+
+  if(stackDepth != 1) glPopMatrix();
 };
