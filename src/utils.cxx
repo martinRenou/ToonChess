@@ -73,3 +73,18 @@ bool _displayGLErrors(const char *file, int line){
 
   return foundError;
 }
+
+std::vector<GLdouble> getOrthoProjMatrix(
+  GLdouble left, GLdouble right,
+  GLdouble bottom, GLdouble top,
+  GLdouble nearVal, GLdouble farVal){
+  std::vector<GLdouble> matrix = {
+    2/(right - left), 0, 0, 0,
+    0, 2/(top - bottom), 0, 0,
+    0, 0, -2/(farVal - nearVal), 0,
+    (left + right)/(left - right), (bottom + top)/(bottom - top),
+      (nearVal + farVal)/(nearVal - farVal), 1
+  };
+
+  return matrix;
+};
