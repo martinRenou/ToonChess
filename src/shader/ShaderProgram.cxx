@@ -77,6 +77,16 @@ void ShaderProgram::setUniformBool(std::string name, bool value){
   glUniform1i(location, value);
 };
 
+void ShaderProgram::bindTexture(
+    GLuint n, GLenum target, std::string name, GLuint texture){
+  GLuint location = glGetUniformLocation(this->id, name.c_str());
+
+  glUniform1i(location, n);
+
+  glActiveTexture(target);
+  glBindTexture(GL_TEXTURE_2D, texture);
+};
+
 ShaderProgram::~ShaderProgram(){
   deleteShaders(&this->shaders);
 

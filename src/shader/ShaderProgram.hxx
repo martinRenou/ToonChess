@@ -46,6 +46,15 @@ class ShaderProgram {
     */
     void setUniformBool(std::string name, bool value);
 
+    /* Bind a texture to sampler "n"
+      \param n The index of the sampler
+      \param target The target for the sampler, must be GL_TEXTUREn with n the
+        index of the sampler
+      \param name The name of the sampler in shaders
+      \param value The texture
+    */
+    void bindTexture(GLuint n, GLenum target, std::string name, GLuint texture);
+
     /* Destructor, this will remove the shaders from memory */
     ~ShaderProgram();
 };
