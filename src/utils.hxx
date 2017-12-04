@@ -50,4 +50,23 @@ std::vector<GLdouble> getOrthoProjMatrix(
   GLdouble nearVal, GLdouble farVal
 );
 
+/* Generate and return a lookAt matrix. Inspired from the gluLookAt
+  function, but it only creates the matrix and returns it, it doesn't call
+  glMultMatrix under the hood.
+  \param eyeX Specifies the X position of the eye point
+  \param eyeY Specifies the Y position of the eye point
+  \param eyeZ Specifies the Z position of the eye point
+  \param centerX Specifies the X position of the reference point
+  \param centerY Specifies the Y position of the reference point
+  \param centerZ Specifies the Z position of the reference point
+  \param upX Specifies the X direction of the up vector
+  \param upY Specifies the Y direction of the up vector
+  \param upZ Specifies the Z direction of the up vector
+  \return The lookAt matrix
+*/
+std::vector<GLdouble> getLookAtMatrix(
+  GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ,
+  GLdouble centerX, GLdouble centerY, GLdouble centerZ,
+  GLdouble upX, GLdouble upY, GLdouble upZ);
+
 #endif

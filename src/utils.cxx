@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <math.h>
 
 std::string loadFile(std::string path){
   std::ifstream in(path);
@@ -84,6 +85,56 @@ std::vector<GLdouble> getOrthoProjMatrix(
     0, 0, -2/(farVal - nearVal), 0,
     (left + right)/(left - right), (bottom + top)/(bottom - top),
       (nearVal + farVal)/(nearVal - farVal), 1
+  };
+
+  return matrix;
+};
+
+void normalize(GLdouble* vector){
+  GLdouble norm = sqrt(
+    pow(vector[0], 2) + pow(vector[1], 2) + pow(vector[2], 2)
+  );
+
+  vector[0] /= norm;
+  vector[1] /= norm;
+  vector[2] /= norm;
+};
+
+void cross(GLdouble* vector1, GLdouble* vector2, GLdouble* result){
+  result[0] = vector1[1] * vector2[2] - vector2[1] * vector1[2];
+  result[1] = vector1[2] * vector2[0] - vector2[2] * vector1[0];
+  result[2] = vector1[0] * vector2[1] - vector2[0] * vector1[1];
+};
+
+std::vector<GLdouble> getLookAtMatrix(
+  GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ,
+  GLdouble centerX, GLdouble centerY, GLdouble centerZ,
+  GLdouble upX, GLdouble upY, GLdouble upZ){
+  // Get forward vector (center - eye)
+  GLdouble forward[3] = {
+    centerX - eyeX,
+    centerY - eyeY,
+    centerZ - eyeZ
+  };
+
+  GLdouble up[3] = {upX, upY, upZ};
+
+  normalize(forward);
+
+  // Get side vector (forward x up)
+  GLdouble side[3];
+  cross(forward, up, side);
+  normalize(side);
+
+  // Compute the real up (side x forward)
+  cross(side, forward, up);
+  normalize(up);
+
+  std::vector<GLdouble> matrix = {
+    side[0], up[0], -forward[0], 0,
+    side[1], up[1], -forward[1], 0,
+    side[2], up[2], -forward[2], 0,
+    0, 0, 0, 1
   };
 
   return matrix;
