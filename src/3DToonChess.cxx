@@ -34,6 +34,11 @@ void celShadingRender(
   std::map<int, ShaderProgram*>* programs,
   sf::Vector2i* selectedPiecePosition);
 
+void shadowMappingRender(
+    int board[][8], std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs,
+    sf::Vector2i* selectedPiecePosition);
+
 int main(){
   // Create window
   sf::ContextSettings settings;
@@ -57,12 +62,6 @@ int main(){
   // Enable backface culling
   glEnable(GL_CULL_FACE);
   glClearColor(1, 1, 1, 1);
-
-  // Create projection matrix
-  glViewport(0, 0, width, height);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(50, (double)width/height, 1, 1000);
 
   // Load and compile shaders
   std::map<int, ShaderProgram*> programs;
@@ -107,11 +106,6 @@ int main(){
         width = event.size.width;
         height = event.size.height;
 
-        glViewport(0, 0, width, height);
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        gluPerspective(50, (double)width/height, 1, 1000);
-
         // Resize the buffers for color picking
         colorPicking->resizeBuffers(width, height);
       }
@@ -125,7 +119,27 @@ int main(){
       }
     }
 
+    /*
+    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(-20, 20, -20, 20, 1, 40);
+
+    gluLookAt(20, 0, 20, 0, 0, 0, 0, 0, 1);
+
+    shadowMappingRender(board, &meshes, &programs, &selectedPiecePosition);
+    */
+
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(50, (double)width/height, 1, 1000);
 
     gluLookAt(0, -40, 20, 0, 0, 0, 0, 0, 1);
 
@@ -233,6 +247,50 @@ void celShadingRender(
         (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
           programs->at(CEL_SHADING)->setUniformBool("selected", true) :
           programs->at(CEL_SHADING)->setUniformBool("selected", false);
+
+        mesh->draw();
+      }
+    }
+  }
+
+  GLint stackDepth;
+  glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);
+
+  if(stackDepth != 1) glPopMatrix();
+};
+
+void shadowMappingRender(
+    int board[][8], std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs,
+    sf::Vector2i* selectedPiecePosition){
+  glPushMatrix();
+
+  // Render all meshes
+  glUseProgram(programs->at(SHADOW_MAPPING)->id);
+  glCullFace(GL_BACK);
+  for(int x = 0; x < 8; x++){
+    for(int y = 0; y < 8; y++){
+      int piece = board[x][y];
+
+      glMatrixMode(GL_MODELVIEW);
+      glLoadIdentity();
+      glTranslatef(x * 4 - 14, y * 4 - 14, 0);
+
+      (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
+        programs->at(SHADOW_MAPPING)->setUniformBool("selected", true) :
+        programs->at(SHADOW_MAPPING)->setUniformBool("selected", false);
+
+      // Draw board cell
+      meshes->at(BOARDCELL)->draw();
+
+      if(piece != EMPTY){
+        // Get piece mesh object
+        Mesh* mesh = meshes->at(abs(piece));
+
+        // Rotate it depending on the team
+        piece > 0 ?
+          glRotatef(-90, 0, 0, 1) :
+          glRotatef(90, 0, 0, 1);
 
         mesh->draw();
       }
