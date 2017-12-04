@@ -27,12 +27,14 @@
   \param meshes The map of meshes
   \param programs The map of shader programs
   \param selectedPiecePosition The position of the selected piece on the board
+  \param shadowMap The shadowMap texture
 */
 void celShadingRender(
   int board[][8],
   std::map<int, Mesh*>* meshes,
   std::map<int, ShaderProgram*>* programs,
-  sf::Vector2i* selectedPiecePosition);
+  sf::Vector2i* selectedPiecePosition,
+  GLuint shadowMap);
 
 void shadowMappingRender(
     int board[][8], std::map<int, Mesh*>* meshes,
@@ -61,7 +63,6 @@ int main(){
   glEnable(GL_DEPTH_TEST);
   // Enable backface culling
   glEnable(GL_CULL_FACE);
-  glClearColor(1, 1, 1, 1);
 
   // Load and compile shaders
   std::map<int, ShaderProgram*> programs;
@@ -78,6 +79,63 @@ int main(){
   // Initialize color picking
   ColorPicking* colorPicking = new ColorPicking(width, height);
   colorPicking->initBuffers();
+
+  // Get lookAt matrix
+  std::vector<GLdouble> lookAtMatrix = getLookAtMatrix(
+    0, -40, 20, 0, 0, 0, 0, 0, 1);
+
+  // Create orthographic projection matrix for shadow mapping
+  std::vector<GLdouble> orthoProjMatrix = getOrthoProjMatrix(
+    -20, 20, -20, 20, 1, 40);
+
+  // Get lookAt matrix from light position for shadow mapping
+  std::vector<GLdouble> lightLookAtMatrix = getLookAtMatrix(
+    20, 0, 20, 0, 0, 0, 0, 0, 1);
+
+  // Create FBO for shadow mapping
+  GLuint shadowMapFBO = 0;
+  glGenFramebuffers(1, &shadowMapFBO);
+  glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
+
+  // Size of the shadowMap
+  sf::Vector2i sizeShadowMap = {512, 512};
+
+  // Create the shadowMap texture
+  GLuint shadowMap;
+  glGenTextures(1, &shadowMap);
+  glBindTexture(GL_TEXTURE_2D, shadowMap);
+
+  // Set the texture
+  glTexImage2D(
+    GL_TEXTURE_2D, 0, GL_RGB,
+    sizeShadowMap.x, sizeShadowMap.y,
+    0, GL_RGB, GL_UNSIGNED_BYTE, 0
+  );
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadowMap, 0);
+
+  // Create render buffer for depth test
+  GLuint depthRenderBuffer;
+  glGenRenderbuffers(1, &depthRenderBuffer);
+  glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
+  glRenderbufferStorage(
+    GL_RENDERBUFFER, GL_DEPTH_COMPONENT, sizeShadowMap.x, sizeShadowMap.y
+  );
+  glFramebufferRenderbuffer(
+    GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer
+  );
+
+  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
+    std::cout << "Error while creating the FBO for shadow mapping" << std::endl;
+  }
+
+  // Unbind
+  glBindRenderbuffer(GL_RENDERBUFFER, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  //
 
   // Define board
   int board[8][8] = {
@@ -119,21 +177,27 @@ int main(){
       }
     }
 
-    /*
+    // Create the shadowMap
     glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
+
+    glClearColor(1, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, sizeShadowMap.x, sizeShadowMap.y);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-20, 20, -20, 20, 1, 40);
+    glMultMatrixd(&orthoProjMatrix[0]);
 
-    gluLookAt(20, 0, 20, 0, 0, 0, 0, 0, 1);
+    glMultMatrixd(&lightLookAtMatrix[0]);
+    glTranslated(-20, 0, -20);
 
     shadowMappingRender(board, &meshes, &programs, &selectedPiecePosition);
-    */
 
+    // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glViewport(0, 0, width, height);
@@ -141,10 +205,13 @@ int main(){
     glLoadIdentity();
     gluPerspective(50, (double)width/height, 1, 1000);
 
-    gluLookAt(0, -40, 20, 0, 0, 0, 0, 0, 1);
+    glMultMatrixd(&lookAtMatrix[0]);
+    glTranslated(0, 40, -20);
 
     // Display all pieces on the screen using the cel-shading effect
-    celShadingRender(board, &meshes, &programs, &selectedPiecePosition);
+    celShadingRender(
+      board, &meshes, &programs, &selectedPiecePosition, shadowMap
+    );
 
     if(selecting){
       selectedPiecePosition = colorPicking->getClickedPiecePosition(
@@ -169,7 +236,8 @@ int main(){
 void celShadingRender(
     int board[][8], std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
-    sf::Vector2i* selectedPiecePosition){
+    sf::Vector2i* selectedPiecePosition,
+    GLuint shadowMap){
   glPushMatrix();
 
   // Render all the black borders
@@ -207,6 +275,11 @@ void celShadingRender(
   // Render all meshes with cell shading
   glUseProgram(programs->at(CEL_SHADING)->id);
   glCullFace(GL_BACK);
+
+  // Bind the shadow map
+  programs->at(CEL_SHADING)->bindTexture(
+    0, GL_TEXTURE0, "shadowMap", shadowMap
+  );
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = board[x][y];
