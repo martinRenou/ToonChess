@@ -139,3 +139,14 @@ std::vector<GLdouble> getLookAtMatrix(
 
   return matrix;
 };
+
+void pushMatrix(){
+  glPushMatrix();
+};
+
+void popMatrix(){
+  GLint stackDepth;
+  glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);
+
+  if(stackDepth != 1) glPopMatrix();
+};

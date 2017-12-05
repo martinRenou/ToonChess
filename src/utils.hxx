@@ -69,4 +69,10 @@ std::vector<GLdouble> getLookAtMatrix(
   GLdouble centerX, GLdouble centerY, GLdouble centerZ,
   GLdouble upX, GLdouble upY, GLdouble upZ);
 
+/* Function which call glPushMatrix and takes care of OpenGL errors */
+void pushMatrix();
+
+/* Function which call glPopMatrix and takes care of OpenGL errors */
+void popMatrix();
+
 #endif
