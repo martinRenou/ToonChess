@@ -31,6 +31,16 @@ bool _displayGLErrors(const char *file, int line);
 
 #define displayGLErrors() _displayGLErrors(__FILE__, __LINE__)
 
+/* Generate and return a perspective matrix. Inspired from the gluPerspective
+  function, but it only creates the matrix and returns it, it doesn't call
+  glMultMatrix under the hood.
+  \param
+  \return The perspective matrix
+*/
+std::vector<GLfloat> getPerspectiveProjMatrix(
+  GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar
+);
+
 /* Generate and return an orthographic matrix. Inspired from the glOrtho
   function, but it only creates the matrix and returns it, it doesn't call
   glMultMatrix under the hood.

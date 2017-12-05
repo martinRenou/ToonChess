@@ -75,6 +75,20 @@ bool _displayGLErrors(const char *file, int line){
   return foundError;
 }
 
+std::vector<GLfloat> getPerspectiveProjMatrix(
+    GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar){
+  GLfloat f = 1.0/tan(fovy/2.0);
+
+  std::vector<GLfloat> matrix = {
+    f/aspect, 0, 0, 0,
+    0, f, 0, 0,
+    0, 0, (zNear + zFar)/(zNear - zFar), -1,
+    0, 0, 2 * zNear * zFar/(zNear - zFar), 0
+  };
+
+  return matrix;
+};
+
 std::vector<GLfloat> getOrthoProjMatrix(
   GLfloat left, GLfloat right,
   GLfloat bottom, GLfloat top,
