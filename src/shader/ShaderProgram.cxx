@@ -77,19 +77,19 @@ void ShaderProgram::setUniformBool(std::string name, bool value){
   glUniform1i(location, value);
 };
 
-void ShaderProgram::setUniformMatrix4fv(std::string name, GLfloat matrix[]){
+void ShaderProgram::setUniformMatrix4fv(std::string name, GLfloat* matrix){
   GLuint location = glGetUniformLocation(this->id, name.c_str());
 
   glUniformMatrix4fv(location, 1, false, matrix);
 };
 
-void ShaderProgram::setMoveMatrix(GLfloat matrix[]){
+void ShaderProgram::setMoveMatrix(GLfloat* matrix){
   GLuint location = glGetUniformLocation(this->id, "MMatrix");
 
   glUniformMatrix4fv(location, 1, false, matrix);
 };
 
-void ShaderProgram::setViewMatrix(GLfloat matrix[]){
+void ShaderProgram::setViewMatrix(GLfloat* matrix){
   GLuint location = glGetUniformLocation(this->id, "VMatrix");
 
   glUniformMatrix4fv(location, 1, false, matrix);

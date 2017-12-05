@@ -52,17 +52,17 @@ class ShaderProgram {
       \param name The uniform name
       \param matrix The matrix value as a table of GLfloats
     */
-    void setUniformMatrix4fv(std::string name, GLfloat matrix[]);
+    void setUniformMatrix4fv(std::string name, GLfloat* matrix);
 
     /* Set the movement matrix
       \param matrix The matrix value as a table of GLfloats
     */
-    void setMoveMatrix(GLfloat matrix[]);
+    void setMoveMatrix(GLfloat* matrix);
 
     /* Set the view matrix
       \param matrix The matrix value as a table of GLfloats
     */
-    void setViewMatrix(GLfloat matrix[]);
+    void setViewMatrix(GLfloat* matrix);
 
     /* Bind a texture to sampler "n"
       \param n The index of the sampler
