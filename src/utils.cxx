@@ -2,6 +2,8 @@
 
 #include <GL/gl.h>
 
+#include <SFML/Graphics.hpp>
+
 #include <sstream>
 #include <fstream>
 #include <iostream>
@@ -104,55 +106,51 @@ std::vector<GLfloat> getOrthoProjMatrix(
   return matrix;
 };
 
-void normalize(GLfloat* vector){
+void normalize(sf::Vector3f* vector){
   GLfloat norm = sqrt(
-    pow(vector[0], 2) + pow(vector[1], 2) + pow(vector[2], 2)
+    pow(vector->x, 2) + pow(vector->y, 2) + pow(vector->z, 2)
   );
 
-  vector[0] /= norm;
-  vector[1] /= norm;
-  vector[2] /= norm;
+  vector->x /= norm;
+  vector->y /= norm;
+  vector->z /= norm;
 };
 
-void cross(GLfloat* vector1, GLfloat* vector2, GLfloat* result){
-  result[0] = vector1[1] * vector2[2] - vector2[1] * vector1[2];
-  result[1] = vector1[2] * vector2[0] - vector2[2] * vector1[0];
-  result[2] = vector1[0] * vector2[1] - vector2[0] * vector1[1];
+void cross(sf::Vector3f vector1, sf::Vector3f vector2, sf::Vector3f* result){
+  result->x = vector1.y * vector2.z - vector2.y * vector1.z;
+  result->y = vector1.z * vector2.x - vector2.z * vector1.x;
+  result->z = vector1.x * vector2.y - vector2.x * vector1.y;
 };
 
 std::vector<GLfloat> getLookAtMatrix(
-  GLfloat eyeX, GLfloat eyeY, GLfloat eyeZ,
-  GLfloat centerX, GLfloat centerY, GLfloat centerZ,
-  GLfloat upX, GLfloat upY, GLfloat upZ){
+  sf::Vector3f eye, sf::Vector3f center, sf::Vector3f up){
   // Get forward vector (center - eye)
-  GLfloat forward[3] = {
-    centerX - eyeX,
-    centerY - eyeY,
-    centerZ - eyeZ
+  sf::Vector3f forward = {
+    center.x - eye.x,
+    center.y - eye.y,
+    center.z - eye.z
   };
 
-  GLfloat up[3] = {upX, upY, upZ};
-
-  normalize(forward);
+  normalize(&forward);
 
   // Get side vector (forward x up)
-  GLfloat side[3];
-  cross(forward, up, side);
-  normalize(side);
+  sf::Vector3f side;
+  cross(forward, up, &side);
+  normalize(&side);
 
   // Compute the real up (side x forward)
-  cross(side, forward, up);
-  normalize(up);
+  cross(side, forward, &up);
+  normalize(&up);
 
   // Compute translation factors
-  GLfloat tx = - side[0] * eyeX - side[1] * eyeY - side[2] * eyeZ + 1;
-  GLfloat ty = - up[0] * eyeX - up[1] * eyeY - up[2] * eyeZ + 1;
-  GLfloat tz = forward[0] * eyeX + forward[1] * eyeY + forward[2] * eyeZ + 1;
+  GLfloat tx = - side.x * eye.x - side.y * eye.y - side.z * eye.z + 1;
+  GLfloat ty = - up.x * eye.x - up.y * eye.y - up.z * eye.z + 1;
+  GLfloat tz = forward.x * eye.x + forward.y * eye.y + forward.z * eye.z + 1;
 
   std::vector<GLfloat> matrix = {
-    side[0], up[0], -forward[0], 0,
-    side[1], up[1], -forward[1], 0,
-    side[2], up[2], -forward[2], 0,
+    side.x, up.x, -forward.x, 0,
+    side.y, up.y, -forward.y, 0,
+    side.z, up.z, -forward.z, 0,
     tx, ty, tz, 1
   };
 

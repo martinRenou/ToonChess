@@ -3,6 +3,8 @@
 
 #include <GL/gl.h>
 
+#include <SFML/Graphics.hpp>
+
 #include <vector>
 #include <string>
 
@@ -63,21 +65,14 @@ std::vector<GLfloat> getOrthoProjMatrix(
 /* Generate and return a lookAt matrix. Inspired from the gluLookAt
   function, but it only creates the matrix and returns it, it doesn't call
   glMultMatrix under the hood.
-  \param eyeX Specifies the X position of the eye point
-  \param eyeY Specifies the Y position of the eye point
-  \param eyeZ Specifies the Z position of the eye point
-  \param centerX Specifies the X position of the reference point
-  \param centerY Specifies the Y position of the reference point
-  \param centerZ Specifies the Z position of the reference point
-  \param upX Specifies the X direction of the up vector
-  \param upY Specifies the Y direction of the up vector
-  \param upZ Specifies the Z direction of the up vector
+  \param eye Specifies the position of the eye point
+  \param center Specifies the position of the reference point
+  \param up Specifies the direction of the up vector
   \return The lookAt matrix
 */
 std::vector<GLfloat> getLookAtMatrix(
-  GLfloat eyeX, GLfloat eyeY, GLfloat eyeZ,
-  GLfloat centerX, GLfloat centerY, GLfloat centerZ,
-  GLfloat upX, GLfloat upY, GLfloat upZ);
+  sf::Vector3f eye, sf::Vector3f center, sf::Vector3f up
+);
 
 /* Function which returns the 4x4 identity matrix
   \return The 4x4 identity matrix
