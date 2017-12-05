@@ -144,11 +144,16 @@ std::vector<GLfloat> getLookAtMatrix(
   cross(side, forward, up);
   normalize(up);
 
+  // Compute translation factors
+  GLfloat tx = - side[0] * eyeX - side[1] * eyeY - side[2] * eyeZ + 1;
+  GLfloat ty = - up[0] * eyeX - up[1] * eyeY - up[2] * eyeZ + 1;
+  GLfloat tz = forward[0] * eyeX + forward[1] * eyeY + forward[2] * eyeZ + 1;
+
   std::vector<GLfloat> matrix = {
     side[0], up[0], -forward[0], 0,
     side[1], up[1], -forward[1], 0,
     side[2], up[2], -forward[2], 0,
-    -eyeX, -eyeY, -eyeZ, 1
+    tx, ty, tz, 1
   };
 
   return matrix;
