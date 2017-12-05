@@ -79,4 +79,9 @@ std::vector<GLfloat> getLookAtMatrix(
   GLfloat centerX, GLfloat centerY, GLfloat centerZ,
   GLfloat upX, GLfloat upY, GLfloat upZ);
 
+/* Function which returns the 4x4 identity matrix
+  \return The 4x4 identity matrix
+*/
+std::vector<GLfloat> getIdentityMatrix();
+
 #endif

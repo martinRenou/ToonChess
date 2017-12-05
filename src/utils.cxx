@@ -158,3 +158,14 @@ std::vector<GLfloat> getLookAtMatrix(
 
   return matrix;
 };
+
+std::vector<GLfloat> getIdentityMatrix(){
+  std::vector<GLfloat> matrix = {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+  };
+
+  return matrix;
+};
