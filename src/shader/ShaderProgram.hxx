@@ -46,6 +46,24 @@ class ShaderProgram {
     */
     void setUniformBool(std::string name, bool value);
 
+    /* Set a matrix uniform value, given its name. The program must be bound with
+      glUseProgram before using this method, otherwise there will be undefined
+      behavior depending on the context
+      \param name The uniform name
+      \param matrix The matrix value as a table of GLfloats
+    */
+    void setUniformMatrix4fv(std::string name, GLfloat matrix[]);
+
+    /* Set the movement matrix
+      \param matrix The matrix value as a table of GLfloats
+    */
+    void setMoveMatrix(GLfloat matrix[]);
+
+    /* Set the view matrix
+      \param matrix The matrix value as a table of GLfloats
+    */
+    void setViewMatrix(GLfloat matrix[]);
+
     /* Bind a texture to sampler "n"
       \param n The index of the sampler
       \param target The target for the sampler, must be GL_TEXTUREn with n the
