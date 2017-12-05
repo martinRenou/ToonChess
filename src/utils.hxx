@@ -44,10 +44,10 @@ bool _displayGLErrors(const char *file, int line);
     This value is negative if the plane is to be behind the viewer
   \return The orthographic matrix
 */
-std::vector<GLdouble> getOrthoProjMatrix(
-  GLdouble left, GLdouble right,
-  GLdouble bottom, GLdouble top,
-  GLdouble nearVal, GLdouble farVal
+std::vector<GLfloat> getOrthoProjMatrix(
+  GLfloat left, GLfloat right,
+  GLfloat bottom, GLfloat top,
+  GLfloat nearVal, GLfloat farVal
 );
 
 /* Generate and return a lookAt matrix. Inspired from the gluLookAt
@@ -64,15 +64,9 @@ std::vector<GLdouble> getOrthoProjMatrix(
   \param upZ Specifies the Z direction of the up vector
   \return The lookAt matrix
 */
-std::vector<GLdouble> getLookAtMatrix(
-  GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ,
-  GLdouble centerX, GLdouble centerY, GLdouble centerZ,
-  GLdouble upX, GLdouble upY, GLdouble upZ);
-
-/* Function which call glPushMatrix and takes care of OpenGL errors */
-void pushMatrix();
-
-/* Function which call glPopMatrix and takes care of OpenGL errors */
-void popMatrix();
+std::vector<GLfloat> getLookAtMatrix(
+  GLfloat eyeX, GLfloat eyeY, GLfloat eyeZ,
+  GLfloat centerX, GLfloat centerY, GLfloat centerZ,
+  GLfloat upX, GLfloat upY, GLfloat upZ);
 
 #endif

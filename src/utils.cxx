@@ -75,11 +75,11 @@ bool _displayGLErrors(const char *file, int line){
   return foundError;
 }
 
-std::vector<GLdouble> getOrthoProjMatrix(
-  GLdouble left, GLdouble right,
-  GLdouble bottom, GLdouble top,
-  GLdouble nearVal, GLdouble farVal){
-  std::vector<GLdouble> matrix = {
+std::vector<GLfloat> getOrthoProjMatrix(
+  GLfloat left, GLfloat right,
+  GLfloat bottom, GLfloat top,
+  GLfloat nearVal, GLfloat farVal){
+  std::vector<GLfloat> matrix = {
     2/(right - left), 0, 0, 0,
     0, 2/(top - bottom), 0, 0,
     0, 0, -2/(farVal - nearVal), 0,
@@ -90,8 +90,8 @@ std::vector<GLdouble> getOrthoProjMatrix(
   return matrix;
 };
 
-void normalize(GLdouble* vector){
-  GLdouble norm = sqrt(
+void normalize(GLfloat* vector){
+  GLfloat norm = sqrt(
     pow(vector[0], 2) + pow(vector[1], 2) + pow(vector[2], 2)
   );
 
@@ -100,29 +100,29 @@ void normalize(GLdouble* vector){
   vector[2] /= norm;
 };
 
-void cross(GLdouble* vector1, GLdouble* vector2, GLdouble* result){
+void cross(GLfloat* vector1, GLfloat* vector2, GLfloat* result){
   result[0] = vector1[1] * vector2[2] - vector2[1] * vector1[2];
   result[1] = vector1[2] * vector2[0] - vector2[2] * vector1[0];
   result[2] = vector1[0] * vector2[1] - vector2[0] * vector1[1];
 };
 
-std::vector<GLdouble> getLookAtMatrix(
-  GLdouble eyeX, GLdouble eyeY, GLdouble eyeZ,
-  GLdouble centerX, GLdouble centerY, GLdouble centerZ,
-  GLdouble upX, GLdouble upY, GLdouble upZ){
+std::vector<GLfloat> getLookAtMatrix(
+  GLfloat eyeX, GLfloat eyeY, GLfloat eyeZ,
+  GLfloat centerX, GLfloat centerY, GLfloat centerZ,
+  GLfloat upX, GLfloat upY, GLfloat upZ){
   // Get forward vector (center - eye)
-  GLdouble forward[3] = {
+  GLfloat forward[3] = {
     centerX - eyeX,
     centerY - eyeY,
     centerZ - eyeZ
   };
 
-  GLdouble up[3] = {upX, upY, upZ};
+  GLfloat up[3] = {upX, upY, upZ};
 
   normalize(forward);
 
   // Get side vector (forward x up)
-  GLdouble side[3];
+  GLfloat side[3];
   cross(forward, up, side);
   normalize(side);
 
@@ -130,23 +130,12 @@ std::vector<GLdouble> getLookAtMatrix(
   cross(side, forward, up);
   normalize(up);
 
-  std::vector<GLdouble> matrix = {
+  std::vector<GLfloat> matrix = {
     side[0], up[0], -forward[0], 0,
     side[1], up[1], -forward[1], 0,
     side[2], up[2], -forward[2], 0,
-    0, 0, 0, 1
+    -eyeX, -eyeY, -eyeZ, 1
   };
 
   return matrix;
-};
-
-void pushMatrix(){
-  glPushMatrix();
-};
-
-void popMatrix(){
-  GLint stackDepth;
-  glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);
-
-  if(stackDepth != 1) glPopMatrix();
 };
