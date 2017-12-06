@@ -101,6 +101,12 @@ void ShaderProgram::setProjectionMatrix(GLfloat* matrix){
   glUniformMatrix4fv(location, 1, false, matrix);
 };
 
+void ShaderProgram::setNormalMatrix(GLfloat* matrix){
+  GLuint location = glGetUniformLocation(this->id, "NMatrix");
+
+  glUniformMatrix4fv(location, 1, false, matrix);
+};
+
 void ShaderProgram::bindTexture(
     GLuint n, GLenum target, std::string name, GLuint texture){
   GLuint location = glGetUniformLocation(this->id, name.c_str());
