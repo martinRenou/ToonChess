@@ -36,7 +36,9 @@ void celShadingRender(
   sf::Vector2i* selectedPiecePosition,
   GLuint shadowMap,
   GLfloat* lookAtMatrix,
-  GLfloat* projectionMatrix);
+  GLfloat* projectionMatrix,
+  GLfloat* lightMatrix,
+  GLfloat* projectionLightMatrix);
 
 void shadowMappingRender(
     int board[][8], std::map<int, Mesh*>* meshes,
@@ -121,10 +123,12 @@ int main(){
     sizeShadowMap.x, sizeShadowMap.y,
     0, GL_RGB, GL_UNSIGNED_BYTE, 0
   );
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
-  glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, shadowMap, 0);
+  glFramebufferTexture2D(
+    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowMap, 0
+  );
 
   // Create render buffer for depth test
   GLuint depthRenderBuffer;
@@ -225,7 +229,8 @@ int main(){
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(
       board, &meshes, &programs, &selectedPiecePosition,
-      shadowMap, &lookAtMatrix[0], &projectionMatrix[0]
+      shadowMap, &lookAtMatrix[0], &projectionMatrix[0],
+      &lightLookAtMatrix[0], &orthoProjMatrix[0]
     );
 
     if(selecting){
@@ -255,7 +260,9 @@ void celShadingRender(
     sf::Vector2i* selectedPiecePosition,
     GLuint shadowMap,
     GLfloat* lookAtMatrix,
-    GLfloat* projectionMatrix){
+    GLfloat* projectionMatrix,
+    GLfloat* lightMatrix,
+    GLfloat* projectionLightMatrix){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
   sf::Vector3f translation;
@@ -302,6 +309,10 @@ void celShadingRender(
   // Bind uniform values
   programs->at(CEL_SHADING)->setViewMatrix(lookAtMatrix);
   programs->at(CEL_SHADING)->setProjectionMatrix(projectionMatrix);
+  programs->at(CEL_SHADING)->setUniformMatrix4fv(
+    "LMatrix", lightMatrix);
+  programs->at(CEL_SHADING)->setUniformMatrix4fv(
+    "PLMatrix", projectionLightMatrix);
   programs->at(CEL_SHADING)->bindTexture(
     0, GL_TEXTURE0, "shadowMap", shadowMap
   );
