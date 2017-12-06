@@ -82,7 +82,7 @@ std::vector<GLfloat> getIdentityMatrix();
 /* Function which perform a matrix product between two matrices
   \param matrix1 The first 4x4 matrix
   \param matrix2 The second 4x4 matrix
-  \return The result
+  \return The result matrix
 */
 std::vector<GLfloat> matrixProduct(
   std::vector<GLfloat>* matrix1, std::vector<GLfloat>* matrix2
@@ -92,6 +92,7 @@ std::vector<GLfloat> matrixProduct(
   \param matrix The 4x4 matrix to rotate
   \param angle The angle of the rotation in degrees
   \param r The axis of the rotation
+  \return The result matrix
 */
 std::vector<GLfloat> rotate(
   std::vector<GLfloat>* matrix,
@@ -102,10 +103,17 @@ std::vector<GLfloat> rotate(
 /* Function which translates a matrix and return the result
   \param matrix The 4x4 matrix to translate
   \param translation The vector of translation
+  \return The result matrix
 */
 std::vector<GLfloat> translate(
   std::vector<GLfloat>* matrix,
   sf::Vector3f translation
 );
+
+/* Function which computes the inverse of a matrix and returns the result
+  \param matrix The 4x4 matrix of which you want the inverse
+  \return The inverse matrix
+*/
+std::vector<GLfloat> inverse(std::vector<GLfloat>* matrix);
 
 #endif
