@@ -79,4 +79,33 @@ std::vector<GLfloat> getLookAtMatrix(
 */
 std::vector<GLfloat> getIdentityMatrix();
 
+/* Function which perform a matrix product between two matrices
+  \param matrix1 The first 4x4 matrix
+  \param matrix2 The second 4x4 matrix
+  \return The result
+*/
+std::vector<GLfloat> matrixProduct(
+  std::vector<GLfloat>* matrix1, std::vector<GLfloat>* matrix2
+);
+
+/* Function which rotates a matrix and return the result
+  \param matrix The 4x4 matrix to rotate
+  \param angle The angle of the rotation in degrees
+  \param r The axis of the rotation
+*/
+std::vector<GLfloat> rotate(
+  std::vector<GLfloat>* matrix,
+  GLfloat angle,
+  sf::Vector3f r
+);
+
+/* Function which translates a matrix and return the result
+  \param matrix The 4x4 matrix to translate
+  \param translation The vector of translation
+*/
+std::vector<GLfloat> translate(
+  std::vector<GLfloat>* matrix,
+  sf::Vector3f translation
+);
+
 #endif

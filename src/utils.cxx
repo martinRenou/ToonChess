@@ -123,7 +123,7 @@ void cross(sf::Vector3f vector1, sf::Vector3f vector2, sf::Vector3f* result){
 };
 
 std::vector<GLfloat> getLookAtMatrix(
-  sf::Vector3f eye, sf::Vector3f center, sf::Vector3f up){
+    sf::Vector3f eye, sf::Vector3f center, sf::Vector3f up){
   // Get forward vector (center - eye)
   sf::Vector3f forward = {
     center.x - eye.x,
@@ -166,4 +166,72 @@ std::vector<GLfloat> getIdentityMatrix(){
   };
 
   return matrix;
+};
+
+std::vector<GLfloat> matrixProduct(
+    std::vector<GLfloat>* matrix1, std::vector<GLfloat>* matrix2){
+  std::vector<GLfloat> result = {
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0
+  };
+
+  for(int i = 0; i < 4; i++){
+    for(int j = 0; j < 4; j++){
+      result.at(4 * i + j) =
+        matrix1->at(4 * i + 0)*matrix2->at(4 * 0 + j) +
+        matrix1->at(4 * i + 1)*matrix2->at(4 * 1 + j) +
+        matrix1->at(4 * i + 2)*matrix2->at(4 * 2 + j) +
+        matrix1->at(4 * i + 3)*matrix2->at(4 * 3 + j);
+    }
+  }
+
+  return result;
+};
+
+std::vector<GLfloat> rotate(
+    std::vector<GLfloat>* matrix,
+    GLfloat angle,
+    sf::Vector3f r){
+  GLfloat co = cos(angle * M_PI/180.);
+  GLfloat si = sin(angle * M_PI/180.);
+  normalize(&r);
+
+  GLfloat a = r.x * r.x * (1 - co) + co;
+  GLfloat b = r.x * r.y * (1 - co) - r.z * si;
+  GLfloat c = r.x * r.z * (1 - co) + r.y * si;
+
+  GLfloat d = r.y * r.x * (1 - co) + r.z * si;
+  GLfloat e = r.y * r.y * (1 - co) + co;
+  GLfloat f = r.y * r.z * (1 - co) - r.x * si;
+
+  GLfloat g = r.z * r.x * (1 - co) - r.y * si;
+  GLfloat h = r.z * r.y * (1 - co) + r.x * si;
+  GLfloat i = r.z * r.z * (1 - co) + co;
+
+  std::vector<GLfloat> rotationMatrix = {
+    a, d, g, 0,
+    b, e, h, 0,
+    c, f, i, 0,
+    0, 0, 0, 1
+  };
+
+  std::vector<GLfloat> result = matrixProduct(matrix, &rotationMatrix);
+
+  return result;
+};
+
+std::vector<GLfloat> translate(
+    std::vector<GLfloat>* matrix, sf::Vector3f translation){
+  std::vector<GLfloat> translationMatrix = {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    translation.x, translation.y, translation.z, 1
+  };
+
+  std::vector<GLfloat> result = matrixProduct(matrix, &translationMatrix);
+
+  return result;
 };
