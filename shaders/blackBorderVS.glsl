@@ -1,4 +1,8 @@
 uniform bool selected;
+uniform mat4 VMatrix;
+uniform mat4 MMatrix;
+uniform mat4 PMatrix;
+
 vec4 position;
 
 void main(void){
@@ -15,5 +19,5 @@ void main(void){
   vec4 deformedPosition = deformation + position;
 
   // The position of the vertex
-  gl_Position = gl_ProjectionMatrix * gl_ModelViewMatrix * deformedPosition;
+  gl_Position = PMatrix * VMatrix * MMatrix * deformedPosition;
 }

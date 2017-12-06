@@ -1,6 +1,11 @@
 varying float depth;
-vec4 position;
+
 uniform bool selected;
+uniform mat4 MMatrix;
+uniform mat4 VMatrix;
+uniform mat4 PMatrix;
+
+vec4 position;
 
 void main(void){
   // If the mesh is selected, move it
@@ -11,7 +16,7 @@ void main(void){
   }
 
   // The position of the vertex on the screen
-  position = gl_ProjectionMatrix * gl_ModelViewMatrix * position;
+  position = PMatrix * VMatrix * MMatrix * position;
 
   // Get depth
   float zDepth = position.z/position.w;

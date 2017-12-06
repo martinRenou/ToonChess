@@ -1,6 +1,6 @@
 #define GL_GLEXT_PROTOTYPES
 
-#include <GL/glu.h>
+#include <GL/gl.h>
 
 #include <SFML/Window.hpp>
 #include <SFML/Graphics.hpp>
@@ -34,12 +34,16 @@ void celShadingRender(
   std::map<int, Mesh*>* meshes,
   std::map<int, ShaderProgram*>* programs,
   sf::Vector2i* selectedPiecePosition,
-  GLuint shadowMap);
+  GLuint shadowMap,
+  GLfloat* lookAtMatrix,
+  GLfloat* projectionMatrix);
 
 void shadowMappingRender(
     int board[][8], std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
-    sf::Vector2i* selectedPiecePosition);
+    sf::Vector2i* selectedPiecePosition,
+    GLfloat* lookAtMatrix,
+    GLfloat* projectionMatrix);
 
 int main(){
   // Create window
@@ -80,17 +84,23 @@ int main(){
   ColorPicking* colorPicking = new ColorPicking(width, height);
   colorPicking->initBuffers();
 
-  // Get lookAt matrix
-  std::vector<GLdouble> lookAtMatrix = getLookAtMatrix(
-    0, -40, 20, 0, 0, 0, 0, 0, 1);
+  // Compute lookAtMatrix and projectionMatrix
+  sf::Vector3f eye = {0.0, -40.0, 20.0};
+  sf::Vector3f center = {0.0, 0.0, 0.0};
+  sf::Vector3f up = {0.0, 0.0, 1.0};
+  std::vector<GLfloat> lookAtMatrix = getLookAtMatrix(eye, center, up);
+  std::vector<GLfloat> projectionMatrix = getPerspectiveProjMatrix(
+    50, (double)width/height, 1, 1000
+  );
 
   // Create orthographic projection matrix for shadow mapping
-  std::vector<GLdouble> orthoProjMatrix = getOrthoProjMatrix(
+  std::vector<GLfloat> orthoProjMatrix = getOrthoProjMatrix(
     -20, 20, -20, 20, 1, 40);
 
   // Get lookAt matrix from light position for shadow mapping
-  std::vector<GLdouble> lightLookAtMatrix = getLookAtMatrix(
-    20, 0, 20, 0, 0, 0, 0, 0, 1);
+  sf::Vector3f lightPosition = {20, 0, 20};
+  std::vector<GLfloat> lightLookAtMatrix = getLookAtMatrix(
+    lightPosition, center, up);
 
   // Create FBO for shadow mapping
   GLuint shadowMapFBO = 0;
@@ -166,14 +176,28 @@ int main(){
 
         // Resize the buffers for color picking
         colorPicking->resizeBuffers(width, height);
+
+        // Recompute projectionMatrix
+        projectionMatrix = getPerspectiveProjMatrix(
+          50, (double)width/height, 1, 1000
+        );
       }
-      else if (event.type == sf::Event::MouseButtonReleased){
-        if (event.mouseButton.button == sf::Mouse::Left){
+      else if(event.type == sf::Event::MouseButtonReleased){
+        if(event.mouseButton.button == sf::Mouse::Left){
           selectedPixelPosition.x = event.mouseButton.x;
           selectedPixelPosition.y = height - event.mouseButton.y;
 
           selecting = true;
         }
+      }
+      else if(event.type == sf::Event::KeyPressed){
+        if(event.key.code == sf::Keyboard::Down) eye.z -= 1.0;
+        else if(event.key.code == sf::Keyboard::Up) eye.z += 1.0;
+        else if(event.key.code == sf::Keyboard::Left) eye.x -= 1.0;
+        else if(event.key.code == sf::Keyboard::Right) eye.x += 1.0;
+        else continue;
+
+        lookAtMatrix = getLookAtMatrix(eye, center, up);
       }
     }
 
@@ -185,14 +209,10 @@ int main(){
 
     glViewport(0, 0, sizeShadowMap.x, sizeShadowMap.y);
 
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    glMultMatrixd(&orthoProjMatrix[0]);
-
-    glMultMatrixd(&lightLookAtMatrix[0]);
-    glTranslated(-20, 0, -20);
-
-    shadowMappingRender(board, &meshes, &programs, &selectedPiecePosition);
+    shadowMappingRender(
+      board, &meshes, &programs, &selectedPiecePosition,
+      &lightLookAtMatrix[0], &orthoProjMatrix[0]
+    );
 
     // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -201,21 +221,17 @@ int main(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(50, (double)width/height, 1, 1000);
-
-    glMultMatrixd(&lookAtMatrix[0]);
-    glTranslated(0, 40, -20);
 
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(
-      board, &meshes, &programs, &selectedPiecePosition, shadowMap
+      board, &meshes, &programs, &selectedPiecePosition,
+      shadowMap, &lookAtMatrix[0], &projectionMatrix[0]
     );
 
     if(selecting){
       selectedPiecePosition = colorPicking->getClickedPiecePosition(
-        selectedPixelPosition, board, &meshes, &programs
+        selectedPixelPosition, board, &meshes, &programs,
+        &lookAtMatrix[0], &projectionMatrix[0]
       );
 
       selecting = false;
@@ -237,38 +253,45 @@ void celShadingRender(
     int board[][8], std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
     sf::Vector2i* selectedPiecePosition,
-    GLuint shadowMap){
-  glPushMatrix();
+    GLuint shadowMap,
+    GLfloat* lookAtMatrix,
+    GLfloat* projectionMatrix){
+  // The movement Matrix
+  std::vector<GLfloat> movementMatrix;
+  sf::Vector3f translation;
+  sf::Vector3f rotation = {0, 0, 1};
 
   // Render all the black borders
   glUseProgram(programs->at(BLACK_BORDER)->id);
   glCullFace(GL_FRONT);
+
+  // Bind uniform values
+  programs->at(BLACK_BORDER)->setViewMatrix(lookAtMatrix);
+  programs->at(BLACK_BORDER)->setProjectionMatrix(projectionMatrix);
+
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = board[x][y];
 
-      glMatrixMode(GL_MODELVIEW);
-      glLoadIdentity();
-      glTranslatef(x * 4 - 14, y * 4 - 14, 0);
+      // Set movement matrix
+      movementMatrix = getIdentityMatrix();
+      // Rotate the piece depending on the team
+      movementMatrix = piece > 0 ?
+        rotate(&movementMatrix, -90.0, rotation) :
+        rotate(&movementMatrix, 90.0, rotation);
+      // Translate the piece
+      translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
+      movementMatrix = translate(&movementMatrix, translation);
+      programs->at(BLACK_BORDER)->setMoveMatrix(&movementMatrix[0]);
 
       (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
-        programs->at(CEL_SHADING)->setUniformBool("selected", true) :
-        programs->at(CEL_SHADING)->setUniformBool("selected", false);
+        programs->at(BLACK_BORDER)->setUniformBool("selected", true) :
+        programs->at(BLACK_BORDER)->setUniformBool("selected", false);
 
       // Draw board cell
       meshes->at(BOARDCELL)->draw();
 
-      if(piece != EMPTY){
-        // Get piece mesh object
-        Mesh* mesh = meshes->at(abs(piece));
-
-        // Rotate it depending on the team
-        piece > 0 ?
-          glRotatef(-90, 0, 0, 1) :
-          glRotatef(90, 0, 0, 1);
-
-        mesh->draw();
-      }
+      if(piece != EMPTY) meshes->at(abs(piece))->draw();
     }
   }
 
@@ -276,17 +299,26 @@ void celShadingRender(
   glUseProgram(programs->at(CEL_SHADING)->id);
   glCullFace(GL_BACK);
 
-  // Bind the shadow map
+  // Bind uniform values
+  programs->at(CEL_SHADING)->setViewMatrix(&lookAtMatrix[0]);
+  programs->at(CEL_SHADING)->setProjectionMatrix(projectionMatrix);
   programs->at(CEL_SHADING)->bindTexture(
     0, GL_TEXTURE0, "shadowMap", shadowMap
   );
+
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = board[x][y];
 
-      glMatrixMode(GL_MODELVIEW);
-      glLoadIdentity();
-      glTranslatef(x * 4 - 14, y * 4 - 14, 0);
+      movementMatrix = getIdentityMatrix();
+      // Rotate the piece depending on the team
+      movementMatrix = piece > 0 ?
+        rotate(&movementMatrix, -90.0, rotation) :
+        rotate(&movementMatrix, 90.0, rotation);
+      // Translate the piece
+      translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
+      movementMatrix = translate(&movementMatrix, translation);
+      programs->at(CEL_SHADING)->setMoveMatrix(&movementMatrix[0]);
 
       // Draw the board cell
       (x + y) % 2 == 0 ?
@@ -302,14 +334,6 @@ void celShadingRender(
       meshes->at(BOARDCELL)->draw();
 
       if(piece != EMPTY){
-        // Get piece mesh object
-        Mesh* mesh = meshes->at(abs(piece));
-
-        // Rotate it depending on the team
-        piece > 0 ?
-          glRotatef(-90, 0, 0, 1) :
-          glRotatef(90, 0, 0, 1);
-
         // Display cel-shading mesh
         piece > 0 ?
           programs->at(CEL_SHADING)->setUniform4f(
@@ -317,37 +341,45 @@ void celShadingRender(
           programs->at(CEL_SHADING)->setUniform4f(
             "pieceColor", 0.51, 0.08, 0.08, 1.0);
 
-        (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
-          programs->at(CEL_SHADING)->setUniformBool("selected", true) :
-          programs->at(CEL_SHADING)->setUniformBool("selected", false);
-
-        mesh->draw();
+        meshes->at(abs(piece))->draw();
       }
     }
   }
-
-  GLint stackDepth;
-  glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);
-
-  if(stackDepth != 1) glPopMatrix();
 };
 
 void shadowMappingRender(
     int board[][8], std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
-    sf::Vector2i* selectedPiecePosition){
-  glPushMatrix();
+    sf::Vector2i* selectedPiecePosition,
+    GLfloat* lookAtMatrix,
+    GLfloat* projectionMatrix){
+  // The movement Matrix
+  std::vector<GLfloat> movementMatrix;
+  sf::Vector3f translation;
+  sf::Vector3f rotation = {0, 0, 1};
 
-  // Render all meshes
+  // Render all meshes with the color depending on the depth (distance from
+  // light)
   glUseProgram(programs->at(SHADOW_MAPPING)->id);
   glCullFace(GL_BACK);
+
+  // Bind uniform values
+  programs->at(SHADOW_MAPPING)->setViewMatrix(lookAtMatrix);
+  programs->at(SHADOW_MAPPING)->setProjectionMatrix(projectionMatrix);
+
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = board[x][y];
 
-      glMatrixMode(GL_MODELVIEW);
-      glLoadIdentity();
-      glTranslatef(x * 4 - 14, y * 4 - 14, 0);
+      movementMatrix = getIdentityMatrix();
+      // Rotate the piece depending on the team
+      movementMatrix = piece > 0 ?
+        rotate(&movementMatrix, -90.0, rotation) :
+        rotate(&movementMatrix, 90.0, rotation);
+      // Translate the piece
+      translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
+      movementMatrix = translate(&movementMatrix, translation);
+      programs->at(SHADOW_MAPPING)->setMoveMatrix(&movementMatrix[0]);
 
       (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
         programs->at(SHADOW_MAPPING)->setUniformBool("selected", true) :
@@ -356,22 +388,7 @@ void shadowMappingRender(
       // Draw board cell
       meshes->at(BOARDCELL)->draw();
 
-      if(piece != EMPTY){
-        // Get piece mesh object
-        Mesh* mesh = meshes->at(abs(piece));
-
-        // Rotate it depending on the team
-        piece > 0 ?
-          glRotatef(-90, 0, 0, 1) :
-          glRotatef(90, 0, 0, 1);
-
-        mesh->draw();
-      }
+      if(piece != EMPTY) meshes->at(abs(piece))->draw();
     }
   }
-
-  GLint stackDepth;
-  glGetIntegerv(GL_MODELVIEW_STACK_DEPTH, &stackDepth);
-
-  if(stackDepth != 1) glPopMatrix();
 };

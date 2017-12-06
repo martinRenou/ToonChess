@@ -1,7 +1,7 @@
 #ifndef COLORPICKING_HXX_
 #define COLORPICKING_HXX_
 
-#include <GL/glu.h>
+#include <GL/gl.h>
 #include <SFML/Graphics.hpp>
 
 #include <map>
@@ -53,7 +53,9 @@ public:
   sf::Vector2i getClickedPiecePosition(
     sf::Vector2i clickedPixelPosition,
     int board[][8], std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs);
+    std::map<int, ShaderProgram*>* programs,
+    GLfloat* lookAtMatrix,
+    GLfloat* projectionMatrix);
 
   /* Destructor, this will remove the buffers from memory */
   ~ColorPicking();

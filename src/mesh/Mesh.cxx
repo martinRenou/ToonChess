@@ -1,6 +1,6 @@
 #define GL_GLEXT_PROTOTYPES
 
-#include <GL/glu.h>
+#include <GL/gl.h>
 
 #include <string>
 #include <vector>

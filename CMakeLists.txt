@@ -75,11 +75,3 @@ if (OPENGL_FOUND)
   target_link_libraries(${TEST_NAME} ${OPENGL_LIBRARIES})
   # target_link_libraries(${EXECUTABLE_NAME} m)
 endif()
-
-# Glut
-find_package(GLUT REQUIRED)
-include_directories(${GLUT_INCLUDE_DIR})
-if (GLUT_FOUND)
-  target_link_libraries(${EXECUTABLE_NAME} ${GLUT_LIBRARIES} )
-  target_link_libraries(${TEST_NAME} ${GLUT_LIBRARIES} )
-endif()
