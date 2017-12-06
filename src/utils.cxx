@@ -79,7 +79,7 @@ bool _displayGLErrors(const char *file, int line){
 
 std::vector<GLfloat> getPerspectiveProjMatrix(
     GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar){
-  GLfloat f = 1.0/tan(fovy/2.0);
+  GLfloat f = 1.0/tan(fovy * M_PI/360.);
 
   std::vector<GLfloat> matrix = {
     f/aspect, 0, 0, 0,
