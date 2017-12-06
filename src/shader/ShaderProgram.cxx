@@ -84,27 +84,19 @@ void ShaderProgram::setUniformMatrix4fv(std::string name, GLfloat* matrix){
 };
 
 void ShaderProgram::setMoveMatrix(GLfloat* matrix){
-  GLuint location = glGetUniformLocation(this->id, "MMatrix");
-
-  glUniformMatrix4fv(location, 1, false, matrix);
+  this->setUniformMatrix4fv("MMatrix", matrix);
 };
 
 void ShaderProgram::setViewMatrix(GLfloat* matrix){
-  GLuint location = glGetUniformLocation(this->id, "VMatrix");
-
-  glUniformMatrix4fv(location, 1, false, matrix);
+  this->setUniformMatrix4fv("VMatrix", matrix);
 };
 
 void ShaderProgram::setProjectionMatrix(GLfloat* matrix){
-  GLuint location = glGetUniformLocation(this->id, "PMatrix");
-
-  glUniformMatrix4fv(location, 1, false, matrix);
+  this->setUniformMatrix4fv("PMatrix", matrix);
 };
 
 void ShaderProgram::setNormalMatrix(GLfloat* matrix){
-  GLuint location = glGetUniformLocation(this->id, "NMatrix");
-
-  glUniformMatrix4fv(location, 1, false, matrix);
+  this->setUniformMatrix4fv("NMatrix", matrix);
 };
 
 void ShaderProgram::bindTexture(
