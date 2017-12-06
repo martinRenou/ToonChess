@@ -300,7 +300,7 @@ void celShadingRender(
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  programs->at(CEL_SHADING)->setViewMatrix(&lookAtMatrix[0]);
+  programs->at(CEL_SHADING)->setViewMatrix(lookAtMatrix);
   programs->at(CEL_SHADING)->setProjectionMatrix(projectionMatrix);
   programs->at(CEL_SHADING)->bindTexture(
     0, GL_TEXTURE0, "shadowMap", shadowMap
@@ -319,6 +319,10 @@ void celShadingRender(
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
       movementMatrix = translate(&movementMatrix, translation);
       programs->at(CEL_SHADING)->setMoveMatrix(&movementMatrix[0]);
+
+      std::vector<GLfloat> normalMatrix = inverse(&movementMatrix);
+      normalMatrix = transpose(&normalMatrix);
+      programs->at(CEL_SHADING)->setNormalMatrix(&normalMatrix[0]);
 
       // Draw the board cell
       (x + y) % 2 == 0 ?
