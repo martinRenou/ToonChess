@@ -116,4 +116,10 @@ std::vector<GLfloat> translate(
 */
 std::vector<GLfloat> inverse(std::vector<GLfloat>* matrix);
 
+/* Function which computes the transpose of a matrix and returns the result
+  \param matrix The 4x4 matrix of which you want the transpose
+  \return The transposed matrix
+*/
+std::vector<GLfloat> transpose(std::vector<GLfloat>* matrix);
+
 #endif

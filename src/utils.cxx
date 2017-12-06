@@ -298,7 +298,7 @@ std::vector<GLfloat> inverse(std::vector<GLfloat>* matrix){
   det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
 
   if (det == 0){
-    std::cerr << "Matrix not inversible" << '\n';;
+    std::cerr << "Matrix not invertible" << '\n';;
   }
 
   det = 1.0 / det;
@@ -308,4 +308,15 @@ std::vector<GLfloat> inverse(std::vector<GLfloat>* matrix){
   }
 
   return inv;
+};
+
+std::vector<GLfloat> transpose(std::vector<GLfloat>* matrix){
+  std::vector<GLfloat> result = {
+    matrix->at(0), matrix->at(4), matrix->at(8), matrix->at(12),
+    matrix->at(1), matrix->at(5), matrix->at(9), matrix->at(13),
+    matrix->at(2), matrix->at(6), matrix->at(10), matrix->at(14),
+    matrix->at(3), matrix->at(7), matrix->at(11), matrix->at(15)
+  };
+
+  return result;
 };
