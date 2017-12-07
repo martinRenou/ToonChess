@@ -13,7 +13,7 @@ struct GameInfo {
   GLboolean shadowMapping = true;
   GLfloat shadowMapResolution = SHADOWMAPPING_LOW;
   GLint antialiasingLevel = ANTIALIASING_LOW;
-  GLboolean vSync = true;
+  GLboolean vSync = false;
   GLint fovy = 50;
 
   sf::Vector3f cameraPosition = {0.0, -40.0, 20.0};
