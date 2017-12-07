@@ -8,6 +8,7 @@
 
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
+#include "../GameInfo.hxx"
 
 class ColorPicking {
 private:
@@ -48,14 +49,15 @@ public:
   /* Get the cliked piece position according to the clicked pixel on the screen.
     This will perform a rendering in the framebuffer
     \param clickedPixelPosition The position of the clicked pixel on the screen
+    \param gameInfo The current game informations
+    \param meshes The map of piece meshes
+    \param programs The map of shader programs
     \return The position of the clicked chess piece
   */
   sf::Vector2i getClickedPiecePosition(
     sf::Vector2i clickedPixelPosition,
-    int board[][8], std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs,
-    GLfloat* lookAtMatrix,
-    GLfloat* projectionMatrix);
+    GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs);
 
   /* Destructor, this will remove the buffers from memory */
   ~ColorPicking();

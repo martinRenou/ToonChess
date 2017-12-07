@@ -18,41 +18,37 @@
 #include "ColorPicking/ColorPicking.hxx"
 
 #include "constants.hxx"
+#include "GameInfo.hxx"
 #include "utils.hxx"
 
 #include "chessBoard/chessBoard.hxx"
 
-/* Makes a cel-shading render in the current frameBuffer
-  \param board The current board
+/* Perform a cel-shading rendering in the current frameBuffer
+  \param gameInfo The current game informations
   \param meshes The map of meshes
   \param programs The map of shader programs
-  \param selectedPiecePosition The position of the selected piece on the board
   \param shadowMap The shadowMap texture
 */
 void celShadingRender(
-  int board[][8],
+  GameInfo* gameInfo,
   std::map<int, Mesh*>* meshes,
   std::map<int, ShaderProgram*>* programs,
-  sf::Vector2i* selectedPiecePosition,
-  GLuint shadowMap,
-  GLfloat* lookAtMatrix,
-  GLfloat* projectionMatrix,
-  GLfloat* lightMatrix,
-  GLfloat* projectionLightMatrix);
+  GLuint shadowMap);
 
 void shadowMappingRender(
-    int board[][8], std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs,
-    sf::Vector2i* selectedPiecePosition,
-    GLfloat* lookAtMatrix,
-    GLfloat* projectionMatrix);
+  GameInfo* gameInfo,
+  std::map<int, Mesh*>* meshes,
+  std::map<int, ShaderProgram*>* programss);
 
 int main(){
+  // Initialize game informations
+  GameInfo gameInfo;
+
   // Create window
   sf::ContextSettings settings;
   settings.depthBits = 24;
   settings.stencilBits = 8;
-  settings.antialiasingLevel = 4;
+  settings.antialiasingLevel = gameInfo.antialiasingLevel;
   settings.majorVersion = 3;
   settings.minorVersion = 0;
 
@@ -64,7 +60,7 @@ int main(){
       sf::Style::Default,
       settings
   );
-  window.setVerticalSyncEnabled(true);
+  window.setVerticalSyncEnabled(gameInfo.vSync);
   // Enable depth test
   glEnable(GL_DEPTH_TEST);
   // Enable backface culling
@@ -86,31 +82,34 @@ int main(){
   ColorPicking* colorPicking = new ColorPicking(width, height);
   colorPicking->initBuffers();
 
-  // Compute lookAtMatrix and projectionMatrix
-  sf::Vector3f eye = {0.0, -40.0, 20.0};
+  // Compute cameraLookAtMatrix and cameraProjectionMatrix
   sf::Vector3f center = {0.0, 0.0, 0.0};
   sf::Vector3f up = {0.0, 0.0, 1.0};
-  std::vector<GLfloat> lookAtMatrix = getLookAtMatrix(eye, center, up);
-  std::vector<GLfloat> projectionMatrix = getPerspectiveProjMatrix(
-    50, (double)width/height, 1, 1000
+  gameInfo.cameraViewMatrix = getLookAtMatrix(
+    gameInfo.cameraPosition, center, up
+  );
+  gameInfo.cameraProjectionMatrix = getPerspectiveProjMatrix(
+    gameInfo.fovy, (double)width/height, 1, 1000
   );
 
   // Create orthographic projection matrix for shadow mapping
-  std::vector<GLfloat> orthoProjMatrix = getOrthoProjMatrix(
-    -20, 20, -20, 20, 1, 40);
+  gameInfo.lightProjectionMatrix = getOrthoProjMatrix(
+    -20, 20, -20, 20, 1, 40
+  );
 
   // Get lookAt matrix from light position for shadow mapping
-  sf::Vector3f lightPosition = {20, 0, 20};
-  std::vector<GLfloat> lightLookAtMatrix = getLookAtMatrix(
+  sf::Vector3f lightPosition = {
+    (float)-20.0 * gameInfo.lightDirection.x,
+    (float)-20.0 * gameInfo.lightDirection.y,
+    (float)-20.0 * gameInfo.lightDirection.z
+  };
+  gameInfo.lightViewMatrix = getLookAtMatrix(
     lightPosition, center, up);
 
   // Create FBO for shadow mapping
   GLuint shadowMapFBO = 0;
   glGenFramebuffers(1, &shadowMapFBO);
   glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
-
-  // Size of the shadowMap
-  sf::Vector2i sizeShadowMap = {512, 512};
 
   // Create the shadowMap texture
   GLuint shadowMap;
@@ -120,7 +119,7 @@ int main(){
   // Set the texture
   glTexImage2D(
     GL_TEXTURE_2D, 0, GL_RGB,
-    sizeShadowMap.x, sizeShadowMap.y,
+    gameInfo.shadowMapResolution, gameInfo.shadowMapResolution,
     0, GL_RGB, GL_UNSIGNED_BYTE, 0
   );
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -135,7 +134,8 @@ int main(){
   glGenRenderbuffers(1, &depthRenderBuffer);
   glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
   glRenderbufferStorage(
-    GL_RENDERBUFFER, GL_DEPTH_COMPONENT, sizeShadowMap.x, sizeShadowMap.y
+    GL_RENDERBUFFER, GL_DEPTH_COMPONENT,
+    gameInfo.shadowMapResolution, gameInfo.shadowMapResolution
   );
   glFramebufferRenderbuffer(
     GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer
@@ -151,22 +151,9 @@ int main(){
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   //
 
-  // Define board
-  int board[8][8] = {
-    ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK,
-    KNIGHT, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT,
-    BISHOP, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*BISHOP,
-    KING, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KING,
-    QUEEN, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*QUEEN,
-    BISHOP, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*BISHOP,
-    KNIGHT, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT,
-    ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK,
-  };
-
   // Render loop
   bool running = true;
   sf::Vector2i selectedPixelPosition = {0, 0};
-  sf::Vector2i  selectedPiecePosition = {-1, -1};
   bool selecting = false;
   while(running){
     sf::Event event;
@@ -182,8 +169,8 @@ int main(){
         colorPicking->resizeBuffers(width, height);
 
         // Recompute projectionMatrix
-        projectionMatrix = getPerspectiveProjMatrix(
-          50, (double)width/height, 1, 1000
+        gameInfo.cameraProjectionMatrix = getPerspectiveProjMatrix(
+          gameInfo.fovy, (double)width/height, 1, 1000
         );
       }
       else if(event.type == sf::Event::MouseButtonReleased){
@@ -195,13 +182,18 @@ int main(){
         }
       }
       else if(event.type == sf::Event::KeyPressed){
-        if(event.key.code == sf::Keyboard::Down) eye.z -= 1.0;
-        else if(event.key.code == sf::Keyboard::Up) eye.z += 1.0;
-        else if(event.key.code == sf::Keyboard::Left) eye.x -= 1.0;
-        else if(event.key.code == sf::Keyboard::Right) eye.x += 1.0;
+        if(event.key.code == sf::Keyboard::Down)
+          gameInfo.cameraPosition.z -= 1.0;
+        else if(event.key.code == sf::Keyboard::Up)
+          gameInfo.cameraPosition.z += 1.0;
+        else if(event.key.code == sf::Keyboard::Left)
+          gameInfo.cameraPosition.x -= 1.0;
+        else if(event.key.code == sf::Keyboard::Right)
+          gameInfo.cameraPosition.x += 1.0;
         else continue;
 
-        lookAtMatrix = getLookAtMatrix(eye, center, up);
+        gameInfo.cameraViewMatrix = getLookAtMatrix(
+          gameInfo.cameraPosition, center, up);
       }
     }
 
@@ -211,12 +203,10 @@ int main(){
     glClearColor(1, 0, 0, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glViewport(0, 0, sizeShadowMap.x, sizeShadowMap.y);
+    glViewport(
+      0, 0, gameInfo.shadowMapResolution, gameInfo.shadowMapResolution);
 
-    shadowMappingRender(
-      board, &meshes, &programs, &selectedPiecePosition,
-      &lightLookAtMatrix[0], &orthoProjMatrix[0]
-    );
+    shadowMappingRender(&gameInfo, &meshes, &programs);
 
     // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -227,16 +217,11 @@ int main(){
     glViewport(0, 0, width, height);
 
     // Display all pieces on the screen using the cel-shading effect
-    celShadingRender(
-      board, &meshes, &programs, &selectedPiecePosition,
-      shadowMap, &lookAtMatrix[0], &projectionMatrix[0],
-      &lightLookAtMatrix[0], &orthoProjMatrix[0]
-    );
+    celShadingRender(&gameInfo, &meshes, &programs, shadowMap);
 
     if(selecting){
-      selectedPiecePosition = colorPicking->getClickedPiecePosition(
-        selectedPixelPosition, board, &meshes, &programs,
-        &lookAtMatrix[0], &projectionMatrix[0]
+      gameInfo.selectedPiecePosition = colorPicking->getClickedPiecePosition(
+        selectedPixelPosition, &gameInfo, &meshes, &programs
       );
 
       selecting = false;
@@ -255,14 +240,10 @@ int main(){
 }
 
 void celShadingRender(
-    int board[][8], std::map<int, Mesh*>* meshes,
+    GameInfo* gameInfo,
+    std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
-    sf::Vector2i* selectedPiecePosition,
-    GLuint shadowMap,
-    GLfloat* lookAtMatrix,
-    GLfloat* projectionMatrix,
-    GLfloat* lightMatrix,
-    GLfloat* projectionLightMatrix){
+    GLuint shadowMap){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
   sf::Vector3f translation;
@@ -273,12 +254,13 @@ void celShadingRender(
   glCullFace(GL_FRONT);
 
   // Bind uniform values
-  programs->at(BLACK_BORDER)->setViewMatrix(lookAtMatrix);
-  programs->at(BLACK_BORDER)->setProjectionMatrix(projectionMatrix);
+  programs->at(BLACK_BORDER)->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
+  programs->at(BLACK_BORDER)->setProjectionMatrix(
+    &gameInfo->cameraProjectionMatrix[0]);
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
-      int piece = board[x][y];
+      int piece = gameInfo->board[x][y];
 
       // Set movement matrix
       movementMatrix = getIdentityMatrix();
@@ -291,7 +273,8 @@ void celShadingRender(
       movementMatrix = translate(&movementMatrix, translation);
       programs->at(BLACK_BORDER)->setMoveMatrix(&movementMatrix[0]);
 
-      (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
+      (gameInfo->selectedPiecePosition.x == x and
+          gameInfo->selectedPiecePosition.y == y) ?
         programs->at(BLACK_BORDER)->setUniformBool("selected", true) :
         programs->at(BLACK_BORDER)->setUniformBool("selected", false);
 
@@ -307,19 +290,20 @@ void celShadingRender(
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  programs->at(CEL_SHADING)->setViewMatrix(lookAtMatrix);
-  programs->at(CEL_SHADING)->setProjectionMatrix(projectionMatrix);
+  programs->at(CEL_SHADING)->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
+  programs->at(CEL_SHADING)->setProjectionMatrix(
+    &gameInfo->cameraProjectionMatrix[0]);
   programs->at(CEL_SHADING)->setUniformMatrix4fv(
-    "LMatrix", lightMatrix);
+    "LMatrix", &gameInfo->lightViewMatrix[0]);
   programs->at(CEL_SHADING)->setUniformMatrix4fv(
-    "PLMatrix", projectionLightMatrix);
+    "PLMatrix", &gameInfo->lightProjectionMatrix[0]);
   programs->at(CEL_SHADING)->bindTexture(
     0, GL_TEXTURE0, "shadowMap", shadowMap
   );
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
-      int piece = board[x][y];
+      int piece = gameInfo->board[x][y];
 
       movementMatrix = getIdentityMatrix();
       // Rotate the piece depending on the team
@@ -342,7 +326,8 @@ void celShadingRender(
         programs->at(CEL_SHADING)->setUniform4f(
           "pieceColor", 1.0, 1.0, 1.0, 1.0);
 
-      (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
+      (gameInfo->selectedPiecePosition.x == x and
+          gameInfo->selectedPiecePosition.y == y) ?
         programs->at(CEL_SHADING)->setUniformBool("selected", true) :
         programs->at(CEL_SHADING)->setUniformBool("selected", false);
 
@@ -363,11 +348,9 @@ void celShadingRender(
 };
 
 void shadowMappingRender(
-    int board[][8], std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs,
-    sf::Vector2i* selectedPiecePosition,
-    GLfloat* lookAtMatrix,
-    GLfloat* projectionMatrix){
+    GameInfo* gameInfo,
+    std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
   sf::Vector3f translation;
@@ -379,12 +362,13 @@ void shadowMappingRender(
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  programs->at(SHADOW_MAPPING)->setViewMatrix(lookAtMatrix);
-  programs->at(SHADOW_MAPPING)->setProjectionMatrix(projectionMatrix);
+  programs->at(SHADOW_MAPPING)->setViewMatrix(&gameInfo->lightViewMatrix[0]);
+  programs->at(SHADOW_MAPPING)->setProjectionMatrix(
+    &gameInfo->lightProjectionMatrix[0]);
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
-      int piece = board[x][y];
+      int piece = gameInfo->board[x][y];
 
       movementMatrix = getIdentityMatrix();
       // Rotate the piece depending on the team
@@ -396,7 +380,8 @@ void shadowMappingRender(
       movementMatrix = translate(&movementMatrix, translation);
       programs->at(SHADOW_MAPPING)->setMoveMatrix(&movementMatrix[0]);
 
-      (selectedPiecePosition->x == x && selectedPiecePosition->y == y) ?
+      (gameInfo->selectedPiecePosition.x == x and
+          gameInfo->selectedPiecePosition.y == y) ?
         programs->at(SHADOW_MAPPING)->setUniformBool("selected", true) :
         programs->at(SHADOW_MAPPING)->setUniformBool("selected", false);
 

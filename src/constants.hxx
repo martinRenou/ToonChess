@@ -23,4 +23,13 @@ const int CEL_SHADING = 101;
 const int COLOR_PICKING = 102;
 const int SHADOW_MAPPING = 103;
 
+// ShadowMapping
+const float SHADOWMAPPING_HIGH = 1024.;
+const float SHADOWMAPPING_LOW = 512.;
+
+// Antialiasing level
+const int ANTIALIASING_HIGH = 4;
+const int ANTIALIASING_LOW = 2;
+const int ANTIALIASING_NONE = 0;
+
 #endif

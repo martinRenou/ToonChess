@@ -10,6 +10,7 @@
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
 #include "../constants.hxx"
+#include "../GameInfo.hxx"
 #include "../utils.hxx"
 
 #include "ColorPicking.hxx"
@@ -21,15 +22,13 @@ struct Pixel {
 };
 
 /* Makes a color-picking rendering in the current framebuffer
-  \param board The current board
+  \param gameInfo The game informations
   \param meshes The map of meshes
   \param programs The map of shader programs
 */
 void colorPickingRender(
-    int board[][8], std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs,
-    GLfloat* lookAtMatrix,
-    GLfloat* projectionMatrix){
+    GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
   sf::Vector3f translation;
@@ -40,12 +39,13 @@ void colorPickingRender(
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  programs->at(COLOR_PICKING)->setViewMatrix(lookAtMatrix);
-  programs->at(COLOR_PICKING)->setProjectionMatrix(projectionMatrix);
+  programs->at(COLOR_PICKING)->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
+  programs->at(COLOR_PICKING)->setProjectionMatrix(
+    &gameInfo->cameraProjectionMatrix[0]);
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
-      int piece = board[x][y];
+      int piece = gameInfo->board[x][y];
 
       // Set movement matrix
       movementMatrix = getIdentityMatrix();
@@ -133,10 +133,8 @@ void ColorPicking::deleteBuffers(){
 
 sf::Vector2i ColorPicking::getClickedPiecePosition(
     sf::Vector2i clickedPixelPosition,
-    int board[][8], std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs,
-    GLfloat* lookAtMatrix,
-    GLfloat* projectionMatrix){
+    GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs){
   // Bind the framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, this->fboId);
 
@@ -146,7 +144,7 @@ sf::Vector2i ColorPicking::getClickedPiecePosition(
 
   glViewport(0, 0, this->width, this->height);
 
-  colorPickingRender(board, meshes, programs, lookAtMatrix, projectionMatrix);
+  colorPickingRender(gameInfo, meshes, programs);
 
   // Get pixel color at clicked position
   Pixel pixel;
