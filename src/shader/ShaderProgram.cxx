@@ -65,6 +65,12 @@ void ShaderProgram::compile(){
   deleteShaders(&this->shaders);
 }
 
+void ShaderProgram::setUniform1i(std::string name, GLfloat value){
+  GLuint location = glGetUniformLocation(this->id, name.c_str());
+
+  glUniform1i(location, value);
+};
+
 void ShaderProgram::setUniform3f(
     std::string name, GLfloat x, GLfloat y, GLfloat z){
   GLuint location = glGetUniformLocation(this->id, name.c_str());

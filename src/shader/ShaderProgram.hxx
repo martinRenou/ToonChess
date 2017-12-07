@@ -26,6 +26,14 @@ class ShaderProgram {
     */
     void compile();
 
+    /* Set an int uniform value, given its name. The program must be bound with
+      glUseProgram before using this method, otherwise there will be undefined
+      behavior depending on the context
+      \param name The uniform name
+      \param value The int value
+    */
+    void setUniform1i(std::string name, GLfloat value);
+
     /* Set a vec3 uniform value, given its name. The program must be bound with
       glUseProgram before using this method, otherwise there will be undefined
       behavior depending on the context
