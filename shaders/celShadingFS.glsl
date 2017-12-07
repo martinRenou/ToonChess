@@ -3,6 +3,8 @@ varying vec3 vLightPosition;
 
 uniform vec4 pieceColor;
 
+uniform int shadowMapResolution;
+
 uniform sampler2D shadowMap;
 
 float getLightFactor(){
@@ -20,7 +22,7 @@ void main(void){
   vec2 dxy;
   for(float x = -1.5; x <= 1.5; x += 1.) {
     for(float y = -1.5; y <= 1.5; y += 1.) {
-      dxy = vec2(x/512., y/512.);
+      dxy = vec2(x/float(shadowMapResolution), y/float(shadowMapResolution));
       sum += texture2D(shadowMap, vLightPosition.xy + dxy).r;
     }
   }

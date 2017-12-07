@@ -308,6 +308,10 @@ void celShadingRender(
     gameInfo->lightDirection.y, gameInfo->lightDirection.z
   );
 
+  programs->at(CEL_SHADING)->setUniform1i(
+    "shadowMapResolution", gameInfo->shadowMapResolution
+  );
+
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = gameInfo->board[x][y];

@@ -24,8 +24,9 @@ const int COLOR_PICKING = 102;
 const int SHADOW_MAPPING = 103;
 
 // ShadowMapping
-const float SHADOWMAPPING_HIGH = 1024.;
-const float SHADOWMAPPING_LOW = 512.;
+const int SHADOWMAPPING_HIGH = 1024;
+const int SHADOWMAPPING_LOW = 512;
+const int SHADOWMAPPING_VERYLOW = 256;
 
 // Antialiasing level
 const int ANTIALIASING_HIGH = 4;
