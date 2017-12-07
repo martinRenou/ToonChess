@@ -24,6 +24,7 @@ set (
   ${CMAKE_SOURCE_DIR}/src/shader/ShaderProgram.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/shaderPrograms.cxx
   ${CMAKE_SOURCE_DIR}/src/ColorPicking/ColorPicking.cxx
+  ${CMAKE_SOURCE_DIR}/src/ShadowMapping/ShadowMapping.cxx
   ${CMAKE_SOURCE_DIR}/src/utils.cxx
 )
 

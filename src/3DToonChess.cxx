@@ -16,6 +16,7 @@
 #include "shader/shaderPrograms.hxx"
 
 #include "ColorPicking/ColorPicking.hxx"
+#include "ShadowMapping/ShadowMapping.hxx"
 
 #include "constants.hxx"
 #include "GameInfo.hxx"
@@ -34,11 +35,6 @@ void celShadingRender(
   std::map<int, Mesh*>* meshes,
   std::map<int, ShaderProgram*>* programs,
   GLuint shadowMap);
-
-void shadowMappingRender(
-  GameInfo* gameInfo,
-  std::map<int, Mesh*>* meshes,
-  std::map<int, ShaderProgram*>* programss);
 
 int main(){
   // Initialize game informations
@@ -82,6 +78,11 @@ int main(){
   ColorPicking* colorPicking = new ColorPicking(width, height);
   colorPicking->initBuffers();
 
+  // Initialize shadow mapping
+  ShadowMapping* shadowMapping = new ShadowMapping(
+    gameInfo.shadowMapResolution);
+  shadowMapping->initBuffers();
+
   // Compute cameraLookAtMatrix and cameraProjectionMatrix
   sf::Vector3f center = {0.0, 0.0, 0.0};
   sf::Vector3f up = {0.0, 0.0, 1.0};
@@ -106,55 +107,11 @@ int main(){
   gameInfo.lightViewMatrix = getLookAtMatrix(
     lightPosition, center, up);
 
-  // Create FBO for shadow mapping
-  GLuint shadowMapFBO = 0;
-  glGenFramebuffers(1, &shadowMapFBO);
-  glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
-
-  // Create the shadowMap texture
-  GLuint shadowMap;
-  glGenTextures(1, &shadowMap);
-  glBindTexture(GL_TEXTURE_2D, shadowMap);
-
-  // Set the texture
-  glTexImage2D(
-    GL_TEXTURE_2D, 0, GL_RGB,
-    gameInfo.shadowMapResolution, gameInfo.shadowMapResolution,
-    0, GL_RGB, GL_UNSIGNED_BYTE, 0
-  );
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-  glFramebufferTexture2D(
-    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowMap, 0
-  );
-
-  // Create render buffer for depth test
-  GLuint depthRenderBuffer;
-  glGenRenderbuffers(1, &depthRenderBuffer);
-  glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBuffer);
-  glRenderbufferStorage(
-    GL_RENDERBUFFER, GL_DEPTH_COMPONENT,
-    gameInfo.shadowMapResolution, gameInfo.shadowMapResolution
-  );
-  glFramebufferRenderbuffer(
-    GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthRenderBuffer
-  );
-
-  if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
-    std::cout << "Error while creating the FBO for shadow mapping" << std::endl;
-  }
-
-  // Unbind
-  glBindRenderbuffer(GL_RENDERBUFFER, 0);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  //
-
   // Render loop
   bool running = true;
   sf::Vector2i selectedPixelPosition = {0, 0};
   bool selecting = false;
+  GLuint shadowMap;
   while(running){
     sf::Event event;
     while(window.pollEvent(event)){
@@ -198,15 +155,7 @@ int main(){
     }
 
     // Create the shadowMap
-    glBindFramebuffer(GL_FRAMEBUFFER, shadowMapFBO);
-
-    glClearColor(1, 0, 0, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glViewport(
-      0, 0, gameInfo.shadowMapResolution, gameInfo.shadowMapResolution);
-
-    shadowMappingRender(&gameInfo, &meshes, &programs);
+    shadowMap = shadowMapping->getShadowMap(&gameInfo, &meshes, &programs);
 
     // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -235,6 +184,7 @@ int main(){
   deleteMeshes(&meshes);
   deletePrograms(&programs);
   delete colorPicking;
+  delete shadowMapping;
 
   return 0;
 }
@@ -354,52 +304,6 @@ void celShadingRender(
 
         meshes->at(abs(piece))->draw();
       }
-    }
-  }
-};
-
-void shadowMappingRender(
-    GameInfo* gameInfo,
-    std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs){
-  // The movement Matrix
-  std::vector<GLfloat> movementMatrix;
-  sf::Vector3f translation;
-  sf::Vector3f rotation = {0, 0, 1};
-
-  // Render all meshes with the color depending on the depth (distance from
-  // light)
-  glUseProgram(programs->at(SHADOW_MAPPING)->id);
-  glCullFace(GL_BACK);
-
-  // Bind uniform values
-  programs->at(SHADOW_MAPPING)->setViewMatrix(&gameInfo->lightViewMatrix[0]);
-  programs->at(SHADOW_MAPPING)->setProjectionMatrix(
-    &gameInfo->lightProjectionMatrix[0]);
-
-  for(int x = 0; x < 8; x++){
-    for(int y = 0; y < 8; y++){
-      int piece = gameInfo->board[x][y];
-
-      movementMatrix = getIdentityMatrix();
-      // Rotate the piece depending on the team
-      movementMatrix = piece > 0 ?
-        rotate(&movementMatrix, -90.0, rotation) :
-        rotate(&movementMatrix, 90.0, rotation);
-      // Translate the piece
-      translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
-      movementMatrix = translate(&movementMatrix, translation);
-      programs->at(SHADOW_MAPPING)->setMoveMatrix(&movementMatrix[0]);
-
-      (gameInfo->selectedPiecePosition.x == x and
-          gameInfo->selectedPiecePosition.y == y) ?
-        programs->at(SHADOW_MAPPING)->setUniformBool("selected", true) :
-        programs->at(SHADOW_MAPPING)->setUniformBool("selected", false);
-
-      // Draw board cell
-      meshes->at(BOARDCELL)->draw();
-
-      if(piece != EMPTY) meshes->at(abs(piece))->draw();
     }
   }
 };
