@@ -94,7 +94,7 @@ int main(){
 
   // Create orthographic projection matrix for shadow mapping
   gameInfo.lightProjectionMatrix = getOrthoProjMatrix(
-    -20, 20, -20, 20, 1, 40
+    -25, 25, -20, 20, 1, 50
   );
 
   // Get lookAt matrix from light position for shadow mapping
@@ -293,12 +293,19 @@ void celShadingRender(
   programs->at(CEL_SHADING)->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
   programs->at(CEL_SHADING)->setProjectionMatrix(
     &gameInfo->cameraProjectionMatrix[0]);
+
   programs->at(CEL_SHADING)->setUniformMatrix4fv(
     "LMatrix", &gameInfo->lightViewMatrix[0]);
   programs->at(CEL_SHADING)->setUniformMatrix4fv(
     "PLMatrix", &gameInfo->lightProjectionMatrix[0]);
+
   programs->at(CEL_SHADING)->bindTexture(
     0, GL_TEXTURE0, "shadowMap", shadowMap
+  );
+
+  programs->at(CEL_SHADING)->setUniform3f(
+    "lightDirection", gameInfo->lightDirection.x,
+    gameInfo->lightDirection.y, gameInfo->lightDirection.z
   );
 
   for(int x = 0; x < 8; x++){

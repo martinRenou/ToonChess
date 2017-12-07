@@ -21,7 +21,7 @@ struct GameInfo {
   // Light direction should NOT be collinear to (0, 0, 1) to prevent
   // lightLookAtMatrix computation issues, and should NOT be collinear to
   // (1, 1, 0) to prevent shadows artefacts
-  sf::Vector3f lightDirection = {-1.0, 0.0, -1.0};
+  sf::Vector3f lightDirection = {-1.0, 1.0, -1.0};
 
   // Position of the selected chess piece
   sf::Vector2i selectedPiecePosition = {-1, -1};

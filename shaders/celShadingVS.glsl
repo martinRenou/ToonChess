@@ -3,6 +3,8 @@ varying vec3 vLightPosition;
 
 uniform bool selected;
 
+uniform vec3 lightDirection;
+
 // View/Movement/Projection matrices
 uniform mat4 VMatrix;
 uniform mat4 MMatrix;
@@ -18,7 +20,7 @@ uniform mat4 PLMatrix;
 vec4 position;
 vec4 lightPosition;
 vec3 normal;
-vec3 lightDir = normalize(vec3(-1.0, 0.0, -1.0));
+vec3 lightDir = normalize(lightDirection);
 
 void main(void){
   // Compute the normal of the vertex and the light intensity
