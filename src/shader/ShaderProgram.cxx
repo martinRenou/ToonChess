@@ -62,6 +62,7 @@ void ShaderProgram::compile(){
   for(unsigned int i = 0; i < this->shaders.size(); i++){
     glDetachShader(this->id, this->shaders.at(i)->id);
   }
+  deleteShaders(&this->shaders);
 }
 
 void ShaderProgram::setUniform4f(
