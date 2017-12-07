@@ -8,19 +8,28 @@ uniform sampler2D shadowMap;
 float getLightFactor(){
   float factor = 0.5;
   if(vLightIntensity > 0.8) factor = 1.0;
-  else if (vLightIntensity > 0.0) factor = 0.9;
-  else if (vLightIntensity > -0.3) factor = 0.7;
+  else if (vLightIntensity > 0.3) factor = 0.9;
+  else if (vLightIntensity > 0.0) factor = 0.7;
 
   return factor;
 }
 
 void main(void){
-  vec4 shadowMapColor = texture2D(shadowMap, vLightPosition.xy);
-  float zShadowMap = shadowMapColor.r;
+  // Percentage Close Filtering
+  float sum = 0.;
+  vec2 dxy;
+  for(float x = -1.5; x <= 1.5; x += 1.) {
+    for(float y = -1.5; y <= 1.5; y += 1.) {
+      dxy = vec2(x/512., y/512.);
+      sum += texture2D(shadowMap, vLightPosition.xy + dxy).r;
+    }
+  }
+  sum /= 16.;
+  float shadowCoeff = smoothstep(0.001, 0.04, vLightPosition.z - sum);
 
+  // Compute light factor
   float factor = getLightFactor();
-
-  if(zShadowMap + 0.005 < vLightPosition.z){
+  if(shadowCoeff > 0.5){
     factor = 0.5;
   }
 
