@@ -15,6 +15,8 @@ struct GameInfo {
   GLint antialiasingLevel = ANTIALIASING_LOW;
   GLboolean vSync = false;
   GLint fovy = 50;
+  GLint width = 1024;
+  GLint height = 576;
 
   sf::Vector3f cameraPosition = {0.0, -40.0, 20.0};
 

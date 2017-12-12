@@ -48,10 +48,8 @@ int main(){
   settings.majorVersion = 3;
   settings.minorVersion = 0;
 
-  int width(800);
-  int height(600);
   sf::Window window(
-      sf::VideoMode(width, height),
+      sf::VideoMode(gameInfo.width, gameInfo.height),
       "3DToonChess",
       sf::Style::Default,
       settings
@@ -75,7 +73,8 @@ int main(){
   std::map<int, Mesh*> meshes = initMeshes();
 
   // Initialize color picking
-  ColorPicking* colorPicking = new ColorPicking(width, height);
+  ColorPicking* colorPicking = new ColorPicking(
+    gameInfo.width, gameInfo.height);
   colorPicking->initBuffers();
 
   // Initialize shadow mapping
@@ -90,7 +89,7 @@ int main(){
     gameInfo.cameraPosition, center, up
   );
   gameInfo.cameraProjectionMatrix = getPerspectiveProjMatrix(
-    gameInfo.fovy, (double)width/height, 1, 1000
+    gameInfo.fovy, (double)gameInfo.width/gameInfo.height, 1, 1000
   );
 
   // Create orthographic projection matrix for shadow mapping
@@ -119,26 +118,31 @@ int main(){
         running = false;
       }
       else if(event.type == sf::Event::Resized){
-        width = event.size.width;
-        height = event.size.height;
+        gameInfo.width = event.size.width;
+        gameInfo.height = event.size.height;
 
         // Resize the buffers for color picking
-        colorPicking->resizeBuffers(width, height);
+        colorPicking->resizeBuffers(gameInfo.width, gameInfo.height);
 
         // Recompute projectionMatrix
         gameInfo.cameraProjectionMatrix = getPerspectiveProjMatrix(
-          gameInfo.fovy, (double)width/height, 1, 1000
+          gameInfo.fovy, (double)gameInfo.width/gameInfo.height, 1, 1000
         );
       }
       else if(event.type == sf::Event::MouseButtonReleased){
         if(event.mouseButton.button == sf::Mouse::Left){
           selectedPixelPosition.x = event.mouseButton.x;
-          selectedPixelPosition.y = height - event.mouseButton.y;
+          selectedPixelPosition.y = gameInfo.height - event.mouseButton.y;
 
           selecting = true;
         }
       }
       else if(event.type == sf::Event::KeyPressed){
+        if(event.key.code == sf::Keyboard::Escape){
+          running = false;
+          continue;
+        }
+
         if(event.key.code == sf::Keyboard::Down)
           gameInfo.cameraPosition.z -= 1.0;
         else if(event.key.code == sf::Keyboard::Up)
@@ -163,7 +167,7 @@ int main(){
     glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glViewport(0, 0, width, height);
+    glViewport(0, 0, gameInfo.width, gameInfo.height);
 
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(&gameInfo, &meshes, &programs, shadowMap);
@@ -180,6 +184,8 @@ int main(){
 
     window.display();
   }
+
+  window.close();
 
   deleteMeshes(&meshes);
   deletePrograms(&programs);
