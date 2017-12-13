@@ -18,7 +18,7 @@ struct GameInfo {
   GLint width = 1024;
   GLint height = 576;
 
-  sf::Vector3f cameraPosition = {0.0, -40.0, 20.0};
+  GLfloat cameraRotationRadius = 40.0;
 
   // Light direction should NOT be collinear to (0, 0, 1) to prevent
   // lightLookAtMatrix computation issues, and should NOT be collinear to
@@ -29,6 +29,7 @@ struct GameInfo {
   sf::Vector2i selectedPiecePosition = {-1, -1};
 
   // View and Projection matrices
+  sf::Vector3f cameraPosition;
   std::vector<GLfloat> cameraViewMatrix;
   std::vector<GLfloat> cameraProjectionMatrix;
   std::vector<GLfloat> lightViewMatrix;

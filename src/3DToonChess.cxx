@@ -85,6 +85,9 @@ int main(){
   // Compute cameraLookAtMatrix and cameraProjectionMatrix
   sf::Vector3f center = {0.0, 0.0, 0.0};
   sf::Vector3f up = {0.0, 0.0, 1.0};
+  gameInfo.cameraPosition.x = 0.0;
+  gameInfo.cameraPosition.y = - gameInfo.cameraRotationRadius;
+  gameInfo.cameraPosition.z = 20.0;
   gameInfo.cameraViewMatrix = getLookAtMatrix(
     gameInfo.cameraPosition, center, up
   );
@@ -109,7 +112,13 @@ int main(){
   // Render loop
   bool running = true;
   sf::Vector2i selectedPixelPosition = {0, 0};
+  // Mouse movement
+  sf::Vector2i mousePosition;
+  GLint dX = 0;
+  // Rotation angle around Z axis
+  GLfloat phi;
   bool selecting = false;
+  bool cameraMoving = false;
   GLuint shadowMap;
   while(running){
     sf::Event event;
@@ -129,32 +138,53 @@ int main(){
           gameInfo.fovy, (double)gameInfo.width/gameInfo.height, 1, 1000
         );
       }
+      else if(event.type == sf::Event::MouseButtonPressed){
+        // If it's the right button, it's a camera movement
+        if(event.mouseButton.button == sf::Mouse::Right){
+          cameraMoving = true;
+
+          mousePosition = sf::Mouse::getPosition(window);
+        }
+      }
       else if(event.type == sf::Event::MouseButtonReleased){
+        // If it's the left button, it must be a piece selection
         if(event.mouseButton.button == sf::Mouse::Left){
           selectedPixelPosition.x = event.mouseButton.x;
           selectedPixelPosition.y = gameInfo.height - event.mouseButton.y;
 
           selecting = true;
         }
+
+        // If it's the right button, it's the end of a camera movement
+        if(event.mouseButton.button == sf::Mouse::Right){
+          cameraMoving = false;
+        }
+      }
+      else if(event.type == sf::Event::MouseMoved and cameraMoving){
+        dX = event.mouseMove.x - mousePosition.x;
+
+        mousePosition.x = event.mouseMove.x;
+        mousePosition.y = event.mouseMove.y;
+
+        phi -= 0.01 * dX;
+
+        // Constraint mouvement angle between -PI/2 and PI/2
+        if(phi > M_PI / 2.0) phi = M_PI / 2.0;
+        else if (phi < - M_PI / 2.0) phi = - M_PI / 2.0;
+
+        // Compute camera position according to the new rotation angle
+        gameInfo.cameraPosition.x = 40 * sin(phi);
+        gameInfo.cameraPosition.y = - 40 * cos(phi);
+
+        gameInfo.cameraViewMatrix = getLookAtMatrix(
+          gameInfo.cameraPosition, center, up);
       }
       else if(event.type == sf::Event::KeyPressed){
         if(event.key.code == sf::Keyboard::Escape){
           running = false;
+
           continue;
         }
-
-        if(event.key.code == sf::Keyboard::Down)
-          gameInfo.cameraPosition.z -= 1.0;
-        else if(event.key.code == sf::Keyboard::Up)
-          gameInfo.cameraPosition.z += 1.0;
-        else if(event.key.code == sf::Keyboard::Left)
-          gameInfo.cameraPosition.x -= 1.0;
-        else if(event.key.code == sf::Keyboard::Right)
-          gameInfo.cameraPosition.x += 1.0;
-        else continue;
-
-        gameInfo.cameraViewMatrix = getLookAtMatrix(
-          gameInfo.cameraPosition, center, up);
       }
     }
 
