@@ -114,9 +114,14 @@ int main(){
   sf::Vector2i selectedPixelPosition = {0, 0};
   // Mouse movement
   sf::Vector2i mousePosition;
+  // Rotation speed in radians per pixel
+  GLfloat rotationSpeed = 0.002;
   GLint dX = 0;
+  GLint dY = 0;
   // Rotation angle around Z axis
   GLfloat phi;
+  // Rotation angle around X axis
+  GLfloat teta;
   bool selecting = false;
   bool cameraMoving = false;
   GLuint shadowMap;
@@ -162,19 +167,26 @@ int main(){
       }
       else if(event.type == sf::Event::MouseMoved and cameraMoving){
         dX = event.mouseMove.x - mousePosition.x;
+        dY = event.mouseMove.y - mousePosition.y;
 
         mousePosition.x = event.mouseMove.x;
         mousePosition.y = event.mouseMove.y;
 
-        phi -= 0.01 * dX;
+        phi -= rotationSpeed * (double)gameInfo.width/gameInfo.height * dX;
+        teta += rotationSpeed * dY;
 
-        // Constraint mouvement angle between -PI/2 and PI/2
+        // Constraint phi between -PI/2 and PI/2
         if(phi > M_PI / 2.0) phi = M_PI / 2.0;
         else if (phi < - M_PI / 2.0) phi = - M_PI / 2.0;
 
+        // Constraint teta between 0.0 and PI/3
+        if(teta > M_PI / 3.0) teta = M_PI / 3.0;
+        else if (teta < 0.0) teta = 0.0;
+
         // Compute camera position according to the new rotation angle
         gameInfo.cameraPosition.x = 40 * sin(phi);
-        gameInfo.cameraPosition.y = - 40 * cos(phi);
+        gameInfo.cameraPosition.y = - 40 * cos(phi) * cos(teta);
+        gameInfo.cameraPosition.z = 20 + 40 * sin(teta);
 
         gameInfo.cameraViewMatrix = getLookAtMatrix(
           gameInfo.cameraPosition, center, up);
