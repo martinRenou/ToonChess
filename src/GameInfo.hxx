@@ -13,7 +13,6 @@ struct GameInfo {
   GLboolean shadowMapping = true;
   GLfloat shadowMapResolution = SHADOWMAPPING_LOW;
   GLint antialiasingLevel = ANTIALIASING_LOW;
-  GLboolean vSync = false;
   GLint fovy = 50;
   GLint width = 1024;
   GLint height = 576;

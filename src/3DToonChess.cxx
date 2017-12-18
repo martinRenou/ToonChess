@@ -54,7 +54,7 @@ int main(){
       sf::Style::Default,
       settings
   );
-  window.setVerticalSyncEnabled(gameInfo.vSync);
+  window.setFramerateLimit(60);
   // Enable depth test
   glEnable(GL_DEPTH_TEST);
   // Enable backface culling
