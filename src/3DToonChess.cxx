@@ -24,6 +24,9 @@
 
 #include "chessBoard/chessBoard.hxx"
 
+#include "stockfishConnector/stockfishConnector.hxx"
+
+
 /* Perform a cel-shading rendering in the current frameBuffer
   \param gameInfo The current game informations
   \param meshes The map of meshes
@@ -37,6 +40,14 @@ void celShadingRender(
   GLuint shadowMap);
 
 int main(){
+  // Start communication with stockfish
+  try{
+    startCommunication();
+  } catch(const std::exception& e){
+    std::cerr << e.what() << std::endl;
+    return 1;
+  }
+
   // Initialize game informations
   GameInfo gameInfo;
 

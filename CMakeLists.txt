@@ -25,6 +25,7 @@ set(
   ${CMAKE_SOURCE_DIR}/src/shader/shaderPrograms.cxx
   ${CMAKE_SOURCE_DIR}/src/ColorPicking/ColorPicking.cxx
   ${CMAKE_SOURCE_DIR}/src/ShadowMapping/ShadowMapping.cxx
+  ${CMAKE_SOURCE_DIR}/src/stockfishConnector/ConnectionException.cxx
   ${CMAKE_SOURCE_DIR}/src/utils.cxx
 )
 
