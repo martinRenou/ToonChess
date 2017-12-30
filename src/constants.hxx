@@ -18,10 +18,14 @@ const int USER = 1;
 const int AI = -1;
 
 // Shaders
-const int BLACK_BORDER = 100;
-const int CEL_SHADING = 101;
-const int COLOR_PICKING = 102;
-const int SHADOW_MAPPING = 103;
+const int BLACK_BORDER = 10;
+const int CEL_SHADING = 11;
+const int COLOR_PICKING = 12;
+const int SHADOW_MAPPING = 13;
+
+// Process ids
+const int PARENT_PROCESS_ID = 20;
+const int CHILD_PROCESS_ID = 21;
 
 // ShadowMapping
 const int SHADOWMAPPING_HIGH = 1024;
