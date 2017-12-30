@@ -6,14 +6,14 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
 endif()
 
-project (3DToonChess)
+project(3DToonChess)
 
 # The version number
-set (3DToonChess_VERSION_MAJOR 0)
-set (3DToonChess_VERSION_MINOR 1)
+set(3DToonChess_VERSION_MAJOR 0)
+set(3DToonChess_VERSION_MINOR 1)
 
 # Add headers
-set (
+set(
   CXX_FILES
   ${CMAKE_SOURCE_DIR}/src/mesh/Mesh.cxx
   ${CMAKE_SOURCE_DIR}/src/mesh/meshes.cxx
@@ -33,10 +33,11 @@ set(EXECUTABLE_NAME "3DToonChess")
 add_executable(${EXECUTABLE_NAME} src/3DToonChess.cxx ${CXX_FILES})
 
 # Download and unpack googletest
-configure_file(CMakeLists.txt.in googletest-download/CMakeLists.txt)
+configure_file(CMakeLists-googletest.txt.in googletest-download/CMakeLists.txt)
 execute_process(COMMAND ${CMAKE_COMMAND} -G "${CMAKE_GENERATOR}" .
   RESULT_VARIABLE result
-  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download )
+  WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/googletest-download
+)
 if(result)
   message(FATAL_ERROR "CMake step for googletest failed: ${result}")
 endif()
@@ -51,6 +52,15 @@ endif()
 add_subdirectory(
   ${CMAKE_BINARY_DIR}/googletest-src
   ${CMAKE_BINARY_DIR}/googletest-build)
+
+# Download and install stockfish
+message(STATUS "Installing stockfish with apt-get (needs root permission):")
+execute_process(COMMAND sudo apt-get install stockfish
+  RESULT_VARIABLE result)
+if(result)
+  message(FATAL_ERROR "Install step for stockfish failed: ${result}")
+endif()
+
 
 # Create test executable
 set(TEST_NAME "tests")
