@@ -16,7 +16,7 @@ void startCommunication(){
   pid_t pid = fork();
 
   if(pid < 0){
-    throw ConnectionException("Failed to fork processes");
+    throw ConnectionException("Failed to fork process");
   }
   if(pid == 0){
     // In the child process running Stockfish
@@ -27,7 +27,7 @@ void startCommunication(){
     // If everything went fine, this code shouldn't be reached
     throw ConnectionException(
       "Could not run stockfish, please be sure it's installed");
-  } else{
+  }else{
     // In the parent process running the GUI
   }
 }
