@@ -2,10 +2,55 @@
 #define STOCKFISHCONNECTOR_HXX
 
 #include <unistd.h>
+
 #include <iostream>
+#include <vector>
 #include <string.h>
 
+#include "../utils.hxx"
+
 #include "ConnectionException.hxx"
+
+/* Read a complete line in a pipe and return it as a string
+  \param readPipe FILE object in which you want to read a line
+  \param print True if you want to print the result in stdin, false otherwise
+  \return The complete line in a string object
+*/
+std::string readLine(FILE* readPipe, bool print){
+  std::string line = "";
+  char buffer[32] = "";
+
+  do{
+    // Clear buffer
+    memset(buffer, 0, sizeof buffer);
+
+    // Write in buffer
+    fgets(buffer, sizeof buffer, readPipe);
+
+    // Append to the string result
+    line.append(buffer);
+
+    // And repeat this task until the buffer reaches the end of line
+  }while(buffer[strlen(buffer) - 1] != '\n');
+
+  // Print the result
+  if(print) std::cout << line;
+
+  return line;
+};
+
+/* Write a complete line in a pipe
+  \param writePipe FILE object in which you want to write a line
+  \param print True if you want to print the line in stdin, false otherwise
+*/
+void writeLine(FILE* writePipe, std::string line, bool print){
+  int fd = fileno(writePipe);
+
+  write(fd, line.c_str(), line.size());
+
+  // Print the line
+  if(print) std::cout << line;
+};
 
 /* Creates a fork of the process, the child process runs stockfish while the
   parent process runs the 3D view
@@ -13,23 +58,73 @@
     run
 */
 void startCommunication(){
+  int fd[2];
+  if(pipe(fd) == -1){
+    throw ConnectionException("Failed to create pipes");
+  }
+
+  int childReadPipe   = fd[0];
+  int parentWritePipe = fd[1];
+
+  if(pipe(fd) == -1){
+    throw ConnectionException("Failed to create pipes");
+  }
+
+  int parentReadPipe = fd[0];
+  int childWritePipe = fd[1];
+
   pid_t pid = fork();
 
+  // If there is an error creating child process
   if(pid < 0){
     throw ConnectionException("Failed to fork process");
   }
+
+  // In the child process running Stockfish
   if(pid == 0){
-    // In the child process running Stockfish
-    char stockfish_cmd[] = "stockfish";
-    char* args[] = { stockfish_cmd, 0 };
-    execvp(args[0], args);
+    // Redirect stdin to child read pipe and stdout to child write pipe
+    dup2(childReadPipe, fileno(stdin));
+    dup2(childWritePipe, fileno(stdout));
+
+    close(parentReadPipe);
+    close(parentWritePipe);
+    close(childReadPipe);
+    close(childWritePipe);
+
+    // Run stockfish
+    execlp("stockfish", "stockfish", (char *)NULL);
 
     // If everything went fine, this code shouldn't be reached
     throw ConnectionException(
       "Could not run stockfish, please be sure it's installed");
-  }else{
-    // In the parent process running the GUI
   }
+
+  // In the parent process running the GUI
+  close(childReadPipe);
+  close(childWritePipe);
+
+  // Get file from file descriptor
+  const char* readMode = "r";
+  const char* writeMode = "w";
+  FILE* parentReadPipeF = fdopen(parentReadPipe, readMode);
+  FILE* parentWritePipeF = fdopen(parentWritePipe, writeMode);
+
+  std::string line;
+  std::vector<std::string> splittedLine;
+
+  // Check that stockfish properly started
+  line = readLine(parentReadPipeF, true);
+  splittedLine = split(line, ' ');
+  if(splittedLine.at(0).compare("Stockfish") != 0) throw ConnectionException(
+    "Communication with stockfish did'nt start properly, closing");
+
+  // Say to stockfish that we are ready
+  writeLine(parentWritePipeF, "isready\n", true);
+
+  // Wait for stockfish answer
+  line = readLine(parentReadPipeF, true);
+  if(line.compare("readyok\n") != 0) throw ConnectionException(
+    "Stockfish not ready, closing");
 }
 
 #endif
