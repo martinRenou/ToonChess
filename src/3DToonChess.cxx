@@ -24,7 +24,7 @@
 
 #include "chessBoard/chessBoard.hxx"
 
-#include "stockfishConnector/stockfishConnector.hxx"
+#include "StockfishConnector/StockfishConnector.hxx"
 
 
 /* Perform a cel-shading rendering in the current frameBuffer
@@ -40,11 +40,15 @@ void celShadingRender(
   GLuint shadowMap);
 
 int main(){
+  StockfishConnector* stockfishConnector = new StockfishConnector();
   // Start communication with stockfish
   try{
-    startCommunication();
+    stockfishConnector->startCommunication();
   } catch(const std::exception& e){
     std::cerr << e.what() << std::endl;
+
+    delete stockfishConnector;
+
     return 1;
   }
 
@@ -77,6 +81,9 @@ int main(){
     programs = initPrograms();
   } catch(const std::exception& e){
     std::cerr << e.what() << std::endl;
+
+    delete stockfishConnector;
+
     return 1;
   }
 
@@ -244,6 +251,7 @@ int main(){
   deletePrograms(&programs);
   delete colorPicking;
   delete shadowMapping;
+  delete stockfishConnector;
 
   return 0;
 }

@@ -1,6 +1,3 @@
-#ifndef STOCKFISHCONNECTOR_HXX
-#define STOCKFISHCONNECTOR_HXX
-
 #include <unistd.h>
 
 #include <iostream>
@@ -10,6 +7,8 @@
 #include "../utils.hxx"
 
 #include "ConnectionException.hxx"
+
+#include "StockfishConnector.hxx"
 
 /* Read a complete line in a pipe and return it as a string
   \param readPipe FILE object in which you want to read a line
@@ -52,12 +51,12 @@ void writeLine(FILE* writePipe, std::string line, bool print){
   if(print) std::cout << line;
 };
 
-/* Creates a fork of the process, the child process runs stockfish while the
-  parent process runs the 3D view
-  /throw ConnectionException if the fork went wrong or if stockfish could not be
-    run
-*/
-void startCommunication(){
+StockfishConnector::StockfishConnector(){
+  this->parentWritePipeF = NULL;
+  this->parentReadPipeF = NULL;
+};
+
+void StockfishConnector::startCommunication(){
   int fd[2];
   if(pipe(fd) == -1){
     throw ConnectionException("Failed to create pipes");
@@ -73,6 +72,8 @@ void startCommunication(){
   int parentReadPipe = fd[0];
   int childWritePipe = fd[1];
 
+  // Create a fork of the process, the child process runs stockfish while the
+  // parent process runs the 3D view
   pid_t pid = fork();
 
   // If there is an error creating child process
@@ -106,25 +107,37 @@ void startCommunication(){
   // Get file from file descriptor
   const char* readMode = "r";
   const char* writeMode = "w";
-  FILE* parentReadPipeF = fdopen(parentReadPipe, readMode);
-  FILE* parentWritePipeF = fdopen(parentWritePipe, writeMode);
+  this->parentReadPipeF = fdopen(parentReadPipe, readMode);
+  this->parentWritePipeF = fdopen(parentWritePipe, writeMode);
 
   std::string line;
   std::vector<std::string> splittedLine;
 
   // Check that stockfish properly started
-  line = readLine(parentReadPipeF, true);
+  line = readLine(this->parentReadPipeF, true);
   splittedLine = split(line, ' ');
   if(splittedLine.at(0).compare("Stockfish") != 0) throw ConnectionException(
     "Communication with stockfish did'nt start properly, closing");
 
   // Say to stockfish that we are ready
-  writeLine(parentWritePipeF, "isready\n", true);
+  writeLine(this->parentWritePipeF, "isready\n", true);
 
   // Wait for stockfish answer
-  line = readLine(parentReadPipeF, true);
+  line = readLine(this->parentReadPipeF, true);
   if(line.compare("readyok\n") != 0) throw ConnectionException(
     "Stockfish not ready, closing");
 }
 
-#endif
+StockfishConnector::~StockfishConnector(){
+  // Say to stockfish that we are closing
+  writeLine(this->parentWritePipeF, "quit\n", true);
+
+  int parentReadPipe = fileno(this->parentReadPipeF);
+  int parentWritePipe = fileno(this->parentWritePipeF);
+
+  fclose(this->parentReadPipeF);
+  fclose(this->parentWritePipeF);
+
+  close(parentReadPipe);
+  close(parentWritePipe);
+}
