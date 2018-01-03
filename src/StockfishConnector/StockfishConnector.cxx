@@ -1,5 +1,5 @@
 #include <unistd.h>
-
+#include <sys/wait.h>
 #include <iostream>
 #include <vector>
 #include <string.h>
@@ -131,6 +131,10 @@ void StockfishConnector::startCommunication(){
 StockfishConnector::~StockfishConnector(){
   // Say to stockfish that we are closing
   writeLine(this->parentWritePipeF, "quit\n", true);
+
+  // Wait for the child process to die properly
+  int status = 0;
+  while ((wait(&status)) > 0) sleep(1);
 
   int parentReadPipe = fileno(this->parentReadPipeF);
   int parentWritePipe = fileno(this->parentWritePipeF);
