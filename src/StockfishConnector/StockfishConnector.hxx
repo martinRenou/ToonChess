@@ -2,6 +2,7 @@
 #define STOCKFISHCONNECTOR_HXX
 
 #include <iostream>
+#include <string>
 
 class StockfishConnector {
 private:
@@ -10,6 +11,9 @@ private:
   */
   FILE* parentWritePipeF;
   FILE* parentReadPipeF;
+
+  /* All the moves since the beginning of the game */
+  std::string moves;
 
 public:
   /* Constructor */

@@ -127,6 +127,12 @@ int main(){
   gameInfo.lightViewMatrix = getLookAtMatrix(
     lightPosition, center, up);
 
+  // State machine
+  const int USERTURN = 0;
+  const int IATURN = 1;
+  int state = USERTURN;
+  std::string movement = "";
+
   // Render loop
   bool running = true;
   sf::Vector2i selectedPixelPosition = {0, 0};
@@ -232,10 +238,41 @@ int main(){
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(&gameInfo, &meshes, &programs, shadowMap);
 
+    if(state == IATURN){
+      std::string newMove = stockfishConnector->getNextIAMove(movement);
+      move(newMove, gameInfo.board);
+
+      state = USERTURN;
+    }
+
     if(selecting){
+      sf::Vector2i lastPosition = gameInfo.selectedPiecePosition;
+
+      // Get selected piece using color picking
       gameInfo.selectedPiecePosition = colorPicking->getClickedPiecePosition(
         selectedPixelPosition, &gameInfo, &meshes, &programs
       );
+
+      sf::Vector2i newPosition = gameInfo.selectedPiecePosition;
+
+      // If it's the user turn, check if he wants to move a piece
+      if(state == USERTURN
+          and lastPosition.x != -1
+          and lastPosition.y != -1
+          and newPosition.x != -1
+          and newPosition.y != -1
+          and gameInfo.board[lastPosition.x][lastPosition.y] > 0){
+
+        movement = "";
+        movement.append(positionToUciFormat(lastPosition.x, lastPosition.y));
+        movement.append(positionToUciFormat(newPosition.x, newPosition.y));
+        move(movement, gameInfo.board);
+
+        // Unselect piece
+        gameInfo.selectedPiecePosition = {-1, -1};
+
+        state = IATURN;
+      }
 
       selecting = false;
     }

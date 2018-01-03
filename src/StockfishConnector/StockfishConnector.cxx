@@ -1,6 +1,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <iostream>
+#include <algorithm>
 #include <vector>
 #include <string.h>
 
@@ -51,7 +52,7 @@ void writeLine(FILE* writePipe, std::string line, bool print){
   if(print) std::cout << line;
 };
 
-StockfishConnector::StockfishConnector(){
+StockfishConnector::StockfishConnector() : moves{""}{
   this->parentWritePipeF = NULL;
   this->parentReadPipeF = NULL;
 };
@@ -132,9 +133,13 @@ std::string StockfishConnector::getNextIAMove(std::string userMove){
   std::string line;
   std::vector<std::string> splittedLine;
 
+  // Append the user move to moves
+  this->moves.append(userMove);
+  this->moves.append(" ");
+
   // Send message to stockfish
   line = "position startpos moves ";
-  line.append(userMove);
+  line.append(this->moves);
   line.append("\ngo\n");
   writeLine(this->parentWritePipeF, line, true);
 
@@ -147,7 +152,14 @@ std::string StockfishConnector::getNextIAMove(std::string userMove){
     if(splittedLine.at(0).compare("bestmove") == 0) break;
   }
 
-  return splittedLine.at(1);
+  // Get IA decision and append to moves
+  std::string iaMove = splittedLine.at(1);
+  // Remove '\n' if there is one
+  iaMove.erase(std::remove(iaMove.begin(), iaMove.end(), '\n'), iaMove.end());
+  this->moves.append(iaMove);
+  this->moves.append(" ");
+
+  return iaMove;
 }
 
 StockfishConnector::~StockfishConnector(){
