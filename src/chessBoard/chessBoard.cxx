@@ -1,6 +1,8 @@
 #include <vector>
 #include <string>
 
+#include <SFML/Graphics.hpp>
+
 #include "chessBoard.hxx"
 
 #include "../constants.hxx"
@@ -17,11 +19,11 @@ std::string uciGrid[8][8] = {
   "h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8",
 };
 
-std::vector<int> uciFormatToPosition(std::string position){
+sf::Vector2i uciFormatToPosition(std::string position){
   int x(0), y(0);
   bool found(false);
-  for(x = 0; x < 8 && !found; x++){
-    for(y = 0; y < 8 && !found; y++){
+  for(x = 0; x < 8 and not found; x++){
+    for(y = 0; y < 8 and not found; y++){
       if(uciGrid[x][y].compare(position) == 0){
         found = true;
       }
@@ -30,23 +32,37 @@ std::vector<int> uciFormatToPosition(std::string position){
 
   //TODO: Throw an exception if not found and close program properly
 
-  std::vector<int> outPosition = {x - 1, y - 1};
+  sf::Vector2i outPosition = {x - 1, y - 1};
   return outPosition;
 };
 
-std::string positionToUciFormat(int positionX, int positionY){
-  return uciGrid[positionX][positionY];
+std::string positionToUciFormat(sf::Vector2i position){
+  return uciGrid[position.x][position.y];
 };
 
-void move(std::string movement, int board[8][8]){
+void movePiece(
+    sf::Vector2i lastPosition, sf::Vector2i newPosition, int board[8][8]){
+  int piece = board[lastPosition.x][lastPosition.y];
+
+  board[lastPosition.x][lastPosition.y] = EMPTY;
+  board[newPosition.x][newPosition.y] = piece;
+};
+
+std::string getMovement(sf::Vector2i lastPosition, sf::Vector2i newPosition){
+  std::string movement = "";
+
+  movement.append(positionToUciFormat(lastPosition));
+  movement.append(positionToUciFormat(newPosition));
+
+  return movement;
+}
+
+void movePiece(std::string movement, int board[8][8]){
   std::string lastPosition_str = movement.substr(0, 2);
   std::string newPosition_str = movement.substr(2, 2);
 
-  std::vector<int> lastPosition = uciFormatToPosition(lastPosition_str);
-  std::vector<int> newPosition = uciFormatToPosition(newPosition_str);
+  sf::Vector2i lastPosition = uciFormatToPosition(lastPosition_str);
+  sf::Vector2i newPosition = uciFormatToPosition(newPosition_str);
 
-  int piece = board[lastPosition[0]][lastPosition[1]];
-
-  board[lastPosition[0]][lastPosition[1]] = EMPTY;
-  board[newPosition[0]][newPosition[1]] = piece;
+  movePiece(lastPosition, newPosition, board);
 };

@@ -131,7 +131,7 @@ int main(){
   const int USERTURN = 0;
   const int IATURN = 1;
   int state = USERTURN;
-  std::string movement = "";
+  sf::Vector2i lastPosition, newPosition;
 
   // Render loop
   bool running = true;
@@ -239,21 +239,25 @@ int main(){
     celShadingRender(&gameInfo, &meshes, &programs, shadowMap);
 
     if(state == IATURN){
-      std::string newMove = stockfishConnector->getNextIAMove(movement);
-      move(newMove, gameInfo.board);
+      std::string lastUserMovement = getMovement(lastPosition, newPosition);
+
+      std::string newMove = stockfishConnector->getNextIAMove(lastUserMovement);
+      movePiece(newMove, gameInfo.board);
 
       state = USERTURN;
     }
 
     if(selecting){
-      sf::Vector2i lastPosition = gameInfo.selectedPiecePosition;
+      // Register last user clicked position
+      lastPosition = gameInfo.selectedPiecePosition;
 
       // Get selected piece using color picking
       gameInfo.selectedPiecePosition = colorPicking->getClickedPiecePosition(
         selectedPixelPosition, &gameInfo, &meshes, &programs
       );
 
-      sf::Vector2i newPosition = gameInfo.selectedPiecePosition;
+      // Register new user clicked position
+      newPosition = gameInfo.selectedPiecePosition;
 
       // If it's the user turn, check if he wants to move a piece
       if(state == USERTURN
@@ -263,10 +267,7 @@ int main(){
           and newPosition.y != -1
           and gameInfo.board[lastPosition.x][lastPosition.y] > 0){
 
-        movement = "";
-        movement.append(positionToUciFormat(lastPosition.x, lastPosition.y));
-        movement.append(positionToUciFormat(newPosition.x, newPosition.y));
-        move(movement, gameInfo.board);
+        movePiece(lastPosition, newPosition, gameInfo.board);
 
         // Unselect piece
         gameInfo.selectedPiecePosition = {-1, -1};
