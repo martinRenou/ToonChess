@@ -21,6 +21,12 @@ public:
   */
   void startCommunication();
 
+  /* Get the next IA move according to the last user move
+    \param userMove The last user move in uci format
+    \return The next IA move in uci format
+  */
+  std::string getNextIAMove(std::string userMove);
+
   /* Destructor, this will properly stop the communication */
   ~StockfishConnector();
 };

@@ -128,6 +128,28 @@ void StockfishConnector::startCommunication(){
     "Stockfish not ready, closing");
 }
 
+std::string StockfishConnector::getNextIAMove(std::string userMove){
+  std::string line;
+  std::vector<std::string> splittedLine;
+
+  // Send message to stockfish
+  line = "position startpos moves ";
+  line.append(userMove);
+  line.append("\ngo\n");
+  writeLine(this->parentWritePipeF, line, true);
+
+  // Get answer
+  while(true){
+    line = readLine(this->parentReadPipeF, true);
+
+    // Check if stockfish took a decision
+    splittedLine = split(line, ' ');
+    if(splittedLine.at(0).compare("bestmove") == 0) break;
+  }
+
+  return splittedLine.at(1);
+}
+
 StockfishConnector::~StockfishConnector(){
   // Say to stockfish that we are closing
   writeLine(this->parentWritePipeF, "quit\n", true);
