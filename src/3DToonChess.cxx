@@ -129,8 +129,11 @@ int main(){
 
   // State machine
   const int USERTURN = 0;
-  const int IATURN = 1;
+  const int WAITING = 1;
+  const int IATURN = 2;
   int state = USERTURN;
+  sf::Clock iaClock;
+  sf::Time waitingElaspedTime;
   sf::Vector2i lastPosition, newPosition;
 
   // Render loop
@@ -238,12 +241,23 @@ int main(){
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(&gameInfo, &meshes, &programs, shadowMap);
 
-    if(state == IATURN){
-      std::string lastUserMovement = getMovement(lastPosition, newPosition);
+    if(state == WAITING){
+      waitingElaspedTime = iaClock.getElapsedTime();
 
+      // If we waited one second or more, transition to IATURN state
+      if(waitingElaspedTime.asSeconds() >= 1.0){
+        state = IATURN;
+      }
+    }
+
+    if(state == IATURN){
+      // Get IA decision according to the last user move
+      std::string lastUserMovement = getMovement(lastPosition, newPosition);
       std::string newMove = stockfishConnector->getNextIAMove(lastUserMovement);
+
       movePiece(newMove, gameInfo.board);
 
+      // Transition to USERTURN state
       state = USERTURN;
     }
 
@@ -270,7 +284,10 @@ int main(){
         // Unselect piece
         gameInfo.selectedPiecePosition = {-1, -1};
 
-        state = IATURN;
+        // Transition to waiting state and restart the clock for measuring
+        // waiting time
+        state = WAITING;
+        iaClock.restart();
       }
 
       selecting = false;
