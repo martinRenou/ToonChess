@@ -5,9 +5,9 @@
 
 ## Installation
 
-- Install SFML and cmake
+- Install cmake SFML and Stockfish
 ```bash
-sudo apt-get install libsfml-dev cmake
+sudo apt-get install cmake libsfml-dev stockfish
 ```
 
 - Download source code

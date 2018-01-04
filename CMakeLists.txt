@@ -55,20 +55,10 @@ add_subdirectory(
   ${CMAKE_BINARY_DIR}/googletest-src
   ${CMAKE_BINARY_DIR}/googletest-build)
 
-# Download and install stockfish
-message(STATUS "Installing stockfish with apt-get (needs root permission):")
-execute_process(COMMAND sudo apt-get install stockfish
-  RESULT_VARIABLE result)
-if(result)
-  message(FATAL_ERROR "Install step for stockfish failed: ${result}")
-endif()
-
-
 # Create test executable
 set(TEST_NAME "tests")
 add_executable(${TEST_NAME} tests/test_main.cxx ${CXX_FILES})
 target_link_libraries(${TEST_NAME} gtest_main)
-
 
 # Detect and add SFML
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
