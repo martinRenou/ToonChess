@@ -21,34 +21,41 @@ void shadowMappingRender(
   sf::Vector3f translation;
   sf::Vector3f rotation = {0, 0, 1};
 
+  // Get shader program
+  ShaderProgram* shadowMappingProgram = programs->at(SHADOW_MAPPING);
+
   // Render all meshes with the color depending on the depth (distance from
   // light)
-  glUseProgram(programs->at(SHADOW_MAPPING)->id);
+  glUseProgram(shadowMappingProgram->id);
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  programs->at(SHADOW_MAPPING)->setViewMatrix(&gameInfo->lightViewMatrix[0]);
-  programs->at(SHADOW_MAPPING)->setProjectionMatrix(
+  shadowMappingProgram->setViewMatrix(&gameInfo->lightViewMatrix[0]);
+  shadowMappingProgram->setProjectionMatrix(
     &gameInfo->lightProjectionMatrix[0]);
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = gameInfo->board[x][y];
 
+      // Set movement matrix to identity
       movementMatrix = getIdentityMatrix();
+
       // Rotate the piece depending on the team
       movementMatrix = piece > 0 ?
         rotate(&movementMatrix, -90.0, rotation) :
         rotate(&movementMatrix, 90.0, rotation);
+
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
       movementMatrix = translate(&movementMatrix, translation);
-      programs->at(SHADOW_MAPPING)->setMoveMatrix(&movementMatrix[0]);
+      shadowMappingProgram->setMoveMatrix(&movementMatrix[0]);
 
+      // Set if the piece is selected or not
       (gameInfo->selectedPiecePosition.x == x and
           gameInfo->selectedPiecePosition.y == y) ?
-        programs->at(SHADOW_MAPPING)->setUniformBool("selected", true) :
-        programs->at(SHADOW_MAPPING)->setUniformBool("selected", false);
+        shadowMappingProgram->setUniformBool("selected", true) :
+        shadowMappingProgram->setUniformBool("selected", false);
 
       // Draw board cell
       meshes->at(BOARDCELL)->draw();

@@ -319,108 +319,116 @@ void celShadingRender(
   sf::Vector3f translation;
   sf::Vector3f rotation = {0, 0, 1};
 
+  // Get shader programs
+  ShaderProgram* blackBorderProgram = programs->at(BLACK_BORDER);
+  ShaderProgram* celShadingProgram = programs->at(CEL_SHADING);
+
   // Render all the black borders
-  glUseProgram(programs->at(BLACK_BORDER)->id);
+  glUseProgram(blackBorderProgram->id);
   glCullFace(GL_FRONT);
 
   // Bind uniform values
-  programs->at(BLACK_BORDER)->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
-  programs->at(BLACK_BORDER)->setProjectionMatrix(
-    &gameInfo->cameraProjectionMatrix[0]);
+  blackBorderProgram->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
+  blackBorderProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix[0]);
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = gameInfo->board[x][y];
 
-      // Set movement matrix
+      // Set movement matrix to identity
       movementMatrix = getIdentityMatrix();
-      // Rotate the piece depending on the team
+
+      // Rotate the piece depending on the team (user or IA)
       movementMatrix = piece > 0 ?
         rotate(&movementMatrix, -90.0, rotation) :
         rotate(&movementMatrix, 90.0, rotation);
+
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
       movementMatrix = translate(&movementMatrix, translation);
-      programs->at(BLACK_BORDER)->setMoveMatrix(&movementMatrix[0]);
+      blackBorderProgram->setMoveMatrix(&movementMatrix[0]);
 
+      // Set if the piece is the selected one or not
       (gameInfo->selectedPiecePosition.x == x and
           gameInfo->selectedPiecePosition.y == y) ?
-        programs->at(BLACK_BORDER)->setUniformBool("selected", true) :
-        programs->at(BLACK_BORDER)->setUniformBool("selected", false);
+        blackBorderProgram->setUniformBool("selected", true) :
+        blackBorderProgram->setUniformBool("selected", false);
 
       // Draw board cell
       meshes->at(BOARDCELL)->draw();
 
+      // Draw piece
       if(piece != EMPTY) meshes->at(abs(piece))->draw();
     }
   }
 
   // Render all meshes with cell shading
-  glUseProgram(programs->at(CEL_SHADING)->id);
+  glUseProgram(celShadingProgram->id);
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  programs->at(CEL_SHADING)->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
-  programs->at(CEL_SHADING)->setProjectionMatrix(
-    &gameInfo->cameraProjectionMatrix[0]);
+  celShadingProgram->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
+  celShadingProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix[0]);
 
-  programs->at(CEL_SHADING)->setUniformMatrix4fv(
+  celShadingProgram->setUniformMatrix4fv(
     "LMatrix", &gameInfo->lightViewMatrix[0]);
-  programs->at(CEL_SHADING)->setUniformMatrix4fv(
+  celShadingProgram->setUniformMatrix4fv(
     "PLMatrix", &gameInfo->lightProjectionMatrix[0]);
 
-  programs->at(CEL_SHADING)->bindTexture(
-    0, GL_TEXTURE0, "shadowMap", shadowMap
+  // Bind shadow map texture
+  celShadingProgram->bindTexture(0, GL_TEXTURE0, "shadowMap", shadowMap);
+
+  // Set shadow map resolution
+  celShadingProgram->setUniform1i(
+    "shadowMapResolution", gameInfo->shadowMapResolution
   );
 
-  programs->at(CEL_SHADING)->setUniform3f(
+  // Set lightDirection
+  celShadingProgram->setUniform3f(
     "lightDirection", gameInfo->lightDirection.x,
     gameInfo->lightDirection.y, gameInfo->lightDirection.z
-  );
-
-  programs->at(CEL_SHADING)->setUniform1i(
-    "shadowMapResolution", gameInfo->shadowMapResolution
   );
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = gameInfo->board[x][y];
 
+      // Set movement matrix to identity
       movementMatrix = getIdentityMatrix();
-      // Rotate the piece depending on the team
+
+      // Rotate the piece depending on the team (user or IA)
       movementMatrix = piece > 0 ?
         rotate(&movementMatrix, -90.0, rotation) :
         rotate(&movementMatrix, 90.0, rotation);
+
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
       movementMatrix = translate(&movementMatrix, translation);
-      programs->at(CEL_SHADING)->setMoveMatrix(&movementMatrix[0]);
+      celShadingProgram->setMoveMatrix(&movementMatrix[0]);
 
+      // Compute normal matrix (=inverse(transpose(movementMatrix)))
       std::vector<GLfloat> normalMatrix = inverse(&movementMatrix);
       normalMatrix = transpose(&normalMatrix);
-      programs->at(CEL_SHADING)->setNormalMatrix(&normalMatrix[0]);
+      celShadingProgram->setNormalMatrix(&normalMatrix[0]);
 
       // Draw the checkerboard
       (x + y) % 2 == 0 ?
-        programs->at(CEL_SHADING)->setUniform4f(
-          "pieceColor", 0.70, 0.60, 0.41, 1.0) :
-        programs->at(CEL_SHADING)->setUniform4f(
-          "pieceColor", 1.0, 1.0, 1.0, 1.0);
+        celShadingProgram->setUniform4f("color", 0.70, 0.60, 0.41, 1.0) :
+        celShadingProgram->setUniform4f("color", 1.0, 1.0, 1.0, 1.0);
 
+      // Set if the piece is the selected one or not
       (gameInfo->selectedPiecePosition.x == x and
           gameInfo->selectedPiecePosition.y == y) ?
-        programs->at(CEL_SHADING)->setUniformBool("selected", true) :
-        programs->at(CEL_SHADING)->setUniformBool("selected", false);
+        celShadingProgram->setUniformBool("selected", true) :
+        celShadingProgram->setUniformBool("selected", false);
 
       meshes->at(BOARDCELL)->draw();
 
       if(piece != EMPTY){
         // Display cel-shading mesh
         piece > 0 ?
-          programs->at(CEL_SHADING)->setUniform4f(
-            "pieceColor", 1.0, 0.93, 0.70, 1.0) :
-          programs->at(CEL_SHADING)->setUniform4f(
-            "pieceColor", 0.51, 0.08, 0.08, 1.0);
+          celShadingProgram->setUniform4f("color", 1.0, 0.93, 0.70, 1.0) :
+          celShadingProgram->setUniform4f("color", 0.51, 0.08, 0.08, 1.0);
 
         meshes->at(abs(piece))->draw();
       }

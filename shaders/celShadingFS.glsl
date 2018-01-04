@@ -1,7 +1,7 @@
 varying float vLightIntensity;
 varying vec3 vLightPosition;
 
-uniform vec4 pieceColor;
+uniform vec4 color;
 
 uniform int shadowMapResolution;
 
@@ -35,7 +35,5 @@ void main(void){
     factor = 0.5;
   }
 
-  vec4 color = pieceColor * vec4(factor, factor, factor, 1.0);
-
-  gl_FragColor = color;
+  gl_FragColor = color * vec4(factor, factor, factor, 1.0);
 }

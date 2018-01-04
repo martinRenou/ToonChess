@@ -34,13 +34,16 @@ void colorPickingRender(
   sf::Vector3f translation;
   sf::Vector3f rotation = {0, 0, 1};
 
+  // Get shader program
+  ShaderProgram* colorPickingProgram = programs->at(COLOR_PICKING);
+
   // Render everything with color depending on the position
-  glUseProgram(programs->at(COLOR_PICKING)->id);
+  glUseProgram(colorPickingProgram->id);
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  programs->at(COLOR_PICKING)->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
-  programs->at(COLOR_PICKING)->setProjectionMatrix(
+  colorPickingProgram->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
+  colorPickingProgram->setProjectionMatrix(
     &gameInfo->cameraProjectionMatrix[0]);
 
   for(int x = 0; x < 8; x++){
@@ -49,18 +52,19 @@ void colorPickingRender(
 
       // Set movement matrix
       movementMatrix = getIdentityMatrix();
+
       // Rotate the piece depending on the team
       movementMatrix = piece > 0 ?
         rotate(&movementMatrix, -90.0, rotation) :
         rotate(&movementMatrix, 90.0, rotation);
+
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
       movementMatrix = translate(&movementMatrix, translation);
-      programs->at(COLOR_PICKING)->setMoveMatrix(&movementMatrix[0]);
+      colorPickingProgram->setMoveMatrix(&movementMatrix[0]);
 
       // Set color depending on the position
-      programs->at(COLOR_PICKING)->setUniform4f(
-        "pieceColor", x/8.0, y/8.0, 0.0, 1.0);
+      colorPickingProgram->setUniform4f("color", x/8.0, y/8.0, 0.0, 1.0);
 
       // Display board cell
       meshes->at(BOARDCELL)->draw();
