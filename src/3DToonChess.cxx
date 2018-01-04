@@ -133,7 +133,7 @@ int main(){
   const int IA_TURN = 2;
   int state = USER_TURN;
   sf::Clock iaClock;
-  sf::Time waitingElaspedTime;
+  sf::Time waitingElapsedTime;
   sf::Vector2i lastPosition, newPosition;
 
   // Render loop
@@ -242,10 +242,10 @@ int main(){
     celShadingRender(&gameInfo, &meshes, &programs, shadowMap);
 
     if(state == WAITING){
-      waitingElaspedTime = iaClock.getElapsedTime();
+      waitingElapsedTime = iaClock.getElapsedTime();
 
       // If we waited one second or more, transition to IA_TURN state
-      if(waitingElaspedTime.asSeconds() >= 1.0){
+      if(waitingElapsedTime.asSeconds() >= 1.0){
         state = IA_TURN;
       }
     }
