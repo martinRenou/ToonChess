@@ -1,5 +1,5 @@
 <p align="center"><img width="700" src="./ToonChess.png"></p>
-<p align="center"> 3D Chess game based on OpenGL and Stockfish </p>
+<h1 align="center"> 3D Chess game based on OpenGL and Stockfish </h1>
 
 ## Installation
 
