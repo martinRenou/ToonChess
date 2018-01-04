@@ -20,6 +20,12 @@ format (e.g. "a5")
 */
 std::string positionToUciFormat(sf::Vector2i position);
 
+/* Get movement as UCI format from a last position and a new position
+  \param lastPosition The last position of the piece as an sf::Vector2i
+  \param newPosition The new position of the piece as an sf::Vector2i
+*/
+std::string getMovement(sf::Vector2i lastPosition, sf::Vector2i newPosition);
+
 /* Move function
   \param lastPosition The last position of the piece to move
   \param newPosition The new position of the piece to move
@@ -27,12 +33,6 @@ std::string positionToUciFormat(sf::Vector2i position);
 */
 void movePiece(
   sf::Vector2i lastPosition, sf::Vector2i newPosition, int board[8][8]);
-
-/* Get movement as UCI format from a last position and a new position
-  \param lastPosition The last position of the piece as an sf::Vector2i
-  \param newPosition The new position of the piece as an sf::Vector2i
-*/
-std::string getMovement(sf::Vector2i lastPosition, sf::Vector2i newPosition);
 
 /* Move function
   \param movement The movement in the UCI format "a2a4"

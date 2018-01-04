@@ -40,14 +40,6 @@ std::string positionToUciFormat(sf::Vector2i position){
   return uciGrid[position.x][position.y];
 };
 
-void movePiece(
-    sf::Vector2i lastPosition, sf::Vector2i newPosition, int board[8][8]){
-  int piece = board[lastPosition.x][lastPosition.y];
-
-  board[lastPosition.x][lastPosition.y] = EMPTY;
-  board[newPosition.x][newPosition.y] = piece;
-};
-
 std::string getMovement(sf::Vector2i lastPosition, sf::Vector2i newPosition){
   std::string movement = "";
 
@@ -55,7 +47,15 @@ std::string getMovement(sf::Vector2i lastPosition, sf::Vector2i newPosition){
   movement.append(positionToUciFormat(newPosition));
 
   return movement;
-}
+};
+
+void movePiece(
+    sf::Vector2i lastPosition, sf::Vector2i newPosition, int board[8][8]){
+  int piece = board[lastPosition.x][lastPosition.y];
+
+  board[lastPosition.x][lastPosition.y] = EMPTY;
+  board[newPosition.x][newPosition.y] = piece;
+};
 
 void movePiece(std::string movement, int board[8][8]){
   std::string lastPosition_str = movement.substr(0, 2);
