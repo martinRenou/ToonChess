@@ -1,4 +1,4 @@
-<p align="center"><img width="700" src="./3DToonChess.png"></p>
+<p align="center"><img width="700" src="./ToonChess.png"></p>
 
 - How to install
 
@@ -8,12 +8,12 @@ Install sfml if you don't have it
 Install cmake
 # sudo apt-get install cmake
 
-Install 3DToonChess
+Install ToonChess
 # mkdir build && cd build && cmake ..
 # make
 
 And run it!
-# ./3DToonChess
+# ./ToonChess
 
 How to run tests:
 # ./tests

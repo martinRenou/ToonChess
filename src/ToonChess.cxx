@@ -65,7 +65,7 @@ int main(){
 
   sf::Window window(
       sf::VideoMode(gameInfo.width, gameInfo.height),
-      "3DToonChess",
+      "ToonChess",
       sf::Style::Default,
       settings
   );

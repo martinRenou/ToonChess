@@ -6,11 +6,11 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Debug CACHE STRING "Choose the type of build (Debug or Release)" FORCE)
 endif()
 
-project(3DToonChess)
+project(ToonChess)
 
 # The version number
-set(3DToonChess_VERSION_MAJOR 0)
-set(3DToonChess_VERSION_MINOR 1)
+set(ToonChess_VERSION_MAJOR 0)
+set(ToonChess_VERSION_MINOR 1)
 
 # Add headers
 set(
@@ -31,8 +31,8 @@ set(
 )
 
 # Define sources and executable
-set(EXECUTABLE_NAME "3DToonChess")
-add_executable(${EXECUTABLE_NAME} src/3DToonChess.cxx ${CXX_FILES})
+set(EXECUTABLE_NAME "ToonChess")
+add_executable(${EXECUTABLE_NAME} src/ToonChess.cxx ${CXX_FILES})
 
 # Download and unpack googletest
 configure_file(CMakeLists-googletest.txt.in googletest-download/CMakeLists.txt)
