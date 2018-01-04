@@ -1,19 +1,20 @@
 <p align="center"><img width="700" src="./ToonChess.png"></p>
+<p align="center"> 3D Chess game based on OpenGL and Stockfish </p>
 
-- How to install
+## Installation
 
-Install sfml if you don't have it
-# sudo apt-get install libsfml-dev
+- Install sfml and cmake
+```bash
+sudo apt-get install libsfml-dev cmake
+```
 
-Install cmake
-# sudo apt-get install cmake
+- Compile ToonChess
+```bash
+mkdir build && cd build && cmake ..
+make
+```
 
-Install ToonChess
-# mkdir build && cd build && cmake ..
-# make
-
-And run it!
-# ./ToonChess
-
-How to run tests:
-# ./tests
+- Run it!
+```bash
+./ToonChess
+```
