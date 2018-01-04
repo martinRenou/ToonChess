@@ -262,9 +262,7 @@ int main(){
       // If it's the user turn, check if he wants to move a piece
       if(state == USERTURN
           and lastPosition.x != -1
-          and lastPosition.y != -1
           and newPosition.x != -1
-          and newPosition.y != -1
           and gameInfo.board[lastPosition.x][lastPosition.y] > 0){
 
         movePiece(lastPosition, newPosition, gameInfo.board);
