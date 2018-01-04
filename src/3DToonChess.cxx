@@ -400,7 +400,7 @@ void celShadingRender(
       normalMatrix = transpose(&normalMatrix);
       programs->at(CEL_SHADING)->setNormalMatrix(&normalMatrix[0]);
 
-      // Draw the board cell
+      // Draw the checkerboard
       (x + y) % 2 == 0 ?
         programs->at(CEL_SHADING)->setUniform4f(
           "pieceColor", 0.70, 0.60, 0.41, 1.0) :
