@@ -128,10 +128,10 @@ int main(){
     lightPosition, center, up);
 
   // State machine
-  const int USERTURN = 0;
+  const int USER_TURN = 0;
   const int WAITING = 1;
-  const int IATURN = 2;
-  int state = USERTURN;
+  const int IA_TURN = 2;
+  int state = USER_TURN;
   sf::Clock iaClock;
   sf::Time waitingElaspedTime;
   sf::Vector2i lastPosition, newPosition;
@@ -244,21 +244,21 @@ int main(){
     if(state == WAITING){
       waitingElaspedTime = iaClock.getElapsedTime();
 
-      // If we waited one second or more, transition to IATURN state
+      // If we waited one second or more, transition to IA_TURN state
       if(waitingElaspedTime.asSeconds() >= 1.0){
-        state = IATURN;
+        state = IA_TURN;
       }
     }
 
-    if(state == IATURN){
+    if(state == IA_TURN){
       // Get IA decision according to the last user move
       std::string lastUserMovement = getMovement(lastPosition, newPosition);
       std::string newMove = stockfishConnector->getNextIAMove(lastUserMovement);
 
       movePiece(newMove, gameInfo.board);
 
-      // Transition to USERTURN state
-      state = USERTURN;
+      // Transition to USER_TURN state
+      state = USER_TURN;
     }
 
     if(selecting){
@@ -274,7 +274,7 @@ int main(){
       newPosition = gameInfo.selectedPiecePosition;
 
       // If it's the user turn, check if he wants to move a piece
-      if(state == USERTURN
+      if(state == USER_TURN
           and lastPosition.x != -1
           and newPosition.x != -1
           and gameInfo.board[lastPosition.x][lastPosition.y] > 0){
