@@ -10,7 +10,6 @@
 
 struct GameInfo {
   // Rendering informations
-  GLboolean shadowMapping = true;
   GLfloat shadowMapResolution = SHADOWMAPPING_LOW;
   GLint antialiasingLevel = ANTIALIASING_LOW;
   GLint fovy = 50;
