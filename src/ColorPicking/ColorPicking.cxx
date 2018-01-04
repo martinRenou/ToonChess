@@ -109,7 +109,12 @@ void ColorPicking::initBuffers(){
 void ColorPicking::resizeBuffers(GLuint width, GLuint height){
   // If the resize is a shrinking of the screen, then don't do anything because
   // the buffer will do the job
-  if(this->width >= width and this->height >= height) return;
+  if(this->width >= width and this->height >= height){
+    this->width = width;
+    this->height = height;
+
+    return;
+  };
 
   // Change the size for the buffers
   this->width = width;
