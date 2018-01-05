@@ -7,7 +7,7 @@
 #include <fstream>
 
 #include "Mesh.hxx"
-#include "../utils.hxx"
+#include "../utils/utils.hxx"
 
 
 void extractFloatVec3(

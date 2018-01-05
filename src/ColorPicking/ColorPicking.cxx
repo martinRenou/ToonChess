@@ -11,7 +11,7 @@
 #include "../shader/ShaderProgram.hxx"
 #include "../constants.hxx"
 #include "../GameInfo.hxx"
-#include "../utils.hxx"
+#include "../utils/math.hxx"
 
 #include "ColorPicking.hxx"
 

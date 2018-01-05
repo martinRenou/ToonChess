@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../utils.hxx"
+#include "../utils/utils.hxx"
 #include "CompilationException.hxx"
 
 #include "Shader.hxx"

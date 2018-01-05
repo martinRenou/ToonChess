@@ -20,7 +20,7 @@
 
 #include "constants.hxx"
 #include "GameInfo.hxx"
-#include "utils.hxx"
+#include "utils/math.hxx"
 
 #include "chessBoard/chessBoard.hxx"
 

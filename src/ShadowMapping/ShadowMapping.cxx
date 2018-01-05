@@ -8,7 +8,7 @@
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
 #include "../GameInfo.hxx"
-#include "../utils.hxx"
+#include "../utils/math.hxx"
 
 #include "ShadowMapping.hxx"
 
