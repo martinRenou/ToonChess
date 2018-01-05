@@ -5,7 +5,7 @@
 
 ## Installation (Only linux compatible)
 
-Install [CMake](https://cmake.org/) [SFML](https://www.sfml-dev.org/index.php) and [Stockfish](https://stockfishchess.org/):
+Install [CMake](https://cmake.org/), [SFML](https://www.sfml-dev.org/index.php) and [Stockfish](https://stockfishchess.org/):
 ```bash
 sudo apt-get install cmake libsfml-dev stockfish
 ```
