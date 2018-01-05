@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
-#include "./test_utils.cxx"
+#include "./utils/test_utils.cxx"
+#include "./utils/test_math.cxx"
 
 #include "./mesh/test_mesh.cxx"
 #include "./chessBoard/test_chessBoard.cxx"

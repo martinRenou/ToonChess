@@ -5,7 +5,7 @@
 #include <vector>
 #include <string.h>
 
-#include "../utils.hxx"
+#include "../utils/utils.hxx"
 
 #include "ConnectionException.hxx"
 

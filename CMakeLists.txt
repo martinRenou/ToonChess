@@ -27,7 +27,8 @@ set(
   ${CMAKE_SOURCE_DIR}/src/ShadowMapping/ShadowMapping.cxx
   ${CMAKE_SOURCE_DIR}/src/StockfishConnector/ConnectionException.cxx
   ${CMAKE_SOURCE_DIR}/src/StockfishConnector/StockfishConnector.cxx
-  ${CMAKE_SOURCE_DIR}/src/utils.cxx
+  ${CMAKE_SOURCE_DIR}/src/utils/utils.cxx
+  ${CMAKE_SOURCE_DIR}/src/utils/math.cxx
 )
 
 # Define sources and executable
