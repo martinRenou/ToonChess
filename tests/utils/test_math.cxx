@@ -18,25 +18,16 @@ TEST(matrixProduct, with_identity) {
 
   std::vector<GLfloat> out = matrixProduct(&in1, &in2);
 
-  EXPECT_EQ(3, out.at(0));
-  EXPECT_EQ(6, out.at(1));
-  EXPECT_EQ(5, out.at(2));
-  EXPECT_EQ(8, out.at(3));
+  std::vector<GLfloat> expectedOut = {
+    3, 6, 5, 8,
+    (GLfloat)21.6, (GLfloat)21.5, (GLfloat)21.2, 21,
+    56, 56, 56, 56,
+    0, (GLfloat)93.3, (GLfloat)93.1, (GLfloat)93.2
+  };
 
-  EXPECT_EQ((GLfloat)21.6, out.at(4));
-  EXPECT_EQ((GLfloat)21.5, out.at(5));
-  EXPECT_EQ((GLfloat)21.2, out.at(6));
-  EXPECT_EQ(21, out.at(7));
-
-  EXPECT_EQ(56, out.at(8));
-  EXPECT_EQ(56, out.at(9));
-  EXPECT_EQ(56, out.at(10));
-  EXPECT_EQ(56, out.at(11));
-
-  EXPECT_EQ(0, out.at(12));
-  EXPECT_EQ((GLfloat)93.3, out.at(13));
-  EXPECT_EQ((GLfloat)93.1, out.at(14));
-  EXPECT_EQ((GLfloat)93.2, out.at(15));
+  for(int i = 0; i < 16; i++){
+    EXPECT_EQ(expectedOut.at(i), out.at(i));
+  }
 }
 
 TEST(inverse, with_identity) {
@@ -44,25 +35,16 @@ TEST(inverse, with_identity) {
 
   std::vector<GLfloat> out = inverse(&in);
 
-  EXPECT_EQ(1, out.at(0));
-  EXPECT_EQ(0, out.at(1));
-  EXPECT_EQ(0, out.at(2));
-  EXPECT_EQ(0, out.at(3));
+  std::vector<GLfloat> expectedOut = {
+    1, 0, 0, 0,
+    0, 1, 0, 0,
+    0, 0, 1, 0,
+    0, 0, 0, 1
+  };
 
-  EXPECT_EQ(0, out.at(4));
-  EXPECT_EQ(1, out.at(5));
-  EXPECT_EQ(0, out.at(6));
-  EXPECT_EQ(0, out.at(7));
-
-  EXPECT_EQ(0, out.at(8));
-  EXPECT_EQ(0, out.at(9));
-  EXPECT_EQ(1, out.at(10));
-  EXPECT_EQ(0, out.at(11));
-
-  EXPECT_EQ(0, out.at(12));
-  EXPECT_EQ(0, out.at(13));
-  EXPECT_EQ(0, out.at(14));
-  EXPECT_EQ(1, out.at(15));
+  for(int i = 0; i < 16; i++){
+    EXPECT_EQ(expectedOut.at(i), out.at(i));
+  }
 }
 
 TEST(inverse, with_matrix) {
@@ -75,25 +57,16 @@ TEST(inverse, with_matrix) {
 
   std::vector<GLfloat> out = inverse(&in);
 
-  EXPECT_EQ(-3, out.at(0));
-  EXPECT_EQ(1, out.at(1));
-  EXPECT_EQ(3, out.at(2));
-  EXPECT_EQ(-3, out.at(3));
+  std::vector<GLfloat> expectedOut = {
+    -3, 1, 3, -3,
+    -1./2., 1./4., 1./4., 0,
+    3./2., -1./4., -5./4., 1,
+    1, -1./2., -1./2., 1
+  };
 
-  EXPECT_EQ(-1./2., out.at(4));
-  EXPECT_EQ(1./4., out.at(5));
-  EXPECT_EQ(1./4., out.at(6));
-  EXPECT_EQ(0, out.at(7));
-
-  EXPECT_EQ(3./2., out.at(8));
-  EXPECT_EQ(-1./4., out.at(9));
-  EXPECT_EQ(-5./4., out.at(10));
-  EXPECT_EQ(1, out.at(11));
-
-  EXPECT_EQ(1, out.at(12));
-  EXPECT_EQ(-1./2., out.at(13));
-  EXPECT_EQ(-1./2., out.at(14));
-  EXPECT_EQ(1, out.at(15));
+  for(int i = 0; i < 16; i++){
+    EXPECT_EQ(expectedOut.at(i), out.at(i));
+  }
 }
 
 TEST(transpose, with_matrix) {
@@ -106,23 +79,14 @@ TEST(transpose, with_matrix) {
 
   std::vector<GLfloat> out = transpose(&in);
 
-  EXPECT_EQ(1, out.at(0));
-  EXPECT_EQ(1, out.at(1));
-  EXPECT_EQ(1, out.at(2));
-  EXPECT_EQ(0, out.at(3));
+  std::vector<GLfloat> expectedOut = {
+    1, 1, 1, 0,
+    0, 3, 1, 2,
+    2, 3, 1, 0,
+    1, 0, 2, 1
+  };
 
-  EXPECT_EQ(0, out.at(4));
-  EXPECT_EQ(3, out.at(5));
-  EXPECT_EQ(1, out.at(6));
-  EXPECT_EQ(2, out.at(7));
-
-  EXPECT_EQ(2, out.at(8));
-  EXPECT_EQ(3, out.at(9));
-  EXPECT_EQ(1, out.at(10));
-  EXPECT_EQ(0, out.at(11));
-
-  EXPECT_EQ(1, out.at(12));
-  EXPECT_EQ(0, out.at(13));
-  EXPECT_EQ(2, out.at(14));
-  EXPECT_EQ(1, out.at(15));
+  for(int i = 0; i < 16; i++){
+    EXPECT_EQ(expectedOut.at(i), out.at(i));
+  }
 }
