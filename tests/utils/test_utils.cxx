@@ -14,17 +14,19 @@ TEST(load_file, txt) {
 TEST(split, with_spaces) {
   std::vector<std::string> out = split("v 1.0 2.5 3.2", ' ');
 
-  EXPECT_EQ("v", out[0]);
-  EXPECT_EQ("1.0", out[1]);
-  EXPECT_EQ("2.5", out[2]);
-  EXPECT_EQ("3.2", out[3]);
+  std::vector<std::string> expectedOut = {"v", "1.0", "2.5", "3.2"};
+
+  for(int i = 0; i < 4; i++){
+    EXPECT_EQ(expectedOut.at(i), out.at(i));
+  }
 }
 
 TEST(split, with_dots) {
   std::vector<std::string> out = split("v 1.0 2.5 3.2", '.');
 
-  EXPECT_EQ("v 1", out[0]);
-  EXPECT_EQ("0 2", out[1]);
-  EXPECT_EQ("5 3", out[2]);
-  EXPECT_EQ("2", out[3]);
+  std::vector<std::string> expectedOut = {"v 1", "0 2", "5 3", "2"};
+
+  for(int i = 0; i < 4; i++){
+    EXPECT_EQ(expectedOut.at(i), out.at(i));
+  }
 }
