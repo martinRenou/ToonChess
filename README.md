@@ -27,13 +27,13 @@ Run it!
 ./ToonChess
 ```
 
-## Tests
+## Tests
 
 Tests are written using [GoogleTest](https://github.com/google/googletest), you can run them after installation with:
 ```bash
 ./tests
 ```
 
-## Assets
+## Assets
 
 Meshes have been created on [Blender](https://www.blender.org/) and exported under ".obj" file format.
