@@ -328,8 +328,8 @@ void celShadingRender(
   glCullFace(GL_FRONT);
 
   // Bind uniform values
-  blackBorderProgram->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
-  blackBorderProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix[0]);
+  blackBorderProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
+  blackBorderProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
@@ -346,7 +346,7 @@ void celShadingRender(
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
       movementMatrix = translate(&movementMatrix, translation);
-      blackBorderProgram->setMoveMatrix(&movementMatrix[0]);
+      blackBorderProgram->setMoveMatrix(&movementMatrix);
 
       // Set if the piece is the selected one or not
       (gameInfo->selectedPiecePosition.x == x and
@@ -367,13 +367,13 @@ void celShadingRender(
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  celShadingProgram->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
-  celShadingProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix[0]);
+  celShadingProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
+  celShadingProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
 
   celShadingProgram->setUniformMatrix4fv(
-    "LMatrix", &gameInfo->lightViewMatrix[0]);
+    "LMatrix", &gameInfo->lightViewMatrix);
   celShadingProgram->setUniformMatrix4fv(
-    "PLMatrix", &gameInfo->lightProjectionMatrix[0]);
+    "PLMatrix", &gameInfo->lightProjectionMatrix);
 
   // Bind shadow map texture
   celShadingProgram->bindTexture(0, GL_TEXTURE0, "shadowMap", shadowMap);
@@ -404,12 +404,12 @@ void celShadingRender(
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
       movementMatrix = translate(&movementMatrix, translation);
-      celShadingProgram->setMoveMatrix(&movementMatrix[0]);
+      celShadingProgram->setMoveMatrix(&movementMatrix);
 
       // Compute normal matrix (=inverse(transpose(movementMatrix)))
       std::vector<GLfloat> normalMatrix = inverse(&movementMatrix);
       normalMatrix = transpose(&normalMatrix);
-      celShadingProgram->setNormalMatrix(&normalMatrix[0]);
+      celShadingProgram->setNormalMatrix(&normalMatrix);
 
       // Draw the checkerboard
       (x + y) % 2 == 0 ?

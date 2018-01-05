@@ -227,7 +227,7 @@ std::vector<GLfloat> inverse(std::vector<GLfloat>* matrix){
   det = m[0] * inv[0] + m[1] * inv[4] + m[2] * inv[8] + m[3] * inv[12];
 
   if (det == 0){
-    std::cerr << "Matrix not invertible" << '\n';;
+    std::cerr << "Matrix not invertible" << std::endl;
   }
 
   det = 1.0 / det;

@@ -68,29 +68,29 @@ class ShaderProgram {
       glUseProgram before using this method, otherwise there will be undefined
       behavior depending on the context
       \param name The uniform name
-      \param matrix The matrix value as a table of GLfloats
+      \param matrix The matrix value as a vector of GLfloats
     */
-    void setUniformMatrix4fv(std::string name, GLfloat* matrix);
+    void setUniformMatrix4fv(std::string name, std::vector<GLfloat>* matrix);
 
     /* Set the movement matrix
-      \param matrix The matrix value as a table of GLfloats
+      \param matrix The matrix value as a vector of GLfloats
     */
-    void setMoveMatrix(GLfloat* matrix);
+    void setMoveMatrix(std::vector<GLfloat>* matrix);
 
     /* Set the view matrix
-      \param matrix The matrix value as a table of GLfloats
+      \param matrix The matrix value as a vector of GLfloats
     */
-    void setViewMatrix(GLfloat* matrix);
+    void setViewMatrix(std::vector<GLfloat>* matrix);
 
     /* Set the projection matrix
-      \param matrix The matrix value as a table of GLfloats
+      \param matrix The matrix value as a vector of GLfloats
     */
-    void setProjectionMatrix(GLfloat* matrix);
+    void setProjectionMatrix(std::vector<GLfloat>* matrix);
 
     /* Set the normal matrix
-      \param matrix The matrix value as a table of GLfloats
+      \param matrix The matrix value as a vector of GLfloats
     */
-    void setNormalMatrix(GLfloat* matrix);
+    void setNormalMatrix(std::vector<GLfloat>* matrix);
 
     /* Bind a texture to sampler "n"
       \param n The index of the sampler
