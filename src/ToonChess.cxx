@@ -149,7 +149,6 @@ int main(){
   GLfloat phi;
   // Rotation angle around X axis
   GLfloat teta;
-  bool selecting = false;
   bool cameraMoving = false;
   GLuint shadowMap;
   while(running){
@@ -184,7 +183,34 @@ int main(){
           selectedPixelPosition.x = event.mouseButton.x;
           selectedPixelPosition.y = gameInfo.height - event.mouseButton.y;
 
-          selecting = true;
+          // Register last user clicked position
+          lastPosition = gameInfo.selectedPiecePosition;
+
+          // Get selected piece using color picking
+          gameInfo.selectedPiecePosition = \
+            colorPicking->getClickedPiecePosition(
+              selectedPixelPosition, &gameInfo, &meshes, &programs
+          );
+
+          // Register new user clicked position
+          newPosition = gameInfo.selectedPiecePosition;
+
+          // If it's the user turn, check if he wants to move a piece
+          if(gameState == USER_TURN
+              and lastPosition.x != -1
+              and newPosition.x != -1
+              and gameInfo.board[lastPosition.x][lastPosition.y] > 0){
+
+            movePiece(lastPosition, newPosition, gameInfo.board);
+
+            // Unselect piece
+            gameInfo.selectedPiecePosition = {-1, -1};
+
+            // Transition to waiting state and restart the clock for measuring
+            // waiting time
+            gameState = WAITING;
+            iaClock.restart();
+          }
         }
 
         // If it's the right button, it's the end of a camera movement
@@ -254,38 +280,6 @@ int main(){
 
       // Transition to USER_TURN state
       gameState = USER_TURN;
-    }
-
-    if(selecting){
-      // Register last user clicked position
-      lastPosition = gameInfo.selectedPiecePosition;
-
-      // Get selected piece using color picking
-      gameInfo.selectedPiecePosition = colorPicking->getClickedPiecePosition(
-        selectedPixelPosition, &gameInfo, &meshes, &programs
-      );
-
-      // Register new user clicked position
-      newPosition = gameInfo.selectedPiecePosition;
-
-      // If it's the user turn, check if he wants to move a piece
-      if(gameState == USER_TURN
-          and lastPosition.x != -1
-          and newPosition.x != -1
-          and gameInfo.board[lastPosition.x][lastPosition.y] > 0){
-
-        movePiece(lastPosition, newPosition, gameInfo.board);
-
-        // Unselect piece
-        gameInfo.selectedPiecePosition = {-1, -1};
-
-        // Transition to waiting state and restart the clock for measuring
-        // waiting time
-        gameState = WAITING;
-        iaClock.restart();
-      }
-
-      selecting = false;
     }
 
     glFlush();
