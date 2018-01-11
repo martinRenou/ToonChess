@@ -241,14 +241,9 @@ int main(){
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(&gameInfo, &meshes, &programs, shadowMap);
 
-    if(state == WAITING){
-      waitingElapsedTime = iaClock.getElapsedTime();
-
-      // If we waited one second or more, transition to IA_TURN state
-      if(waitingElapsedTime.asSeconds() >= 1.0){
-        state = IA_TURN;
-      }
-    }
+    // If we waited one second or more, transition to IA_TURN state
+    if(state == WAITING and iaClock.getElapsedTime().asSeconds() >= 1.0)
+      state = IA_TURN;
 
     if(state == IA_TURN){
       // Get IA decision according to the last user move
