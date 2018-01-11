@@ -131,7 +131,7 @@ int main(){
   const int USER_TURN = 0;
   const int WAITING = 1;
   const int IA_TURN = 2;
-  int state = USER_TURN;
+  int gameState = USER_TURN;
   sf::Clock iaClock;
   sf::Time waitingElapsedTime;
   sf::Vector2i lastPosition, newPosition;
@@ -242,10 +242,10 @@ int main(){
     celShadingRender(&gameInfo, &meshes, &programs, shadowMap);
 
     // If we waited one second or more, transition to IA_TURN state
-    if(state == WAITING and iaClock.getElapsedTime().asSeconds() >= 1.0)
-      state = IA_TURN;
+    if(gameState == WAITING and iaClock.getElapsedTime().asSeconds() >= 1.0)
+      gameState = IA_TURN;
 
-    if(state == IA_TURN){
+    if(gameState == IA_TURN){
       // Get IA decision according to the last user move
       std::string lastUserMovement = getMovement(lastPosition, newPosition);
       std::string newMove = stockfishConnector->getNextIAMove(lastUserMovement);
@@ -253,7 +253,7 @@ int main(){
       movePiece(newMove, gameInfo.board);
 
       // Transition to USER_TURN state
-      state = USER_TURN;
+      gameState = USER_TURN;
     }
 
     if(selecting){
@@ -269,7 +269,7 @@ int main(){
       newPosition = gameInfo.selectedPiecePosition;
 
       // If it's the user turn, check if he wants to move a piece
-      if(state == USER_TURN
+      if(gameState == USER_TURN
           and lastPosition.x != -1
           and newPosition.x != -1
           and gameInfo.board[lastPosition.x][lastPosition.y] > 0){
@@ -281,7 +281,7 @@ int main(){
 
         // Transition to waiting state and restart the clock for measuring
         // waiting time
-        state = WAITING;
+        gameState = WAITING;
         iaClock.restart();
       }
 
