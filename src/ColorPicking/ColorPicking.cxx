@@ -42,9 +42,8 @@ void colorPickingRender(
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  colorPickingProgram->setViewMatrix(&gameInfo->cameraViewMatrix[0]);
-  colorPickingProgram->setProjectionMatrix(
-    &gameInfo->cameraProjectionMatrix[0]);
+  colorPickingProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
+  colorPickingProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
@@ -61,7 +60,7 @@ void colorPickingRender(
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
       movementMatrix = translate(&movementMatrix, translation);
-      colorPickingProgram->setMoveMatrix(&movementMatrix[0]);
+      colorPickingProgram->setMoveMatrix(&movementMatrix);
 
       // Set color depending on the position
       colorPickingProgram->setUniform4f("color", x/8.0, y/8.0, 0.0, 1.0);

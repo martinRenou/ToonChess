@@ -9,7 +9,10 @@
 /* Generate and return a perspective matrix. Inspired from the gluPerspective
   function, but it only creates the matrix and returns it, it doesn't call
   glMultMatrix under the hood.
-  \param
+  \param fovy The field of view
+  \param aspect The ratio aspect
+  \param zNear The near value for the clipplane
+  \param zFar The fat value for the clipplane
   \return The perspective matrix
 */
 std::vector<GLfloat> getPerspectiveProjMatrix(

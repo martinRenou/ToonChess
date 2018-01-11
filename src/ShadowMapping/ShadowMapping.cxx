@@ -30,9 +30,8 @@ void shadowMappingRender(
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  shadowMappingProgram->setViewMatrix(&gameInfo->lightViewMatrix[0]);
-  shadowMappingProgram->setProjectionMatrix(
-    &gameInfo->lightProjectionMatrix[0]);
+  shadowMappingProgram->setViewMatrix(&gameInfo->lightViewMatrix);
+  shadowMappingProgram->setProjectionMatrix(&gameInfo->lightProjectionMatrix);
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
@@ -49,7 +48,7 @@ void shadowMappingRender(
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
       movementMatrix = translate(&movementMatrix, translation);
-      shadowMappingProgram->setMoveMatrix(&movementMatrix[0]);
+      shadowMappingProgram->setMoveMatrix(&movementMatrix);
 
       // Set if the piece is selected or not
       (gameInfo->selectedPiecePosition.x == x and
