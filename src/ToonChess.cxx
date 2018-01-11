@@ -370,8 +370,7 @@ void celShadingRender(
   celShadingProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
   celShadingProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
 
-  celShadingProgram->setUniformMatrix4fv(
-    "LMatrix", &gameInfo->lightViewMatrix);
+  celShadingProgram->setUniformMatrix4fv("LMatrix", &gameInfo->lightViewMatrix);
   celShadingProgram->setUniformMatrix4fv(
     "PLMatrix", &gameInfo->lightProjectionMatrix);
 
