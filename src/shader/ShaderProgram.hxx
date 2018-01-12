@@ -32,7 +32,7 @@ class ShaderProgram {
       \param name The uniform name
       \param value The int value
     */
-    void setUniform1i(std::string name, GLfloat value);
+    void setInt(std::string name, GLfloat value);
 
     /* Set a vec3 uniform value, given its name. The program must be bound with
       glUseProgram before using this method, otherwise there will be undefined
@@ -42,7 +42,7 @@ class ShaderProgram {
       \param y Second component of the vec3
       \param z Third component of the vec3
     */
-    void setUniform3f(std::string name, GLfloat x, GLfloat y, GLfloat z);
+    void setVector3f(std::string name, GLfloat x, GLfloat y, GLfloat z);
 
     /* Set a vec4 uniform value, given its name. The program must be bound with
       glUseProgram before using this method, otherwise there will be undefined
@@ -53,7 +53,7 @@ class ShaderProgram {
       \param z Third component of the vec4
       \param w Fourth component of the vec4
     */
-    void setUniform4f(
+    void setVector4f(
       std::string name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 
     /* Set a bool uniform value, given its name. The program must be bound with
@@ -62,7 +62,7 @@ class ShaderProgram {
       \param name The uniform name
       \param value The boolean value
     */
-    void setUniformBool(std::string name, bool value);
+    void setBoolean(std::string name, bool value);
 
     /* Set a matrix uniform value, given its name. The program must be bound with
       glUseProgram before using this method, otherwise there will be undefined
@@ -70,7 +70,7 @@ class ShaderProgram {
       \param name The uniform name
       \param matrix The matrix value as a vector of GLfloats
     */
-    void setUniformMatrix4fv(std::string name, std::vector<GLfloat>* matrix);
+    void setMatrix4fv(std::string name, std::vector<GLfloat>* matrix);
 
     /* Set the movement matrix
       \param matrix The matrix value as a vector of GLfloats

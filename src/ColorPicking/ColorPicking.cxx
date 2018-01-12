@@ -63,7 +63,7 @@ void colorPickingRender(
       colorPickingProgram->setMoveMatrix(&movementMatrix);
 
       // Set color depending on the position
-      colorPickingProgram->setUniform4f("color", x/8.0, y/8.0, 0.0, 1.0);
+      colorPickingProgram->setVector4f("color", x/8.0, y/8.0, 0.0, 1.0);
 
       // Display board cell
       meshes->at(BOARDCELL)->draw();

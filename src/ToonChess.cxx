@@ -340,8 +340,8 @@ void celShadingRender(
       // Set if the piece is the selected one or not
       (gameInfo->selectedPiecePosition.x == x and
           gameInfo->selectedPiecePosition.y == y) ?
-        blackBorderProgram->setUniformBool("selected", true) :
-        blackBorderProgram->setUniformBool("selected", false);
+        blackBorderProgram->setBoolean("selected", true) :
+        blackBorderProgram->setBoolean("selected", false);
 
       // Draw board cell
       meshes->at(BOARDCELL)->draw();
@@ -359,20 +359,19 @@ void celShadingRender(
   celShadingProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
   celShadingProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
 
-  celShadingProgram->setUniformMatrix4fv("LMatrix", &gameInfo->lightViewMatrix);
-  celShadingProgram->setUniformMatrix4fv(
-    "PLMatrix", &gameInfo->lightProjectionMatrix);
+  celShadingProgram->setMatrix4fv("LMatrix", &gameInfo->lightViewMatrix);
+  celShadingProgram->setMatrix4fv("PLMatrix", &gameInfo->lightProjectionMatrix);
 
   // Bind shadow map texture
   celShadingProgram->bindTexture(0, GL_TEXTURE0, "shadowMap", shadowMap);
 
   // Set shadow map resolution
-  celShadingProgram->setUniform1i(
+  celShadingProgram->setInt(
     "shadowMapResolution", gameInfo->shadowMapResolution
   );
 
   // Set lightDirection
-  celShadingProgram->setUniform3f(
+  celShadingProgram->setVector3f(
     "lightDirection", gameInfo->lightDirection.x,
     gameInfo->lightDirection.y, gameInfo->lightDirection.z
   );
@@ -401,22 +400,22 @@ void celShadingRender(
 
       // Draw the checkerboard
       (x + y) % 2 == 0 ?
-        celShadingProgram->setUniform4f("color", 0.70, 0.60, 0.41, 1.0) :
-        celShadingProgram->setUniform4f("color", 1.0, 1.0, 1.0, 1.0);
+        celShadingProgram->setVector4f("color", 0.70, 0.60, 0.41, 1.0) :
+        celShadingProgram->setVector4f("color", 1.0, 1.0, 1.0, 1.0);
 
       // Set if the piece is the selected one or not
       (gameInfo->selectedPiecePosition.x == x and
           gameInfo->selectedPiecePosition.y == y) ?
-        celShadingProgram->setUniformBool("selected", true) :
-        celShadingProgram->setUniformBool("selected", false);
+        celShadingProgram->setBoolean("selected", true) :
+        celShadingProgram->setBoolean("selected", false);
 
       meshes->at(BOARDCELL)->draw();
 
       if(piece != EMPTY){
         // Display cel-shading mesh
         piece > 0 ?
-          celShadingProgram->setUniform4f("color", 1.0, 0.93, 0.70, 1.0) :
-          celShadingProgram->setUniform4f("color", 0.51, 0.08, 0.08, 1.0);
+          celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
+          celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
 
         meshes->at(abs(piece))->draw();
       }

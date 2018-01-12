@@ -53,8 +53,8 @@ void shadowMappingRender(
       // Set if the piece is selected or not
       (gameInfo->selectedPiecePosition.x == x and
           gameInfo->selectedPiecePosition.y == y) ?
-        shadowMappingProgram->setUniformBool("selected", true) :
-        shadowMappingProgram->setUniformBool("selected", false);
+        shadowMappingProgram->setBoolean("selected", true) :
+        shadowMappingProgram->setBoolean("selected", false);
 
       // Draw board cell
       meshes->at(BOARDCELL)->draw();
