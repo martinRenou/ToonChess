@@ -6,7 +6,7 @@ before_install:
   - sudo apt-get install -qq cppcheck
 
 script:
-  - cppcheck --error-exitcode=1 src/
+  - cppcheck --error-exitcode=1 --enable=all src/
   - mkdir build
   - cd build
   - cmake ..
