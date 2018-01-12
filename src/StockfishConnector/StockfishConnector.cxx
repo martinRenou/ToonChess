@@ -136,7 +136,7 @@ std::string StockfishConnector::getNextIAMove(std::string userMove){
   std::vector<std::string> splittedLine;
 
   // Print user move in stdout
-  std::cout << "User move: " << userMove << std::endl;
+  std::cout << std::endl << "User move: " << userMove << std::endl;
 
   // Append the user move to moves
   this->moves.append(userMove);
@@ -167,7 +167,7 @@ std::string StockfishConnector::getNextIAMove(std::string userMove){
   // Print IA move in stdout and suggested move for the user if available
   std::cout << "IA move: " << iaMove << std::endl;
   if(splittedLine.size() == 4){
-    std::cout << "Suggested user move: " << splittedLine.at(3) << std::endl;
+    std::cout << "Suggested user move: " << splittedLine.at(3);
   }
 
   return iaMove;
