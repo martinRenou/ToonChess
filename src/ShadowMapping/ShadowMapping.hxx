@@ -30,7 +30,7 @@ public:
   /* Constructor
     \param resolution The resolution of the shadow map
   */
-  explicit ShadowMapping(GLuint resolution);
+  ShadowMapping(GLuint resolution);
 
   /* Initialization of the buffer objects */
   void initBuffers();
