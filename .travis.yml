@@ -3,8 +3,10 @@ language: c++
 before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq libsfml-dev cmake stockfish
+  - sudo apt-get install -qq cppcheck
 
 script:
+  - cppcheck src/
   - mkdir build
   - cd build
   - cmake ..
