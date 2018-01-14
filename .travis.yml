@@ -12,7 +12,7 @@ before_install:
   - popd
 
 script:
-  - cppcheck --error-exitcode=1 --enable=all src/
+  - cppcheck --quiet --error-exitcode=1 --enable=all src/
   - mkdir build
   - cd build
   - cmake ..
