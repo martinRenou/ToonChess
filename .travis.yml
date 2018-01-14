@@ -7,6 +7,7 @@ before_install:
   - wget github.com/danmar/cppcheck/releases/download/1.81/cppcheck-1.81.tar.gz
   - tar -xvf cppcheck-1.81.tar.gz
   - pushd cppcheck-1.81/
+  - make SRCDIR=build CFGDIR=/usr/share/cppcheck/ HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
   - sudo make install CFGDIR=/usr/share/cppcheck/
   - popd
 
