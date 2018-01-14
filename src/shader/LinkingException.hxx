@@ -9,7 +9,7 @@ class LinkingException : public std::exception{
     std::string msg;
 
   public:
-    explicit LinkingException(std::string msg);
+    explicit LinkingException(const std::string& msg);
 
     virtual ~LinkingException() throw();
 

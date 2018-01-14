@@ -9,7 +9,8 @@ class CompilationException : public std::exception{
     std::string msg;
 
   public:
-    explicit CompilationException(std::string shaderPath, std::string msg);
+    explicit CompilationException(
+      const std::string& shaderPath, const std::string& msg);
 
     virtual ~CompilationException() throw();
 

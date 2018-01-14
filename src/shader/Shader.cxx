@@ -10,7 +10,7 @@
 
 #include "Shader.hxx"
 
-Shader::Shader(std::string filePath, GLenum type) :
+Shader::Shader(std::string& filePath, GLenum type) :
   filePath{filePath}, type{type}{}
 
 void Shader::compile(){

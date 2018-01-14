@@ -9,7 +9,7 @@ class ConnectionException : public std::exception{
     std::string msg;
 
   public:
-    explicit ConnectionException(std::string msg);
+    explicit ConnectionException(const std::string& msg);
 
     virtual ~ConnectionException() throw();
 
