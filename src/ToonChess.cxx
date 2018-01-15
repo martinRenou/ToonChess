@@ -281,9 +281,8 @@ int main(){
       std::string newMove = stockfishConnector->getNextIAMove(lastUserMovement);
 
       // If the IA tried to move one user's pawn, stop the game
-      std::string iaMoveStartPositionUCI = newMove.substr(0, 2);
       sf::Vector2i iaMoveStartPosition = uciFormatToPosition(
-        iaMoveStartPositionUCI);
+        newMove.substr(0, 2));
       if(gameInfo.board[iaMoveStartPosition.x][iaMoveStartPosition.y] >= 0){
         std::cerr <<
           "\033[1;31mGame error:\033[0m A forbiden move has been performed!"
