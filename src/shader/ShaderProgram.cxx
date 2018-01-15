@@ -18,7 +18,7 @@ void deleteShaders(std::vector<Shader*>* shaders){
   shaders->clear();
 }
 
-ShaderProgram::ShaderProgram(std::vector<Shader*> shaders) : shaders{shaders}{}
+ShaderProgram::ShaderProgram(std::vector<Shader*>& shaders) : shaders{shaders}{}
 
 void ShaderProgram::compile(){
   // Compile shaders one by one

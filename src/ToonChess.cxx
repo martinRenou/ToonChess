@@ -20,6 +20,7 @@
 
 #include "constants.hxx"
 #include "GameInfo.hxx"
+#include "utils/utils.hxx"
 #include "utils/math.hxx"
 
 #include "chessBoard/chessBoard.hxx"
@@ -126,6 +127,9 @@ int main(){
   };
   gameInfo.lightViewMatrix = getLookAtMatrix(
     lightPosition, center, up);
+
+  // Display OpenGL errors
+  displayGLErrors();
 
   // State machine
   const int USER_TURN = 0;
