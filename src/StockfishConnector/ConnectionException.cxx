@@ -3,7 +3,7 @@
 #include "ConnectionException.hxx"
 
 ConnectionException::ConnectionException(const std::string& msg) :
-  msg{"\033[1;31mConnection error: \033[0m\n" + msg}{}
+  msg{"\033[1;31mConnection error: \033[0m" + msg}{}
 
 ConnectionException::~ConnectionException() throw(){};
 

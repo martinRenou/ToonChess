@@ -58,6 +58,9 @@ StockfishConnector::StockfishConnector() : moves{""}{
 };
 
 void StockfishConnector::startCommunication(){
+  const char* readMode = "r";
+  const char* writeMode = "w";
+
   int fd[2];
   if(pipe(fd) == -1){
     throw ConnectionException("Failed to create pipes");
@@ -91,12 +94,13 @@ void StockfishConnector::startCommunication(){
     close(parentReadPipe);
     close(parentWritePipe);
     close(childReadPipe);
-    close(childWritePipe);
 
     // Run stockfish
     execlp("stockfish", "stockfish", (char *)NULL);
 
     // If everything went fine, this code shouldn't be reached
+    writeLine(fdopen(childWritePipe, writeMode), "stop\n", true);
+    close(childWritePipe);
     throw ConnectionException(
       "Could not run stockfish, please be sure it's installed");
   }
@@ -106,8 +110,6 @@ void StockfishConnector::startCommunication(){
   close(childWritePipe);
 
   // Get file from file descriptor
-  const char* readMode = "r";
-  const char* writeMode = "w";
   this->parentReadPipeF = fdopen(parentReadPipe, readMode);
   this->parentWritePipeF = fdopen(parentWritePipe, writeMode);
 
@@ -134,7 +136,7 @@ std::string StockfishConnector::getNextIAMove(std::string userMove){
   std::vector<std::string> splittedLine;
 
   // Print user move in stdout
-  std::cout << "User move: " << userMove << std::endl;
+  std::cout << std::endl << "User move: " << userMove << std::endl;
 
   // Append the user move to moves
   this->moves.append(userMove);
@@ -165,7 +167,7 @@ std::string StockfishConnector::getNextIAMove(std::string userMove){
   // Print IA move in stdout and suggested move for the user if available
   std::cout << "IA move: " << iaMove << std::endl;
   if(splittedLine.size() == 4){
-    std::cout << "Suggested user move: " << splittedLine.at(3) << std::endl;
+    std::cout << "Suggested user move: " << splittedLine.at(3);
   }
 
   return iaMove;
