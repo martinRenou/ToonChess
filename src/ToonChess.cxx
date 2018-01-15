@@ -285,11 +285,17 @@ int main(){
       sf::Vector2i iaMoveStartPosition = uciFormatToPosition(
         iaMoveStartPositionUCI);
       if(gameInfo.board[iaMoveStartPosition.x][iaMoveStartPosition.y] >= 0){
-        std::cout <<
+        std::cerr <<
           "\033[1;31mGame error:\033[0m A forbiden move has been performed!"
           << std::endl;
 
-        break;
+        deleteMeshes(&meshes);
+        deletePrograms(&programs);
+        delete colorPicking;
+        delete shadowMapping;
+        delete stockfishConnector;
+
+        return 1;
       }
 
       movePiece(newMove, gameInfo.board);
