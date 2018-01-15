@@ -65,33 +65,33 @@ void ShaderProgram::compile(){
   deleteShaders(&this->shaders);
 }
 
-void ShaderProgram::setUniform1i(std::string name, GLfloat value){
+void ShaderProgram::setInt(std::string name, GLfloat value){
   GLuint location = glGetUniformLocation(this->id, name.c_str());
 
   glUniform1i(location, value);
 };
 
-void ShaderProgram::setUniform3f(
+void ShaderProgram::setVector3f(
     std::string name, GLfloat x, GLfloat y, GLfloat z){
   GLuint location = glGetUniformLocation(this->id, name.c_str());
 
   glUniform3f(location, x, y, z);
 };
 
-void ShaderProgram::setUniform4f(
+void ShaderProgram::setVector4f(
     std::string name, GLfloat x, GLfloat y, GLfloat z, GLfloat w){
   GLuint location = glGetUniformLocation(this->id, name.c_str());
 
   glUniform4f(location, x, y, z, w);
 };
 
-void ShaderProgram::setUniformBool(std::string name, bool value){
+void ShaderProgram::setBoolean(std::string name, bool value){
   GLuint location = glGetUniformLocation(this->id, name.c_str());
 
   glUniform1i(location, value);
 };
 
-void ShaderProgram::setUniformMatrix4fv(
+void ShaderProgram::setMatrix4fv(
     std::string name, std::vector<GLfloat>* matrix){
   GLuint location = glGetUniformLocation(this->id, name.c_str());
 
@@ -99,19 +99,19 @@ void ShaderProgram::setUniformMatrix4fv(
 };
 
 void ShaderProgram::setMoveMatrix(std::vector<GLfloat>* matrix){
-  this->setUniformMatrix4fv("MMatrix", matrix);
+  this->setMatrix4fv("MMatrix", matrix);
 };
 
 void ShaderProgram::setViewMatrix(std::vector<GLfloat>* matrix){
-  this->setUniformMatrix4fv("VMatrix", matrix);
+  this->setMatrix4fv("VMatrix", matrix);
 };
 
 void ShaderProgram::setProjectionMatrix(std::vector<GLfloat>* matrix){
-  this->setUniformMatrix4fv("PMatrix", matrix);
+  this->setMatrix4fv("PMatrix", matrix);
 };
 
 void ShaderProgram::setNormalMatrix(std::vector<GLfloat>* matrix){
-  this->setUniformMatrix4fv("NMatrix", matrix);
+  this->setMatrix4fv("NMatrix", matrix);
 };
 
 void ShaderProgram::bindTexture(

@@ -135,7 +135,7 @@ int main(){
   const int USER_TURN = 0;
   const int WAITING = 1;
   const int IA_TURN = 2;
-  int state = USER_TURN;
+  int gameState = USER_TURN;
   sf::Clock iaClock;
   sf::Time waitingElapsedTime;
   sf::Vector2i lastPosition, newPosition;
@@ -153,7 +153,6 @@ int main(){
   GLfloat phi;
   // Rotation angle around X axis
   GLfloat teta;
-  bool selecting = false;
   bool cameraMoving = false;
   GLuint shadowMap;
   while(running){
@@ -188,7 +187,34 @@ int main(){
           selectedPixelPosition.x = event.mouseButton.x;
           selectedPixelPosition.y = gameInfo.height - event.mouseButton.y;
 
-          selecting = true;
+          // Register last user clicked position
+          lastPosition = gameInfo.selectedPiecePosition;
+
+          // Get selected piece using color picking
+          gameInfo.selectedPiecePosition = \
+            colorPicking->getClickedPiecePosition(
+              selectedPixelPosition, &gameInfo, &meshes, &programs
+          );
+
+          // Register new user clicked position
+          newPosition = gameInfo.selectedPiecePosition;
+
+          // If it's the user turn, check if he wants to move a piece
+          if(gameState == USER_TURN
+              and lastPosition.x != -1
+              and newPosition.x != -1
+              and gameInfo.board[lastPosition.x][lastPosition.y] > 0){
+
+            movePiece(lastPosition, newPosition, gameInfo.board);
+
+            // Unselect piece
+            gameInfo.selectedPiecePosition = {-1, -1};
+
+            // Transition to waiting state and restart the clock for measuring
+            // waiting time
+            gameState = WAITING;
+            iaClock.restart();
+          }
         }
 
         // If it's the right button, it's the end of a camera movement
@@ -245,16 +271,11 @@ int main(){
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(&gameInfo, &meshes, &programs, shadowMap);
 
-    if(state == WAITING){
-      waitingElapsedTime = iaClock.getElapsedTime();
+    // If we waited one second or more, transition to IA_TURN state
+    if(gameState == WAITING and iaClock.getElapsedTime().asSeconds() >= 1.0)
+      gameState = IA_TURN;
 
-      // If we waited one second or more, transition to IA_TURN state
-      if(waitingElapsedTime.asSeconds() >= 1.0){
-        state = IA_TURN;
-      }
-    }
-
-    if(state == IA_TURN){
+    if(gameState == IA_TURN){
       // Get IA decision according to the last user move
       std::string lastUserMovement = getMovement(lastPosition, newPosition);
       std::string newMove = stockfishConnector->getNextIAMove(lastUserMovement);
@@ -262,39 +283,7 @@ int main(){
       movePiece(newMove, gameInfo.board);
 
       // Transition to USER_TURN state
-      state = USER_TURN;
-    }
-
-    if(selecting){
-      // Register last user clicked position
-      lastPosition = gameInfo.selectedPiecePosition;
-
-      // Get selected piece using color picking
-      gameInfo.selectedPiecePosition = colorPicking->getClickedPiecePosition(
-        selectedPixelPosition, &gameInfo, &meshes, &programs
-      );
-
-      // Register new user clicked position
-      newPosition = gameInfo.selectedPiecePosition;
-
-      // If it's the user turn, check if he wants to move a piece
-      if(state == USER_TURN
-          and lastPosition.x != -1
-          and newPosition.x != -1
-          and gameInfo.board[lastPosition.x][lastPosition.y] > 0){
-
-        movePiece(lastPosition, newPosition, gameInfo.board);
-
-        // Unselect piece
-        gameInfo.selectedPiecePosition = {-1, -1};
-
-        // Transition to waiting state and restart the clock for measuring
-        // waiting time
-        state = WAITING;
-        iaClock.restart();
-      }
-
-      selecting = false;
+      gameState = USER_TURN;
     }
 
     glFlush();
@@ -355,8 +344,8 @@ void celShadingRender(
       // Set if the piece is the selected one or not
       (gameInfo->selectedPiecePosition.x == x and
           gameInfo->selectedPiecePosition.y == y) ?
-        blackBorderProgram->setUniformBool("selected", true) :
-        blackBorderProgram->setUniformBool("selected", false);
+        blackBorderProgram->setBoolean("selected", true) :
+        blackBorderProgram->setBoolean("selected", false);
 
       // Draw board cell
       meshes->at(BOARDCELL)->draw();
@@ -374,20 +363,19 @@ void celShadingRender(
   celShadingProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
   celShadingProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
 
-  celShadingProgram->setUniformMatrix4fv("LMatrix", &gameInfo->lightViewMatrix);
-  celShadingProgram->setUniformMatrix4fv(
-    "PLMatrix", &gameInfo->lightProjectionMatrix);
+  celShadingProgram->setMatrix4fv("LMatrix", &gameInfo->lightViewMatrix);
+  celShadingProgram->setMatrix4fv("PLMatrix", &gameInfo->lightProjectionMatrix);
 
   // Bind shadow map texture
   celShadingProgram->bindTexture(0, GL_TEXTURE0, "shadowMap", shadowMap);
 
   // Set shadow map resolution
-  celShadingProgram->setUniform1i(
+  celShadingProgram->setInt(
     "shadowMapResolution", gameInfo->shadowMapResolution
   );
 
   // Set lightDirection
-  celShadingProgram->setUniform3f(
+  celShadingProgram->setVector3f(
     "lightDirection", gameInfo->lightDirection.x,
     gameInfo->lightDirection.y, gameInfo->lightDirection.z
   );
@@ -416,22 +404,22 @@ void celShadingRender(
 
       // Draw the checkerboard
       (x + y) % 2 == 0 ?
-        celShadingProgram->setUniform4f("color", 0.70, 0.60, 0.41, 1.0) :
-        celShadingProgram->setUniform4f("color", 1.0, 1.0, 1.0, 1.0);
+        celShadingProgram->setVector4f("color", 0.70, 0.60, 0.41, 1.0) :
+        celShadingProgram->setVector4f("color", 1.0, 1.0, 1.0, 1.0);
 
       // Set if the piece is the selected one or not
       (gameInfo->selectedPiecePosition.x == x and
           gameInfo->selectedPiecePosition.y == y) ?
-        celShadingProgram->setUniformBool("selected", true) :
-        celShadingProgram->setUniformBool("selected", false);
+        celShadingProgram->setBoolean("selected", true) :
+        celShadingProgram->setBoolean("selected", false);
 
       meshes->at(BOARDCELL)->draw();
 
       if(piece != EMPTY){
         // Display cel-shading mesh
         piece > 0 ?
-          celShadingProgram->setUniform4f("color", 1.0, 0.93, 0.70, 1.0) :
-          celShadingProgram->setUniform4f("color", 0.51, 0.08, 0.08, 1.0);
+          celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
+          celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
 
         meshes->at(abs(piece))->draw();
       }
