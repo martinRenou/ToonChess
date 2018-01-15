@@ -24,7 +24,7 @@ class Shader {
         GL_TESS_CONTROL_SHADER, GL_TESS_EVALUATION_SHADER, GL_GEOMETRY_SHADER,
         GL_FRAGMENT_SHADER, or GL_COMPUTE_SHADER
     */
-    explicit Shader(std::string filePath, GLenum type);
+    explicit Shader(std::string& filePath, GLenum type);
 
     /* Compilation method, this will load the GLSL code and compile it
       \throw CompilationException if the compilation failed
