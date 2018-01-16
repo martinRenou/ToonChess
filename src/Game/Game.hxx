@@ -8,6 +8,7 @@
 #include "../constants.hxx"
 #include "StockfishConnector.hxx"
 
+// cppcheck-suppress noCopyConstructor
 class Game {
 private:
   /* The checkerboard */
@@ -64,7 +65,7 @@ public:
     it will move one chess piece according to the currently clicked piece, if
     it's WAITING it will wait one second before changing to IA_TURN, if it's
     IA_TURN it will ask Stockfish what is the next IA move
-    \throw GameException if chess rules are not respected 
+    \throw GameException if chess rules are not respected
   */
   void perform();
 
