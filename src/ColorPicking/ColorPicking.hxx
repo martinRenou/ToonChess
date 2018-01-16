@@ -9,6 +9,7 @@
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
 #include "../GameInfo.hxx"
+#include "../Game/Game.hxx"
 
 class ColorPicking {
 private:
@@ -49,6 +50,7 @@ public:
   /* Get the cliked piece position according to the clicked pixel on the screen.
     This will perform a rendering in the framebuffer
     \param clickedPixelPosition The position of the clicked pixel on the screen
+    \param game The game instance
     \param gameInfo The current game informations
     \param meshes The map of piece meshes
     \param programs The map of shader programs
@@ -56,6 +58,7 @@ public:
   */
   sf::Vector2i getClickedPiecePosition(
     sf::Vector2i clickedPixelPosition,
+    Game* game,
     GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs);
 

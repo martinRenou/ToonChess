@@ -8,6 +8,21 @@
 #include "../constants.hxx"
 #include "StockfishConnector.hxx"
 
+/* Conversion function: converts a position in UCI format (e.g. "h3") into a
+vector
+  \param position The position in the UCI format
+  \return the SFML vector representing the position on the board
+*/
+sf::Vector2i uciFormatToPosition(std::string position);
+
+/* Conversion function: converts a position specified with x and y into a UCI
+format (e.g. "a5")
+  \param position The position as an sf::Vector2i
+  \return the position in the UCI format
+*/
+std::string positionToUciFormat(sf::Vector2i position);
+
+
 // cppcheck-suppress noCopyConstructor
 class Game {
 private:

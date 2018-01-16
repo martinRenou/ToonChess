@@ -4,7 +4,7 @@
 #include "./utils/test_math.cxx"
 
 #include "./mesh/test_mesh.cxx"
-#include "./chessBoard/test_chessBoard.cxx"
+#include "./Game/test_game.cxx"
 
 int main(int argc, char **argv) {::testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();

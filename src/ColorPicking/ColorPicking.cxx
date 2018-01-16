@@ -11,6 +11,7 @@
 #include "../shader/ShaderProgram.hxx"
 #include "../constants.hxx"
 #include "../GameInfo.hxx"
+#include "../Game/Game.hxx"
 #include "../utils/math.hxx"
 
 #include "ColorPicking.hxx"
@@ -22,11 +23,13 @@ struct Pixel {
 };
 
 /* Makes a color-picking rendering in the current framebuffer
+  \param game The game instance
   \param gameInfo The game informations
   \param meshes The map of meshes
   \param programs The map of shader programs
 */
 void colorPickingRender(
+    Game* game,
     GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs){
   // The movement Matrix
@@ -47,7 +50,7 @@ void colorPickingRender(
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
-      int piece = gameInfo->board[x][y];
+      int piece = game->board[x][y];
 
       // Set movement matrix
       movementMatrix = getIdentityMatrix();
@@ -141,6 +144,7 @@ void ColorPicking::deleteBuffers(){
 
 sf::Vector2i ColorPicking::getClickedPiecePosition(
     sf::Vector2i clickedPixelPosition,
+    Game* game,
     GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs){
   // Bind the framebuffer
@@ -152,7 +156,7 @@ sf::Vector2i ColorPicking::getClickedPiecePosition(
 
   glViewport(0, 0, this->width, this->height);
 
-  colorPickingRender(gameInfo, meshes, programs);
+  colorPickingRender(game, gameInfo, meshes, programs);
 
   // Get pixel color at clicked position
   Pixel pixel;

@@ -26,6 +26,7 @@
 #include "Game/Game.hxx"
 
 /* Perform a cel-shading rendering in the current frameBuffer
+  \param game The game instance
   \param gameInfo The current game informations
   \param meshes The map of meshes
   \param programs The map of shader programs
@@ -176,7 +177,7 @@ int main(){
           // Get selected piece using color picking
           game->setNewSelectedPiecePosition(
             colorPicking->getClickedPiecePosition(
-                selectedPixelPosition, &gameInfo, &meshes, &programs
+                selectedPixelPosition, game, &gameInfo, &meshes, &programs
             )
           );
         }
@@ -222,7 +223,8 @@ int main(){
     }
 
     // Create the shadowMap
-    shadowMap = shadowMapping->getShadowMap(&gameInfo, &meshes, &programs);
+    shadowMap = shadowMapping->getShadowMap(
+      game, &gameInfo, &meshes, &programs);
 
     // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);

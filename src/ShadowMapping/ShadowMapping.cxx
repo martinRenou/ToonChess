@@ -9,10 +9,12 @@
 #include "../shader/ShaderProgram.hxx"
 #include "../GameInfo.hxx"
 #include "../utils/math.hxx"
+#include "../Game/Game.hxx"
 
 #include "ShadowMapping.hxx"
 
 void shadowMappingRender(
+    Game* game,
     GameInfo* gameInfo,
     std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs){
@@ -35,7 +37,7 @@ void shadowMappingRender(
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
-      int piece = gameInfo->board[x][y];
+      int piece = game->board[x][y];
 
       // Set movement matrix to identity
       movementMatrix = getIdentityMatrix();
@@ -51,8 +53,8 @@ void shadowMappingRender(
       shadowMappingProgram->setMoveMatrix(&movementMatrix);
 
       // Set if the piece is selected or not
-      (gameInfo->selectedPiecePosition.x == x and
-          gameInfo->selectedPiecePosition.y == y) ?
+      (game->selectedPiecePosition.x == x and
+          game->selectedPiecePosition.y == y) ?
         shadowMappingProgram->setBoolean("selected", true) :
         shadowMappingProgram->setBoolean("selected", false);
 
@@ -125,7 +127,7 @@ void ShadowMapping::deleteBuffers(){
 }
 
 GLuint ShadowMapping::getShadowMap(
-    GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
+    Game* game, GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs){
   // Bind the framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, this->fboId);
@@ -136,7 +138,7 @@ GLuint ShadowMapping::getShadowMap(
 
   glViewport(0, 0, this->resolution, this->resolution);
 
-  shadowMappingRender(gameInfo, meshes, programs);
+  shadowMappingRender(game, gameInfo, meshes, programs);
 
   // Return the shadowmap id
   return this->shadowMapId;
