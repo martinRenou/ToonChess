@@ -61,7 +61,16 @@ std::string getMovement(sf::Vector2i lastPosition, sf::Vector2i newPosition){
 Game::Game(){
   // Start communication with stockfish
   this->stockfishConnector = new StockfishConnector();
-  this->stockfishConnector->startCommunication();
+
+  try{
+    this->stockfishConnector->startCommunication();
+  } catch(const std::exception& e){
+    std::cerr << e.what() << std::endl;
+
+    delete this->stockfishConnector;
+
+    throw;
+  }
 };
 
 void Game::movePiece(sf::Vector2i lastPosition, sf::Vector2i newPosition){

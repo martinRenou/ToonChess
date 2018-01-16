@@ -11,26 +11,6 @@
 // cppcheck-suppress noCopyConstructor
 class Game {
 private:
-  /* The checkerboard */
-  int board[8][8] = {
-    {ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK},
-    {KNIGHT, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT},
-    {BISHOP, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*BISHOP},
-    {KING, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KING},
-    {QUEEN, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*QUEEN},
-    {BISHOP, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*BISHOP},
-    {KNIGHT, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT},
-    {ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK}
-  };
-
-  /* Position of the currently selected chess piece {-1, -1} if nothing is
-  selected */
-  sf::Vector2i selectedPiecePosition = {-1, -1};
-
-  /* Position of the selected chess piece just before the currently selected
-  one was selected */
-  sf::Vector2i oldSelectedPiecePosition = {-1, -1};
-
   /* Last user move */
   std::string lastUserMove;
 
@@ -57,6 +37,26 @@ private:
 public:
   /* Constructor */
   Game();
+
+  /* The checkerboard */
+  int board[8][8] = {
+    {ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK},
+    {KNIGHT, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT},
+    {BISHOP, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*BISHOP},
+    {KING, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KING},
+    {QUEEN, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*QUEEN},
+    {BISHOP, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*BISHOP},
+    {KNIGHT, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT},
+    {ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK}
+  };
+
+  /* Position of the currently selected chess piece {-1, -1} if nothing is
+  selected */
+  sf::Vector2i selectedPiecePosition = {-1, -1};
+
+  /* Position of the selected chess piece just before the currently selected
+  one was selected */
+  sf::Vector2i oldSelectedPiecePosition = {-1, -1};
 
   /* Set the new clicked position on the board */
   void setNewSelectedPiecePosition(sf::Vector2i newSelectedPiecePosition);

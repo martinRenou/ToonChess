@@ -32,6 +32,7 @@
   \param shadowMap The shadowMap texture
 */
 void celShadingRender(
+  Game* game,
   GameInfo* gameInfo,
   std::map<int, Mesh*>* meshes,
   std::map<int, ShaderProgram*>* programs,
@@ -44,10 +45,6 @@ int main(){
   try{
     game = new Game();
   } catch(const std::exception& e){
-    std::cerr << e.what() << std::endl;
-
-    delete game;
-
     return 1;
   }
 
@@ -236,7 +233,7 @@ int main(){
     glViewport(0, 0, gameInfo.width, gameInfo.height);
 
     // Display all pieces on the screen using the cel-shading effect
-    celShadingRender(&gameInfo, &meshes, &programs, shadowMap);
+    celShadingRender(game, &gameInfo, &meshes, &programs, shadowMap);
 
     // Perform the chess rules
     try{
@@ -272,6 +269,7 @@ int main(){
 }
 
 void celShadingRender(
+    Game* game,
     GameInfo* gameInfo,
     std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
@@ -295,7 +293,7 @@ void celShadingRender(
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
-      int piece = gameInfo->board[x][y];
+      int piece = game->board[x][y];
 
       // Set movement matrix to identity
       movementMatrix = getIdentityMatrix();
@@ -311,8 +309,8 @@ void celShadingRender(
       blackBorderProgram->setMoveMatrix(&movementMatrix);
 
       // Set if the piece is the selected one or not
-      (gameInfo->selectedPiecePosition.x == x and
-          gameInfo->selectedPiecePosition.y == y) ?
+      (game->selectedPiecePosition.x == x and
+          game->selectedPiecePosition.y == y) ?
         blackBorderProgram->setBoolean("selected", true) :
         blackBorderProgram->setBoolean("selected", false);
 
@@ -351,7 +349,7 @@ void celShadingRender(
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
-      int piece = gameInfo->board[x][y];
+      int piece = game->board[x][y];
 
       // Set movement matrix to identity
       movementMatrix = getIdentityMatrix();
@@ -377,8 +375,8 @@ void celShadingRender(
         celShadingProgram->setVector4f("color", 1.0, 1.0, 1.0, 1.0);
 
       // Set if the piece is the selected one or not
-      (gameInfo->selectedPiecePosition.x == x and
-          gameInfo->selectedPiecePosition.y == y) ?
+      (game->selectedPiecePosition.x == x and
+          game->selectedPiecePosition.y == y) ?
         celShadingProgram->setBoolean("selected", true) :
         celShadingProgram->setBoolean("selected", false);
 
