@@ -36,7 +36,7 @@ private:
   int state = USER_TURN;
 
   /* Clock used for waiting between the USER_TURN and the IA_TURN */
-  sf::Clock clock;
+  sf::Clock* clock;
 
   /* Move function, this will move a chess piece on the board
     \param lastPosition The last position of the piece to move

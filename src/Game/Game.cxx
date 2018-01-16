@@ -3,7 +3,7 @@
 
 #include "Game.hxx"
 
-std::string uciGrid[8][8] = {
+const std::string uciGrid[8][8] = {
   "a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8",
   "b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8",
   "c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8",
@@ -45,19 +45,6 @@ std::string positionToUciFormat(sf::Vector2i position){
   return uciGrid[position.x][position.y];
 };
 
-/* Get movement as UCI format from a last position and a new position
-  \param lastPosition The last position of the piece as an sf::Vector2i
-  \param newPosition The new position of the piece as an sf::Vector2i
-*/
-std::string getMovement(sf::Vector2i lastPosition, sf::Vector2i newPosition){
-  std::string movement = "";
-
-  movement.append(positionToUciFormat(lastPosition));
-  movement.append(positionToUciFormat(newPosition));
-
-  return movement;
-};
-
 Game::Game(){
   // Start communication with stockfish
   this->stockfishConnector = new StockfishConnector();
@@ -71,6 +58,9 @@ Game::Game(){
 
     throw;
   }
+
+  this->lastUserMove = "";
+  this->clock = new sf::Clock();
 };
 
 void Game::movePiece(sf::Vector2i lastPosition, sf::Vector2i newPosition){
@@ -112,25 +102,27 @@ void Game::perform(){
 
         movePiece(this->oldSelectedPiecePosition, this->selectedPiecePosition);
 
+        // Store the last user move as an UCI string
+        this->lastUserMove.clear();
+        this->lastUserMove.append(
+          positionToUciFormat(this->oldSelectedPiecePosition));
+        this->lastUserMove.append(
+          positionToUciFormat(this->selectedPiecePosition));
+
         // Unselect piece
         this->oldSelectedPiecePosition = {-1, -1};
         this->selectedPiecePosition = {-1, -1};
 
-        // Store the last user move as an UCI string
-        this->lastUserMove = getMovement(
-          this->oldSelectedPiecePosition,
-          this->selectedPiecePosition
-        );
-
         // Transition to waiting state and restart the clock for measuring
         // waiting time
         this->state = WAITING;
-        this->clock.restart();
+        this->clock->restart();
       }
       break;
     }
     case WAITING: {
-      if(this->clock.getElapsedTime().asSeconds() >= 1.0) this->state = IA_TURN;
+      if(this->clock->getElapsedTime().asSeconds() >= 1.0)
+        this->state = IA_TURN;
       break;
     }
     case IA_TURN: {
