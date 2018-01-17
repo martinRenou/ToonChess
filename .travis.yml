@@ -12,9 +12,6 @@ before_install:
   - popd
 
 script:
-  - stockfish
-  - cat /etc/environment
-  - cat ~/.profile
   - cppcheck --quiet --error-exitcode=1 --enable=all --inline-suppr src/
   - mkdir build
   - cd build
