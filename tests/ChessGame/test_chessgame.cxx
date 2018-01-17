@@ -36,12 +36,6 @@ TEST(chess_game, initialization){
 TEST(chess_game, move_piece){
   ChessGame* game = new ChessGame();
 
-  EXPECT_EQ(game->oldSelectedPiecePosition.x, -1);
-  EXPECT_EQ(game->oldSelectedPiecePosition.y, -1);
-
-  EXPECT_EQ(game->selectedPiecePosition.x, -1);
-  EXPECT_EQ(game->selectedPiecePosition.y, -1);
-
   // Select PAWN (simulating click on a pawn)
   game->setNewSelectedPiecePosition({1, 1});
 
@@ -79,12 +73,6 @@ TEST(chess_game, move_piece){
 TEST(chess_game, unselect_piece){
   ChessGame* game = new ChessGame();
 
-  EXPECT_EQ(game->oldSelectedPiecePosition.x, -1);
-  EXPECT_EQ(game->oldSelectedPiecePosition.y, -1);
-
-  EXPECT_EQ(game->selectedPiecePosition.x, -1);
-  EXPECT_EQ(game->selectedPiecePosition.y, -1);
-
   // Select PAWN (simulating click on a pawn)
   game->setNewSelectedPiecePosition({1, 1});
 
@@ -115,6 +103,31 @@ TEST(chess_game, unselect_piece){
   for(int x = 0; x < 8; x++)
     for(int y = 0; y < 8; y++)
       EXPECT_EQ(game->board[x][y], expectedBoard[x][y]);
+
+  delete game;
+};
+
+TEST(chess_game, throw_exception){
+  ChessGame* game = new ChessGame();
+
+  // Select PAWN (simulating click on a pawn)
+  game->setNewSelectedPiecePosition({1, 1});
+
+  // Select position where to move (forbiden move)
+  game->setNewSelectedPiecePosition({2, 7});
+
+  // Perform forbiden move !
+  game->perform();
+
+  // Wait for the WAITING state to stop
+  sleep(2);
+
+  // Transition to IA_TURN state !
+  game->perform();
+
+  // Now an exception should be raised (The IA should try to move on user's
+  // piece)
+  EXPECT_ANY_THROW(game->perform());
 
   delete game;
 };
