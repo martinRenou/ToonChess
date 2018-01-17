@@ -75,7 +75,7 @@ void ChessGame::perform(){
       int piece = this->board
         [this->oldSelectedPiecePosition.x][this->oldSelectedPiecePosition.y];
 
-      // If it's the user turn, check if he wants to move a piece
+      // Check if the user wants to move a piece
       if(this->oldSelectedPiecePosition.x != -1
           and this->selectedPiecePosition.x != -1
           and piece > 0){
