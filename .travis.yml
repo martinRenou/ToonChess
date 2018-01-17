@@ -12,6 +12,7 @@ before_install:
   - popd
 
 script:
+  - stockfish
   - cppcheck --quiet --error-exitcode=1 --enable=all --inline-suppr src/
   - mkdir build
   - cd build
