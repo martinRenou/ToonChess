@@ -33,7 +33,7 @@ sf::Vector2i ChessGame::uciFormatToPosition(std::string position){
     }
   }
 
-  //TODO: Throw an exception if not found and close program properly
+  if(not found) throw GameException("The IA is drunk... Can't do anything");
 
   sf::Vector2i outPosition = {x - 1, y - 1};
   return outPosition;
