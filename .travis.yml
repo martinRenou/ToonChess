@@ -13,6 +13,7 @@ before_install:
 
 script:
   - stockfish
+  - more /etc/environment
   - cppcheck --quiet --error-exitcode=1 --enable=all --inline-suppr src/
   - mkdir build
   - cd build
