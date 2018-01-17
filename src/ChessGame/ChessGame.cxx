@@ -3,36 +3,6 @@
 
 #include "ChessGame.hxx"
 
-/* Conversion function: converts a position in UCI format (e.g. "h3") into a
-vector
-  \param position The position in the UCI format
-  \return the SFML vector representing the position on the board
-*/
-sf::Vector2i ChessGame::uciFormatToPosition(std::string position){
-  int x(0), y(0);
-  bool found(false);
-  for(x = 0; x < 8 and not found; x++){
-    for(y = 0; y < 8 and not found; y++){
-      if(this->uciGrid[x][y].compare(position) == 0){
-        found = true;
-      }
-    }
-  }
-
-  //TODO: Throw an exception if not found and close program properly
-
-  sf::Vector2i outPosition = {x - 1, y - 1};
-  return outPosition;
-};
-
-/* Conversion function: converts a position specified with x and y into a UCI
-format (e.g. "a5")
-  \param position The position as an sf::Vector2i
-  \return the position in the UCI format
-*/
-std::string ChessGame::positionToUciFormat(sf::Vector2i position){
-  return this->uciGrid[position.x][position.y];
-};
 
 ChessGame::ChessGame(){
   // Start communication with stockfish
@@ -50,6 +20,27 @@ ChessGame::ChessGame(){
 
   this->lastUserMove = "";
   this->clock = new sf::Clock();
+};
+
+sf::Vector2i ChessGame::uciFormatToPosition(std::string position){
+  int x(0), y(0);
+  bool found(false);
+  for(x = 0; x < 8 and not found; x++){
+    for(y = 0; y < 8 and not found; y++){
+      if(this->uciGrid[x][y].compare(position) == 0){
+        found = true;
+      }
+    }
+  }
+
+  //TODO: Throw an exception if not found and close program properly
+
+  sf::Vector2i outPosition = {x - 1, y - 1};
+  return outPosition;
+};
+
+std::string ChessGame::positionToUciFormat(sf::Vector2i position){
+  return this->uciGrid[position.x][position.y];
 };
 
 void ChessGame::movePiece(sf::Vector2i lastPosition, sf::Vector2i newPosition){
