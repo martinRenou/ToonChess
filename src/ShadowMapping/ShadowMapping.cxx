@@ -9,12 +9,12 @@
 #include "../shader/ShaderProgram.hxx"
 #include "../GameInfo.hxx"
 #include "../utils/math.hxx"
-#include "../Game/Game.hxx"
+#include "../ChessGame/ChessGame.hxx"
 
 #include "ShadowMapping.hxx"
 
 void shadowMappingRender(
-    Game* game,
+    ChessGame* game,
     GameInfo* gameInfo,
     std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs){
@@ -127,7 +127,7 @@ void ShadowMapping::deleteBuffers(){
 }
 
 GLuint ShadowMapping::getShadowMap(
-    Game* game, GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
+    ChessGame* game, GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs){
   // Bind the framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, this->fboId);

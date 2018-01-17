@@ -8,7 +8,7 @@
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
 #include "../GameInfo.hxx"
-#include "../Game/Game.hxx"
+#include "../ChessGame/ChessGame.hxx"
 
 class ShadowMapping {
 private:
@@ -44,7 +44,7 @@ public:
     \return The id of the shadowMap
   */
   GLuint getShadowMap(
-    Game* game, GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
+    ChessGame* game, GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs);
 
   /* Destructor, this will remove the buffers from memory */

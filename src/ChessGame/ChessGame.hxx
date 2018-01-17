@@ -1,5 +1,5 @@
-#ifndef GAME_HXX_
-#define GAME_HXX_
+#ifndef CHESSGAME_HXX_
+#define CHESSGAME_HXX_
 
 #include <string>
 
@@ -10,7 +10,7 @@
 
 
 // cppcheck-suppress noCopyConstructor
-class Game {
+class ChessGame {
 private:
   /* Last user move */
   std::string lastUserMove;
@@ -63,7 +63,7 @@ private:
 
 public:
   /* Constructor */
-  Game();
+  ChessGame();
 
   /* The checkerboard */
   int board[8][8] = {
@@ -97,7 +97,7 @@ public:
   void perform();
 
   /* Destructor */
-  ~Game();
+  ~ChessGame();
 };
 
 #endif

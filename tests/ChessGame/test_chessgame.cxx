@@ -2,7 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "../../src/Game/Game.hxx"
+#include "../../src/ChessGame/ChessGame.hxx"
 
 TEST(uciFormatToPosition, can_convert){
   std::string in = "a1";

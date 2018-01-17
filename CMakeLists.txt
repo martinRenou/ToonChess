@@ -24,10 +24,10 @@ set(
   ${CMAKE_SOURCE_DIR}/src/shader/shaderPrograms.cxx
   ${CMAKE_SOURCE_DIR}/src/ColorPicking/ColorPicking.cxx
   ${CMAKE_SOURCE_DIR}/src/ShadowMapping/ShadowMapping.cxx
-  ${CMAKE_SOURCE_DIR}/src/Game/ConnectionException.cxx
-  ${CMAKE_SOURCE_DIR}/src/Game/StockfishConnector.cxx
-  ${CMAKE_SOURCE_DIR}/src/Game/GameException.cxx
-  ${CMAKE_SOURCE_DIR}/src/Game/Game.cxx
+  ${CMAKE_SOURCE_DIR}/src/ChessGame/ConnectionException.cxx
+  ${CMAKE_SOURCE_DIR}/src/ChessGame/StockfishConnector.cxx
+  ${CMAKE_SOURCE_DIR}/src/ChessGame/GameException.cxx
+  ${CMAKE_SOURCE_DIR}/src/ChessGame/ChessGame.cxx
   ${CMAKE_SOURCE_DIR}/src/utils/utils.cxx
   ${CMAKE_SOURCE_DIR}/src/utils/math.cxx
 )

@@ -23,7 +23,7 @@
 #include "utils/utils.hxx"
 #include "utils/math.hxx"
 
-#include "Game/Game.hxx"
+#include "ChessGame/ChessGame.hxx"
 
 /* Perform a cel-shading rendering in the current frameBuffer
   \param game The game instance
@@ -33,7 +33,7 @@
   \param shadowMap The shadowMap texture
 */
 void celShadingRender(
-  Game* game,
+  ChessGame* game,
   GameInfo* gameInfo,
   std::map<int, Mesh*>* meshes,
   std::map<int, ShaderProgram*>* programs,
@@ -42,9 +42,9 @@ void celShadingRender(
 int main(){
   // Create an instance of the Game (This starts the communication with
   // Stockfish and could fail)
-  Game* game;
+  ChessGame* game;
   try{
-    game = new Game();
+    game = new ChessGame();
   } catch(const std::exception& e){
     return 1;
   }
@@ -271,7 +271,7 @@ int main(){
 }
 
 void celShadingRender(
-    Game* game,
+    ChessGame* game,
     GameInfo* gameInfo,
     std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,

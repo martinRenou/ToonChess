@@ -1,14 +1,14 @@
 #include "StockfishConnector.hxx"
 #include "GameException.hxx"
 
-#include "Game.hxx"
+#include "ChessGame.hxx"
 
 /* Conversion function: converts a position in UCI format (e.g. "h3") into a
 vector
   \param position The position in the UCI format
   \return the SFML vector representing the position on the board
 */
-sf::Vector2i Game::uciFormatToPosition(std::string position){
+sf::Vector2i ChessGame::uciFormatToPosition(std::string position){
   int x(0), y(0);
   bool found(false);
   for(x = 0; x < 8 and not found; x++){
@@ -30,11 +30,11 @@ format (e.g. "a5")
   \param position The position as an sf::Vector2i
   \return the position in the UCI format
 */
-std::string Game::positionToUciFormat(sf::Vector2i position){
+std::string ChessGame::positionToUciFormat(sf::Vector2i position){
   return this->uciGrid[position.x][position.y];
 };
 
-Game::Game(){
+ChessGame::ChessGame(){
   // Start communication with stockfish
   this->stockfishConnector = new StockfishConnector();
 
@@ -52,14 +52,14 @@ Game::Game(){
   this->clock = new sf::Clock();
 };
 
-void Game::movePiece(sf::Vector2i lastPosition, sf::Vector2i newPosition){
+void ChessGame::movePiece(sf::Vector2i lastPosition, sf::Vector2i newPosition){
   int piece = this->board[lastPosition.x][lastPosition.y];
 
   this->board[lastPosition.x][lastPosition.y] = EMPTY;
   this->board[newPosition.x][newPosition.y] = piece;
 };
 
-void Game::movePiece(std::string movement){
+void ChessGame::movePiece(std::string movement){
   std::string lastPosition_str = movement.substr(0, 2);
   std::string newPosition_str = movement.substr(2, 2);
 
@@ -69,7 +69,8 @@ void Game::movePiece(std::string movement){
   movePiece(lastPosition, newPosition);
 };
 
-void Game::setNewSelectedPiecePosition(sf::Vector2i newSelectedPiecePosition){
+void ChessGame::setNewSelectedPiecePosition(
+    sf::Vector2i newSelectedPiecePosition){
   // Register last user clicked position
   this->oldSelectedPiecePosition = this->selectedPiecePosition;
 
@@ -77,7 +78,7 @@ void Game::setNewSelectedPiecePosition(sf::Vector2i newSelectedPiecePosition){
   this->selectedPiecePosition = newSelectedPiecePosition;
 };
 
-void Game::perform(){
+void ChessGame::perform(){
   switch (this->state) {
     case USER_TURN: {
       int piece = this->board
@@ -134,6 +135,6 @@ void Game::perform(){
   }
 };
 
-Game::~Game(){
+ChessGame::~ChessGame(){
   delete this->stockfishConnector;
 };

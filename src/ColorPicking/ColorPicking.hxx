@@ -9,7 +9,7 @@
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
 #include "../GameInfo.hxx"
-#include "../Game/Game.hxx"
+#include "../ChessGame/ChessGame.hxx"
 
 class ColorPicking {
 private:
@@ -58,7 +58,7 @@ public:
   */
   sf::Vector2i getClickedPiecePosition(
     sf::Vector2i clickedPixelPosition,
-    Game* game,
+    ChessGame* game,
     GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs);
 

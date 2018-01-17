@@ -11,7 +11,7 @@
 #include "../shader/ShaderProgram.hxx"
 #include "../constants.hxx"
 #include "../GameInfo.hxx"
-#include "../Game/Game.hxx"
+#include "../ChessGame/ChessGame.hxx"
 #include "../utils/math.hxx"
 
 #include "ColorPicking.hxx"
@@ -29,7 +29,7 @@ struct Pixel {
   \param programs The map of shader programs
 */
 void colorPickingRender(
-    Game* game,
+    ChessGame* game,
     GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs){
   // The movement Matrix
@@ -144,7 +144,7 @@ void ColorPicking::deleteBuffers(){
 
 sf::Vector2i ColorPicking::getClickedPiecePosition(
     sf::Vector2i clickedPixelPosition,
-    Game* game,
+    ChessGame* game,
     GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs){
   // Bind the framebuffer
