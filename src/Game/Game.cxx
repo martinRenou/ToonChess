@@ -84,7 +84,7 @@ void Game::setNewSelectedPiecePosition(sf::Vector2i newSelectedPiecePosition){
   // Register last user clicked position
   this->oldSelectedPiecePosition = this->selectedPiecePosition;
 
-  // Get selected piece using color picking
+  // And set the new selected piece position
   this->selectedPiecePosition = newSelectedPiecePosition;
 };
 
