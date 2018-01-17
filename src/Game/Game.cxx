@@ -95,8 +95,7 @@ void Game::perform(){
         [this->oldSelectedPiecePosition.x][this->oldSelectedPiecePosition.y];
 
       // If it's the user turn, check if he wants to move a piece
-      if(this->state == USER_TURN
-          and this->oldSelectedPiecePosition.x != -1
+      if(this->oldSelectedPiecePosition.x != -1
           and this->selectedPiecePosition.x != -1
           and piece > 0){
 
