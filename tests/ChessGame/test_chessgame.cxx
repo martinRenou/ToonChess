@@ -1,49 +1,46 @@
 #include <gtest/gtest.h>
 
-#include <SFML/Graphics.hpp>
-
 #include "../../src/ChessGame/ChessGame.hxx"
 
-TEST(uciFormatToPosition, can_convert){
-  std::string in = "a1";
-  sf::Vector2i out = uciFormatToPosition(in);
-  EXPECT_EQ(0, out.x);
-  EXPECT_EQ(0, out.y);
+TEST(chess_game, move_piece){
+  ChessGame* game = new ChessGame();
 
-  in = "b2";
-  out = uciFormatToPosition(in);
-  EXPECT_EQ(1, out.x);
-  EXPECT_EQ(1, out.y);
+  EXPECT_EQ(game->oldSelectedPiecePosition.x, -1);
+  EXPECT_EQ(game->oldSelectedPiecePosition.y, -1);
 
-  in = "e3";
-  out = uciFormatToPosition(in);
-  EXPECT_EQ(4, out.x);
-  EXPECT_EQ(2, out.y);
+  EXPECT_EQ(game->selectedPiecePosition.x, -1);
+  EXPECT_EQ(game->selectedPiecePosition.y, -1);
 
-  in = "h8";
-  out = uciFormatToPosition(in);
-  EXPECT_EQ(7, out.x);
-  EXPECT_EQ(7, out.y);
+  // Select PAWN (simulating click on a pawn)
+  game->setNewSelectedPiecePosition({1, 1});
 
-  in = "h1";
-  out = uciFormatToPosition(in);
-  EXPECT_EQ(7, out.x);
-  EXPECT_EQ(0, out.y);
-}
+  // Select position where to move
+  game->setNewSelectedPiecePosition({1, 2});
 
-TEST(positionToUciFormat, can_convert){
-  std::string out = "a1";
-  EXPECT_EQ(out, positionToUciFormat({0, 0}));
+  EXPECT_EQ(game->oldSelectedPiecePosition.x, 1);
+  EXPECT_EQ(game->oldSelectedPiecePosition.y, 1);
 
-  out = "b2";
-  EXPECT_EQ(out, positionToUciFormat({1, 1}));
+  EXPECT_EQ(game->selectedPiecePosition.x, 1);
+  EXPECT_EQ(game->selectedPiecePosition.y, 2);
 
-  out = "e3";
-  EXPECT_EQ(out, positionToUciFormat({4, 2}));
+  // Perform the move !
+  game->perform();
 
-  out = "h8";
-  EXPECT_EQ(out, positionToUciFormat({7, 7}));
+  // Expected board after the move
+  int expectedBoard[8][8] = {
+    {ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK},
+    {KNIGHT, /**/EMPTY, PAWN/**/, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT},
+    {BISHOP, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*BISHOP},
+    {KING, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KING},
+    {QUEEN, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*QUEEN},
+    {BISHOP, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*BISHOP},
+    {KNIGHT, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT},
+    {ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK}
+  };
 
-  out = "h1";
-  EXPECT_EQ(out, positionToUciFormat({7, 0}));
-}
+  for(int x = 0; x < 8; x++)
+    for(int y = 0; y < 8; y++)
+      EXPECT_EQ(game->board[x][y], expectedBoard[x][y]);
+
+  delete game;
+};
