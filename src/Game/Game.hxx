@@ -8,20 +8,6 @@
 #include "../constants.hxx"
 #include "StockfishConnector.hxx"
 
-/* Conversion function: converts a position in UCI format (e.g. "h3") into a
-vector
-  \param position The position in the UCI format
-  \return the SFML vector representing the position on the board
-*/
-sf::Vector2i uciFormatToPosition(std::string position);
-
-/* Conversion function: converts a position specified with x and y into a UCI
-format (e.g. "a5")
-  \param position The position as an sf::Vector2i
-  \return the position in the UCI format
-*/
-std::string positionToUciFormat(sf::Vector2i position);
-
 
 // cppcheck-suppress noCopyConstructor
 class Game {
@@ -37,6 +23,32 @@ private:
 
   /* Clock used for waiting between the USER_TURN and the IA_TURN */
   sf::Clock* clock;
+
+  /* Grid used for conversions between position and UCI format */
+  const std::string uciGrid[8][8] = {
+    {"a1", "a2", "a3", "a4", "a5", "a6", "a7", "a8"},
+    {"b1", "b2", "b3", "b4", "b5", "b6", "b7", "b8"},
+    {"c1", "c2", "c3", "c4", "c5", "c6", "c7", "c8"},
+    {"d1", "d2", "d3", "d4", "d5", "d6", "d7", "d8"},
+    {"e1", "e2", "e3", "e4", "e5", "e6", "e7", "e8"},
+    {"f1", "f2", "f3", "f4", "f5", "f6", "f7", "f8"},
+    {"g1", "g2", "g3", "g4", "g5", "g6", "g7", "g8"},
+    {"h1", "h2", "h3", "h4", "h5", "h6", "h7", "h8"},
+  };
+
+  /* Conversion function: converts a position in UCI format (e.g. "h3") into a
+  vector
+    \param position The position in the UCI format
+    \return the SFML vector representing the position on the board
+  */
+  sf::Vector2i uciFormatToPosition(std::string position);
+
+  /* Conversion function: converts a position specified with x and y into a UCI
+  format (e.g. "a5")
+    \param position The position as an sf::Vector2i
+    \return the position in the UCI format
+  */
+  std::string positionToUciFormat(sf::Vector2i position);
 
   /* Move function, this will move a chess piece on the board
     \param lastPosition The last position of the piece to move
