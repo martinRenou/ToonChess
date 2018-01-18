@@ -71,6 +71,7 @@ private:
   void computeROOKNextPositions(sf::Vector2i position);
   void computeKNIGHTNextPositions(sf::Vector2i position);
   void computeBISHOPNextPositions(sf::Vector2i position);
+  void computeKINGNextPositions(sf::Vector2i position);
 
   /* Compute the allowedNextPositions matrix according to the selected piece */
   void computeAllowedNextPositions();
