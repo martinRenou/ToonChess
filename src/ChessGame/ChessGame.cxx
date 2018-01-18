@@ -13,11 +13,7 @@ ChessGame::ChessGame(){
 };
 
 void ChessGame::start(){
-  try{
-    this->stockfishConnector->startCommunication();
-  } catch(const std::exception& e){
-    throw;
-  }
+  this->stockfishConnector->startCommunication();
 }
 
 sf::Vector2i ChessGame::uciFormatToPosition(std::string position){
