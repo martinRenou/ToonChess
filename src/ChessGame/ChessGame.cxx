@@ -199,19 +199,21 @@ void ChessGame::computeAllowedNextPositions(){
   switch (piece) {
     case PAWN:
       computePAWNNextPositions(piecePosition);
-
       break;
     case ROOK:
       computeROOKNextPositions(piecePosition);
-
       break;
     case KNIGHT:
       computeKNIGHTNextPositions(piecePosition);
-
       break;
     case BISHOP:
       computeBISHOPNextPositions(piecePosition);
-
+      break;
+    case QUEEN:
+      // The rule for the QUEEN is a combination of the rule for the BISHOP and
+      // ROOK
+      computeBISHOPNextPositions(piecePosition);
+      computeROOKNextPositions(piecePosition);
       break;
   }
 };
