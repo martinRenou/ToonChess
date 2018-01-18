@@ -62,26 +62,6 @@ const int ChessGame::boardAt(int x, int y){
   }
 };
 
-void ChessGame::setNewSelectedPiecePosition(
-    sf::Vector2i newSelectedPiecePosition){
-  // Register last user clicked position
-  this->oldSelectedPiecePosition = this->selectedPiecePosition;
-
-  // And set the new selected piece position
-  this->selectedPiecePosition = newSelectedPiecePosition;
-
-  // If the new selected piece is an allowed move, it surely means that the user
-  // wants to move a piece: it will be performed at the next "perform" method
-  // call
-  if(allowedNextPositions[this->selectedPiecePosition.x]
-                         [this->selectedPiecePosition.y] == true){
-    return;
-  }
-
-  // In other cases, compute the new allowedNextPositions matrix
-  this->computeAllowedNextPositions();
-};
-
 void ChessGame::computeAllowedNextPositions(){
   // Reset matrix
   this->resetAllowedNextPositions();
@@ -224,6 +204,26 @@ void ChessGame::resetAllowedNextPositions(){
   for(int x = 0; x < 8; x++)
     for(int y = 0; y < 8; y++)
       this->allowedNextPositions[x][y] = false;
+};
+
+void ChessGame::setNewSelectedPiecePosition(
+    sf::Vector2i newSelectedPiecePosition){
+  // Register last user clicked position
+  this->oldSelectedPiecePosition = this->selectedPiecePosition;
+
+  // And set the new selected piece position
+  this->selectedPiecePosition = newSelectedPiecePosition;
+
+  // If the new selected piece is an allowed move, it surely means that the user
+  // wants to move a piece: it will be performed at the next "perform" method
+  // call
+  if(allowedNextPositions[this->selectedPiecePosition.x]
+                         [this->selectedPiecePosition.y] == true){
+    return;
+  }
+
+  // In other cases, compute the new allowedNextPositions matrix
+  this->computeAllowedNextPositions();
 };
 
 void ChessGame::perform(){

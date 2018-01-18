@@ -66,6 +66,12 @@ private:
   doesn't throw exception */
   const int boardAt(int x, int y);
 
+  /* Compute the allowedNextPositions matrix according to the selected piece */
+  void computeAllowedNextPositions();
+
+  /* Reset the allowedNextPositions matrix with its default value */
+  void resetAllowedNextPositions();
+
 public:
   /* Constructor */
   ChessGame();
@@ -110,12 +116,6 @@ public:
 
   /* Set the new clicked position on the board */
   void setNewSelectedPiecePosition(sf::Vector2i newSelectedPiecePosition);
-
-  /* Compute the allowedNextPositions matrix according to the selected piece */
-  void computeAllowedNextPositions();
-
-  /* Reset the allowedNextPositions matrix with its default value */
-  void resetAllowedNextPositions();
 
   /* Perform the chess rules depending on the game state, if it's the USER_TURN
     it will move one chess piece according to the currently clicked piece, if
