@@ -17,7 +17,6 @@ set(
   CXX_FILES
   ${CMAKE_SOURCE_DIR}/src/mesh/Mesh.cxx
   ${CMAKE_SOURCE_DIR}/src/mesh/meshes.cxx
-  ${CMAKE_SOURCE_DIR}/src/chessBoard/chessBoard.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/CompilationException.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/LinkingException.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/Shader.cxx
@@ -25,8 +24,10 @@ set(
   ${CMAKE_SOURCE_DIR}/src/shader/shaderPrograms.cxx
   ${CMAKE_SOURCE_DIR}/src/ColorPicking/ColorPicking.cxx
   ${CMAKE_SOURCE_DIR}/src/ShadowMapping/ShadowMapping.cxx
-  ${CMAKE_SOURCE_DIR}/src/StockfishConnector/ConnectionException.cxx
-  ${CMAKE_SOURCE_DIR}/src/StockfishConnector/StockfishConnector.cxx
+  ${CMAKE_SOURCE_DIR}/src/ChessGame/ConnectionException.cxx
+  ${CMAKE_SOURCE_DIR}/src/ChessGame/StockfishConnector.cxx
+  ${CMAKE_SOURCE_DIR}/src/ChessGame/GameException.cxx
+  ${CMAKE_SOURCE_DIR}/src/ChessGame/ChessGame.cxx
   ${CMAKE_SOURCE_DIR}/src/utils/utils.cxx
   ${CMAKE_SOURCE_DIR}/src/utils/math.cxx
 )

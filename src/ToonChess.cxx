@@ -23,32 +23,32 @@
 #include "utils/utils.hxx"
 #include "utils/math.hxx"
 
-#include "chessBoard/chessBoard.hxx"
-
-#include "StockfishConnector/StockfishConnector.hxx"
-
+#include "ChessGame/ChessGame.hxx"
 
 /* Perform a cel-shading rendering in the current frameBuffer
+  \param game The game instance
   \param gameInfo The current game informations
   \param meshes The map of meshes
   \param programs The map of shader programs
   \param shadowMap The shadowMap texture
 */
 void celShadingRender(
+  ChessGame* game,
   GameInfo* gameInfo,
   std::map<int, Mesh*>* meshes,
   std::map<int, ShaderProgram*>* programs,
   GLuint shadowMap);
 
 int main(){
-  StockfishConnector* stockfishConnector = new StockfishConnector();
-  // Start communication with stockfish
+  // Create an instance of the Game (This starts the communication with
+  // Stockfish and could fail)
+  ChessGame* game = new ChessGame();
   try{
-    stockfishConnector->startCommunication();
+    game->start();
   } catch(const std::exception& e){
     std::cerr << e.what() << std::endl;
 
-    delete stockfishConnector;
+    delete game;
 
     return 1;
   }
@@ -83,7 +83,7 @@ int main(){
   } catch(const std::exception& e){
     std::cerr << e.what() << std::endl;
 
-    delete stockfishConnector;
+    delete game;
 
     return 1;
   }
@@ -130,15 +130,6 @@ int main(){
 
   // Display OpenGL errors
   displayGLErrors();
-
-  // State machine
-  const int USER_TURN = 0;
-  const int WAITING = 1;
-  const int IA_TURN = 2;
-  int gameState = USER_TURN;
-  sf::Clock iaClock;
-  sf::Time waitingElapsedTime;
-  sf::Vector2i lastPosition, newPosition;
 
   // Render loop
   bool running = true;
@@ -187,34 +178,12 @@ int main(){
           selectedPixelPosition.x = event.mouseButton.x;
           selectedPixelPosition.y = gameInfo.height - event.mouseButton.y;
 
-          // Register last user clicked position
-          lastPosition = gameInfo.selectedPiecePosition;
-
           // Get selected piece using color picking
-          gameInfo.selectedPiecePosition = \
+          game->setNewSelectedPiecePosition(
             colorPicking->getClickedPiecePosition(
-              selectedPixelPosition, &gameInfo, &meshes, &programs
+                selectedPixelPosition, game, &gameInfo, &meshes, &programs
+            )
           );
-
-          // Register new user clicked position
-          newPosition = gameInfo.selectedPiecePosition;
-
-          // If it's the user turn, check if he wants to move a piece
-          if(gameState == USER_TURN
-              and lastPosition.x != -1
-              and newPosition.x != -1
-              and gameInfo.board[lastPosition.x][lastPosition.y] > 0){
-
-            movePiece(lastPosition, newPosition, gameInfo.board);
-
-            // Unselect piece
-            gameInfo.selectedPiecePosition = {-1, -1};
-
-            // Transition to waiting state and restart the clock for measuring
-            // waiting time
-            gameState = WAITING;
-            iaClock.restart();
-          }
         }
 
         // If it's the right button, it's the end of a camera movement
@@ -258,7 +227,8 @@ int main(){
     }
 
     // Create the shadowMap
-    shadowMap = shadowMapping->getShadowMap(&gameInfo, &meshes, &programs);
+    shadowMap = shadowMapping->getShadowMap(
+      game, &gameInfo, &meshes, &programs);
 
     // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -269,38 +239,23 @@ int main(){
     glViewport(0, 0, gameInfo.width, gameInfo.height);
 
     // Display all pieces on the screen using the cel-shading effect
-    celShadingRender(&gameInfo, &meshes, &programs, shadowMap);
+    celShadingRender(game, &gameInfo, &meshes, &programs, shadowMap);
 
-    // If we waited one second or more, transition to IA_TURN state
-    if(gameState == WAITING and iaClock.getElapsedTime().asSeconds() >= 1.0)
-      gameState = IA_TURN;
+    // Perform the chess rules
+    try{
+      game->perform();
+    } catch(const std::exception& e){
+      std::cerr << e.what() << std::endl;
 
-    if(gameState == IA_TURN){
-      // Get IA decision according to the last user move
-      std::string lastUserMovement = getMovement(lastPosition, newPosition);
-      std::string newMove = stockfishConnector->getNextIAMove(lastUserMovement);
+      window.close();
 
-      // If the IA tried to move one user's pawn, stop the game
-      sf::Vector2i iaMoveStartPosition = uciFormatToPosition(
-        newMove.substr(0, 2));
-      if(gameInfo.board[iaMoveStartPosition.x][iaMoveStartPosition.y] >= 0){
-        std::cerr <<
-          "\033[1;31mGame error:\033[0m A forbiden move has been performed!"
-          << std::endl;
+      deleteMeshes(&meshes);
+      deletePrograms(&programs);
+      delete colorPicking;
+      delete shadowMapping;
+      delete game;
 
-        deleteMeshes(&meshes);
-        deletePrograms(&programs);
-        delete colorPicking;
-        delete shadowMapping;
-        delete stockfishConnector;
-
-        return 1;
-      }
-
-      movePiece(newMove, gameInfo.board);
-
-      // Transition to USER_TURN state
-      gameState = USER_TURN;
+      return 1;
     }
 
     glFlush();
@@ -314,12 +269,13 @@ int main(){
   deletePrograms(&programs);
   delete colorPicking;
   delete shadowMapping;
-  delete stockfishConnector;
+  delete game;
 
   return 0;
 }
 
 void celShadingRender(
+    ChessGame* game,
     GameInfo* gameInfo,
     std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
@@ -343,7 +299,7 @@ void celShadingRender(
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
-      int piece = gameInfo->board[x][y];
+      int piece = game->board[x][y];
 
       // Set movement matrix to identity
       movementMatrix = getIdentityMatrix();
@@ -359,8 +315,8 @@ void celShadingRender(
       blackBorderProgram->setMoveMatrix(&movementMatrix);
 
       // Set if the piece is the selected one or not
-      (gameInfo->selectedPiecePosition.x == x and
-          gameInfo->selectedPiecePosition.y == y) ?
+      (game->selectedPiecePosition.x == x and
+          game->selectedPiecePosition.y == y) ?
         blackBorderProgram->setBoolean("selected", true) :
         blackBorderProgram->setBoolean("selected", false);
 
@@ -399,7 +355,7 @@ void celShadingRender(
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
-      int piece = gameInfo->board[x][y];
+      int piece = game->board[x][y];
 
       // Set movement matrix to identity
       movementMatrix = getIdentityMatrix();
@@ -425,8 +381,8 @@ void celShadingRender(
         celShadingProgram->setVector4f("color", 1.0, 1.0, 1.0, 1.0);
 
       // Set if the piece is the selected one or not
-      (gameInfo->selectedPiecePosition.x == x and
-          gameInfo->selectedPiecePosition.y == y) ?
+      (game->selectedPiecePosition.x == x and
+          game->selectedPiecePosition.y == y) ?
         celShadingProgram->setBoolean("selected", true) :
         celShadingProgram->setBoolean("selected", false);
 
