@@ -4,6 +4,7 @@
 
 TEST(chess_game, initialization){
   ChessGame* game = new ChessGame();
+  game->start();
 
   EXPECT_EQ(game->oldSelectedPiecePosition.x, -1);
   EXPECT_EQ(game->oldSelectedPiecePosition.y, -1);
@@ -35,6 +36,7 @@ TEST(chess_game, initialization){
 
 TEST(chess_game, move_piece){
   ChessGame* game = new ChessGame();
+  game->start();
 
   // Select PAWN (simulating click on a pawn)
   game->setNewSelectedPiecePosition({1, 1});
@@ -72,6 +74,7 @@ TEST(chess_game, move_piece){
 
 TEST(chess_game, unselect_piece){
   ChessGame* game = new ChessGame();
+  game->start();
 
   // Select PAWN (simulating click on a pawn)
   game->setNewSelectedPiecePosition({1, 1});
@@ -109,6 +112,7 @@ TEST(chess_game, unselect_piece){
 
 TEST(chess_game, throw_exception){
   ChessGame* game = new ChessGame();
+  game->start();
 
   // Select PAWN (simulating click on a pawn)
   game->setNewSelectedPiecePosition({1, 1});
