@@ -102,7 +102,8 @@ void ChessGame::computeAllowedNextPositions(){
 
   // In other cases, one user's piece has been selected, we compute the new
   // matrix according to this piece
-  int dx, dy;
+  int dx, dy; // Left/right and forward/backward
+  int dd; // Diagonal
   switch (piece) {
     case PAWN:
       // Moving one tile
@@ -180,6 +181,40 @@ void ChessGame::computeAllowedNextPositions(){
         allowedNextPositions[piecePosition.x - 1][piecePosition.y - 2] = true;
       if(boardAt(piecePosition.x - 2, piecePosition.y - 1) <= 0)
         allowedNextPositions[piecePosition.x - 2][piecePosition.y - 1] = true;
+
+      break;
+    case BISHOP:
+      // Moving forward/right
+      for(dd = 1; piecePosition.x + dd < 8 and piecePosition.y + dd < 8; dd++){
+        if(boardAt(piecePosition.x + dd, piecePosition.y + dd) <= 0)
+          allowedNextPositions[piecePosition.x + dd][piecePosition.y + dd] = true;
+        if(boardAt(piecePosition.x + dd, piecePosition.y + dd) != EMPTY)
+          break;
+      }
+
+      // Moving forward/left
+      for(dd = 1; piecePosition.x - dd >= 0 and piecePosition.y + dd < 8; dd++){
+        if(boardAt(piecePosition.x - dd, piecePosition.y + dd) <= 0)
+          allowedNextPositions[piecePosition.x - dd][piecePosition.y + dd] = true;
+        if(boardAt(piecePosition.x - dd, piecePosition.y + dd) != EMPTY)
+          break;
+      }
+
+      // Moving backward/right
+      for(dd = 1; piecePosition.x + dd < 8 and piecePosition.y - dd < 8; dd++){
+        if(boardAt(piecePosition.x + dd, piecePosition.y - dd) <= 0)
+          allowedNextPositions[piecePosition.x + dd][piecePosition.y - dd] = true;
+        if(boardAt(piecePosition.x + dd, piecePosition.y - dd) != EMPTY)
+          break;
+      }
+
+      // Moving backward/left
+      for(dd = 1; piecePosition.x - dd >= 0 and piecePosition.y - dd < 8; dd++){
+        if(boardAt(piecePosition.x - dd, piecePosition.y - dd) <= 0)
+          allowedNextPositions[piecePosition.x - dd][piecePosition.y - dd] = true;
+        if(boardAt(piecePosition.x - dd, piecePosition.y - dd) != EMPTY)
+          break;
+      }
 
       break;
   }
