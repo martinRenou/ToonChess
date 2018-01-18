@@ -314,9 +314,11 @@ void celShadingRender(
       movementMatrix = translate(&movementMatrix, translation);
       blackBorderProgram->setMoveMatrix(&movementMatrix);
 
-      // Set if the piece is the selected one or not
+      // If it's the selected piece, or if it's an allowed next move, move up
+      // the piece
       (game->selectedPiecePosition.x == x and
-          game->selectedPiecePosition.y == y) ?
+          game->selectedPiecePosition.y == y) or
+          game->allowedNextPositions[x][y] ?
         blackBorderProgram->setBoolean("selected", true) :
         blackBorderProgram->setBoolean("selected", false);
 
@@ -380,9 +382,11 @@ void celShadingRender(
         celShadingProgram->setVector4f("color", 0.70, 0.60, 0.41, 1.0) :
         celShadingProgram->setVector4f("color", 1.0, 1.0, 1.0, 1.0);
 
-      // Set if the piece is the selected one or not
+      // If it's the selected piece, or if it's an allowed next move, move up
+      // the piece
       (game->selectedPiecePosition.x == x and
-          game->selectedPiecePosition.y == y) ?
+          game->selectedPiecePosition.y == y) or
+          game->allowedNextPositions[x][y] ?
         celShadingProgram->setBoolean("selected", true) :
         celShadingProgram->setBoolean("selected", false);
 
