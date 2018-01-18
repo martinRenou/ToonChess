@@ -79,23 +79,43 @@ void ChessGame::computeAllowedNextPositions(){
   this->resetAllowedNextPositions();
 
   // Get the selected piece
-  const int piece = \
-    this->board[this->selectedPiecePosition.x][this->selectedPiecePosition.y];
+  sf::Vector2i piecePosition = this->selectedPiecePosition;
+  const int piece = this->board[piecePosition.x][piecePosition.y];
 
   // If the new selected piece position is {-1, -1} which means that nothing is
   // selected, or if the new selected piece is one of IA's pieces (< 0), or if
   // the selected position corresponds to an EMPTY space (== 0), we only reset
   // the allowedNextPositions matrix
-  if((this->selectedPiecePosition.x == -1 and
-      this->selectedPiecePosition.y == -1) or
+  if((piecePosition.x == -1 and piecePosition.y == -1) or
       piece < 0 or
       piece == EMPTY){
     return;
   }
 
-  // In other case, one user's piece has been selected, on compute the new
+  // In other cases, one user's piece has been selected, we compute the new
   // matrix according to this piece
-  // TODO
+  switch (piece) {
+    case PAWN:
+      // Moving one tile
+      if(this->board[piecePosition.x][piecePosition.y + 1] == EMPTY)
+        this->allowedNextPositions[piecePosition.x][piecePosition.y + 1] = true;
+
+      // Moving two tiles
+      if(piecePosition.y == 1 and
+          this->board[piecePosition.x][piecePosition.y + 1] == EMPTY and
+          this->board[piecePosition.x][piecePosition.y + 2] == EMPTY)
+        this->allowedNextPositions[piecePosition.x][piecePosition.y + 2] = true;
+
+      // Moving in diagonal
+      if(this->board[piecePosition.x - 1][piecePosition.y + 1] < 0)
+        this->allowedNextPositions[piecePosition.x - 1][piecePosition.y + 1] = \
+          true;
+      if(this->board[piecePosition.x + 1][piecePosition.y + 1] < 0)
+        this->allowedNextPositions[piecePosition.x + 1][piecePosition.y + 1] = \
+          true;
+
+      break;
+  }
 };
 
 void ChessGame::resetAllowedNextPositions(){
