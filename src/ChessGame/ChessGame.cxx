@@ -61,19 +61,57 @@ void ChessGame::setNewSelectedPiecePosition(
 
   // And set the new selected piece position
   this->selectedPiecePosition = newSelectedPiecePosition;
+
+  // If the new selected piece is an allowed move, it surely means that the user
+  // wants to move a piece: it will be performed at the next "perform" method
+  // call
+  if(allowedNextPositions[this->selectedPiecePosition.x]
+                         [this->selectedPiecePosition.y] == true){
+    return;
+  }
+
+  // In other cases, compute the new allowedNextPositions matrix
+  this->computeAllowedNextPositions();
+};
+
+void ChessGame::computeAllowedNextPositions(){
+  // Reset matrix
+  this->resetAllowedNextPositions();
+
+  // Get the selected piece
+  const int piece = \
+    this->board[this->selectedPiecePosition.x][this->selectedPiecePosition.y];
+
+  // If the new selected piece position is {-1, -1} which means that nothing is
+  // selected, or if the new selected piece is one of IA's pieces (< 0), or if
+  // the selected position corresponds to an EMPTY space (== 0), we only reset
+  // the allowedNextPositions matrix
+  if((this->selectedPiecePosition.x == -1 and
+      this->selectedPiecePosition.y == -1) or
+      piece < 0 or
+      piece == EMPTY){
+    return;
+  }
+
+  // In other case, one user's piece has been selected, on compute the new
+  // matrix according to this piece
+  // TODO
+};
+
+void ChessGame::resetAllowedNextPositions(){
+  for(int x = 0; x < 8; x++)
+    for(int y = 0; y < 8; y++)
+      this->allowedNextPositions[x][y] = false;
 };
 
 void ChessGame::perform(){
   switch (this->state) {
     case USER_TURN: {
-      int piece = this->board
-        [this->oldSelectedPiecePosition.x][this->oldSelectedPiecePosition.y];
-
-      // Check if the user wants to move a piece
-      if(this->oldSelectedPiecePosition.x != -1
-          and this->selectedPiecePosition.x != -1
-          and piece > 0){
-
+      // If the selected position is an allowed move, it surely means that the
+      // user wants to move a piece
+      if(allowedNextPositions[this->selectedPiecePosition.x]
+                             [this->selectedPiecePosition.y] == true){
+        // Move the piece
         movePiece(this->oldSelectedPiecePosition, this->selectedPiecePosition);
 
         // Store the last user move as an UCI string
@@ -86,6 +124,9 @@ void ChessGame::perform(){
         // Unselect piece
         this->oldSelectedPiecePosition = {-1, -1};
         this->selectedPiecePosition = {-1, -1};
+
+        // Reset allowedNextPositions matrix
+        this->resetAllowedNextPositions();
 
         // Transition to waiting state and restart the clock for measuring
         // waiting time

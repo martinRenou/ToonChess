@@ -106,6 +106,12 @@ public:
   /* Set the new clicked position on the board */
   void setNewSelectedPiecePosition(sf::Vector2i newSelectedPiecePosition);
 
+  /* Compute the allowedNextPositions matrix according to the selected piece */
+  void computeAllowedNextPositions();
+
+  /* Reset the allowedNextPositions matrix with its default value */
+  void resetAllowedNextPositions();
+
   /* Perform the chess rules depending on the game state, if it's the USER_TURN
     it will move one chess piece according to the currently clicked piece, if
     it's WAITING it will wait one second before changing to IA_TURN, if it's
