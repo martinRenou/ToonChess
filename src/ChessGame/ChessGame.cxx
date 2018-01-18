@@ -38,10 +38,10 @@ std::string ChessGame::positionToUciFormat(sf::Vector2i position){
 };
 
 void ChessGame::movePiece(sf::Vector2i lastPosition, sf::Vector2i newPosition){
-  int piece = this->board[lastPosition.x][lastPosition.y];
+  int piece = board[lastPosition.x][lastPosition.y];
 
-  this->board[lastPosition.x][lastPosition.y] = EMPTY;
-  this->board[newPosition.x][newPosition.y] = piece;
+  board[lastPosition.x][lastPosition.y] = EMPTY;
+  board[newPosition.x][newPosition.y] = piece;
 };
 
 void ChessGame::movePiece(std::string movement){
@@ -52,6 +52,14 @@ void ChessGame::movePiece(std::string movement){
   sf::Vector2i newPosition = uciFormatToPosition(newPosition_str);
 
   movePiece(lastPosition, newPosition);
+};
+
+const int ChessGame::boardAt(int x, int y){
+  if(0 <= x and x < 8 and 0 <= y and y < 8){
+    return board[x][y];
+  }else{
+    return OUT_OF_BOUND;
+  }
 };
 
 void ChessGame::setNewSelectedPiecePosition(
@@ -80,7 +88,7 @@ void ChessGame::computeAllowedNextPositions(){
 
   // Get the selected piece
   sf::Vector2i piecePosition = this->selectedPiecePosition;
-  const int piece = this->board[piecePosition.x][piecePosition.y];
+  const int piece = boardAt(piecePosition.x, piecePosition.y);
 
   // If the new selected piece position is {-1, -1} which means that nothing is
   // selected, or if the new selected piece is one of IA's pieces (< 0), or if
@@ -98,68 +106,80 @@ void ChessGame::computeAllowedNextPositions(){
   switch (piece) {
     case PAWN:
       // Moving one tile
-      if(this->board[piecePosition.x][piecePosition.y + 1] == EMPTY)
-        this->allowedNextPositions[piecePosition.x][piecePosition.y + 1] = true;
+      if(boardAt(piecePosition.x, piecePosition.y + 1) == EMPTY)
+        allowedNextPositions[piecePosition.x][piecePosition.y + 1] = true;
 
       // Moving two tiles
       if(piecePosition.y == 1 and
-          this->board[piecePosition.x][piecePosition.y + 1] == EMPTY and
-          this->board[piecePosition.x][piecePosition.y + 2] == EMPTY)
-        this->allowedNextPositions[piecePosition.x][piecePosition.y + 2] = true;
+          boardAt(piecePosition.x, piecePosition.y + 1) == EMPTY and
+          boardAt(piecePosition.x, piecePosition.y + 2) == EMPTY)
+        allowedNextPositions[piecePosition.x][piecePosition.y + 2] = true;
 
       // Moving in diagonal
-      if(this->board[piecePosition.x - 1][piecePosition.y + 1] < 0)
-        this->allowedNextPositions[piecePosition.x - 1][piecePosition.y + 1] = \
-          true;
-      if(this->board[piecePosition.x + 1][piecePosition.y + 1] < 0)
-        this->allowedNextPositions[piecePosition.x + 1][piecePosition.y + 1] = \
-          true;
+      if(boardAt(piecePosition.x - 1, piecePosition.y + 1) < 0)
+        allowedNextPositions[piecePosition.x - 1][piecePosition.y + 1] = true;
+      if(boardAt(piecePosition.x + 1, piecePosition.y + 1) < 0)
+        allowedNextPositions[piecePosition.x + 1][piecePosition.y + 1] = true;
 
       break;
     case ROOK:
       // Moving forward
       for(dy = 1; piecePosition.y + dy < 8; dy++){
-        if(this->board[piecePosition.x][piecePosition.y + dy] <= 0){
-          this->allowedNextPositions[piecePosition.x][piecePosition.y + dy] = \
-            true;
-        }
-        if(this->board[piecePosition.x][piecePosition.y + dy] != EMPTY){
+        if(boardAt(piecePosition.x, piecePosition.y + dy) <= 0)
+          allowedNextPositions[piecePosition.x][piecePosition.y + dy] = true;
+        if(boardAt(piecePosition.x, piecePosition.y + dy) != EMPTY)
           break;
-        }
       }
 
       // Moving backward
       for(dy = 1; piecePosition.y - dy >= 0; dy++){
-        if(this->board[piecePosition.x][piecePosition.y - dy] <= 0){
-          this->allowedNextPositions[piecePosition.x][piecePosition.y - dy] = \
-            true;
-        }
-        if(this->board[piecePosition.x][piecePosition.y - dy] != EMPTY){
+        if(boardAt(piecePosition.x, piecePosition.y - dy) <= 0)
+          allowedNextPositions[piecePosition.x][piecePosition.y - dy] = true;
+        if(boardAt(piecePosition.x, piecePosition.y - dy) != EMPTY)
           break;
-        }
       }
 
       // Moving to the right
       for(dx = 1; piecePosition.x + dx < 8; dx++){
-        if(this->board[piecePosition.x + dx][piecePosition.y] <= 0){
-          this->allowedNextPositions[piecePosition.x + dx][piecePosition.y] = \
-            true;
-        }
-        if(this->board[piecePosition.x + dx][piecePosition.y] != EMPTY){
+        if(boardAt(piecePosition.x + dx, piecePosition.y) <= 0)
+          allowedNextPositions[piecePosition.x + dx][piecePosition.y] = true;
+        if(boardAt(piecePosition.x + dx, piecePosition.y) != EMPTY)
           break;
-        }
       }
 
       // Moving to the left
       for(dx = 1; piecePosition.x - dx >= 0; dx++){
-        if(this->board[piecePosition.x - dx][piecePosition.y] <= 0){
-          this->allowedNextPositions[piecePosition.x - dx][piecePosition.y] = \
-            true;
-        }
-        if(this->board[piecePosition.x - dx][piecePosition.y] != EMPTY){
+        if(boardAt(piecePosition.x - dx, piecePosition.y) <= 0)
+          allowedNextPositions[piecePosition.x - dx][piecePosition.y] = true;
+        if(boardAt(piecePosition.x - dx, piecePosition.y) != EMPTY)
           break;
-        }
       }
+
+      break;
+    case KNIGHT:
+      // Moving forward/right
+      if(boardAt(piecePosition.x + 1, piecePosition.y + 2) <= 0)
+        allowedNextPositions[piecePosition.x + 1][piecePosition.y + 2] = true;
+      if(boardAt(piecePosition.x + 2, piecePosition.y + 1) <= 0)
+        allowedNextPositions[piecePosition.x + 2][piecePosition.y + 1] = true;
+
+      // Moving forward/left
+      if(boardAt(piecePosition.x - 1, piecePosition.y + 2) <= 0)
+        allowedNextPositions[piecePosition.x - 1][piecePosition.y + 2] = true;
+      if(boardAt(piecePosition.x - 2, piecePosition.y + 1) <= 0)
+        allowedNextPositions[piecePosition.x - 2][piecePosition.y + 1] = true;
+
+      // Moving backward/right
+      if(boardAt(piecePosition.x + 1, piecePosition.y - 2) <= 0)
+        allowedNextPositions[piecePosition.x + 1][piecePosition.y - 2] = true;
+      if(boardAt(piecePosition.x + 2, piecePosition.y - 1) <= 0)
+        allowedNextPositions[piecePosition.x + 2][piecePosition.y - 1] = true;
+
+      // Moving backward/left
+      if(boardAt(piecePosition.x - 1, piecePosition.y - 2) <= 0)
+        allowedNextPositions[piecePosition.x - 1][piecePosition.y - 2] = true;
+      if(boardAt(piecePosition.x - 2, piecePosition.y - 1) <= 0)
+        allowedNextPositions[piecePosition.x - 2][piecePosition.y - 1] = true;
 
       break;
   }
@@ -215,7 +235,7 @@ void ChessGame::perform(){
       // If the IA tried to move one user's pawn, stop the game
       sf::Vector2i iaMoveStartPosition = uciFormatToPosition(
         iaMove.substr(0, 2));
-      if(this->board[iaMoveStartPosition.x][iaMoveStartPosition.y] >= 0){
+      if(boardAt(iaMoveStartPosition.x, iaMoveStartPosition.y) >= 0){
         throw GameException("A forbiden move has been performed!");
       }
 

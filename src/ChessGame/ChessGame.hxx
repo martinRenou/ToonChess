@@ -61,6 +61,11 @@ private:
   */
   void movePiece(std::string movement);
 
+  /* Method used for accessing piece at position {x, y}, if {x, y} doesn't
+  correspond to a position on the board, it returns OUT_OF_BOUND constant and
+  doesn't throw exception */
+  const int boardAt(int x, int y);
+
 public:
   /* Constructor */
   ChessGame();
