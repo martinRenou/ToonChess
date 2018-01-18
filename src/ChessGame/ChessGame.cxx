@@ -62,6 +62,120 @@ const int ChessGame::boardAt(int x, int y){
   }
 };
 
+void ChessGame::computePAWNNextPositions(sf::Vector2i position){
+  // Moving one tile
+  if(boardAt(position.x, position.y + 1) == EMPTY)
+    allowedNextPositions[position.x][position.y + 1] = true;
+
+  // Moving two tiles
+  if(position.y == 1 and
+      boardAt(position.x, position.y + 1) == EMPTY and
+      boardAt(position.x, position.y + 2) == EMPTY)
+    allowedNextPositions[position.x][position.y + 2] = true;
+
+  // Moving in diagonal
+  if(boardAt(position.x - 1, position.y + 1) < 0)
+    allowedNextPositions[position.x - 1][position.y + 1] = true;
+  if(boardAt(position.x + 1, position.y + 1) < 0)
+    allowedNextPositions[position.x + 1][position.y + 1] = true;
+};
+
+void ChessGame::computeROOKNextPositions(sf::Vector2i position){
+  int dx, dy;
+  // Moving forward
+  for(dy = 1; position.y + dy < 8; dy++){
+    if(boardAt(position.x, position.y + dy) <= 0)
+      allowedNextPositions[position.x][position.y + dy] = true;
+    if(boardAt(position.x, position.y + dy) != EMPTY)
+      break;
+  }
+
+  // Moving backward
+  for(dy = 1; position.y - dy >= 0; dy++){
+    if(boardAt(position.x, position.y - dy) <= 0)
+      allowedNextPositions[position.x][position.y - dy] = true;
+    if(boardAt(position.x, position.y - dy) != EMPTY)
+      break;
+  }
+
+  // Moving to the right
+  for(dx = 1; position.x + dx < 8; dx++){
+    if(boardAt(position.x + dx, position.y) <= 0)
+      allowedNextPositions[position.x + dx][position.y] = true;
+    if(boardAt(position.x + dx, position.y) != EMPTY)
+      break;
+  }
+
+  // Moving to the left
+  for(dx = 1; position.x - dx >= 0; dx++){
+    if(boardAt(position.x - dx, position.y) <= 0)
+      allowedNextPositions[position.x - dx][position.y] = true;
+    if(boardAt(position.x - dx, position.y) != EMPTY)
+      break;
+  }
+};
+
+void ChessGame::computeKNIGHTNextPositions(sf::Vector2i position){
+  // Moving forward/right
+  if(boardAt(position.x + 1, position.y + 2) <= 0)
+    allowedNextPositions[position.x + 1][position.y + 2] = true;
+  if(boardAt(position.x + 2, position.y + 1) <= 0)
+    allowedNextPositions[position.x + 2][position.y + 1] = true;
+
+  // Moving forward/left
+  if(boardAt(position.x - 1, position.y + 2) <= 0)
+    allowedNextPositions[position.x - 1][position.y + 2] = true;
+  if(boardAt(position.x - 2, position.y + 1) <= 0)
+    allowedNextPositions[position.x - 2][position.y + 1] = true;
+
+  // Moving backward/right
+  if(boardAt(position.x + 1, position.y - 2) <= 0)
+    allowedNextPositions[position.x + 1][position.y - 2] = true;
+  if(boardAt(position.x + 2, position.y - 1) <= 0)
+    allowedNextPositions[position.x + 2][position.y - 1] = true;
+
+  // Moving backward/left
+  if(boardAt(position.x - 1, position.y - 2) <= 0)
+    allowedNextPositions[position.x - 1][position.y - 2] = true;
+  if(boardAt(position.x - 2, position.y - 1) <= 0)
+    allowedNextPositions[position.x - 2][position.y - 1] = true;
+};
+
+void ChessGame::computeBISHOPNextPositions(sf::Vector2i position){
+  int dd;
+  // Moving forward/right
+  for(dd = 1; position.x + dd < 8 and position.y + dd < 8; dd++){
+    if(boardAt(position.x + dd, position.y + dd) <= 0)
+      allowedNextPositions[position.x + dd][position.y + dd] = true;
+    if(boardAt(position.x + dd, position.y + dd) != EMPTY)
+      break;
+  }
+
+  // Moving forward/left
+  for(dd = 1; position.x - dd >= 0 and position.y + dd < 8; dd++){
+    if(boardAt(position.x - dd, position.y + dd) <= 0)
+      allowedNextPositions[position.x - dd][position.y + dd] = true;
+    if(boardAt(position.x - dd, position.y + dd) != EMPTY)
+      break;
+  }
+
+  // Moving backward/right
+  for(dd = 1; position.x + dd < 8 and position.y - dd < 8; dd++){
+    if(boardAt(position.x + dd, position.y - dd) <= 0)
+      allowedNextPositions[position.x + dd][position.y - dd] = true;
+    if(boardAt(position.x + dd, position.y - dd) != EMPTY)
+      break;
+  }
+
+  // Moving backward/left
+  for(dd = 1; position.x - dd >= 0 and position.y - dd < 8; dd++){
+    if(boardAt(position.x - dd, position.y - dd) <= 0)
+      allowedNextPositions[position.x - dd][position.y - dd] = true;
+    if(boardAt(position.x - dd, position.y - dd) != EMPTY)
+      break;
+  }
+};
+
 void ChessGame::computeAllowedNextPositions(){
   // Reset matrix
   this->resetAllowedNextPositions();
@@ -82,119 +196,21 @@ void ChessGame::computeAllowedNextPositions(){
 
   // In other cases, one user's piece has been selected, we compute the new
   // matrix according to this piece
-  int dx, dy; // Left/right and forward/backward
-  int dd; // Diagonal
   switch (piece) {
     case PAWN:
-      // Moving one tile
-      if(boardAt(piecePosition.x, piecePosition.y + 1) == EMPTY)
-        allowedNextPositions[piecePosition.x][piecePosition.y + 1] = true;
-
-      // Moving two tiles
-      if(piecePosition.y == 1 and
-          boardAt(piecePosition.x, piecePosition.y + 1) == EMPTY and
-          boardAt(piecePosition.x, piecePosition.y + 2) == EMPTY)
-        allowedNextPositions[piecePosition.x][piecePosition.y + 2] = true;
-
-      // Moving in diagonal
-      if(boardAt(piecePosition.x - 1, piecePosition.y + 1) < 0)
-        allowedNextPositions[piecePosition.x - 1][piecePosition.y + 1] = true;
-      if(boardAt(piecePosition.x + 1, piecePosition.y + 1) < 0)
-        allowedNextPositions[piecePosition.x + 1][piecePosition.y + 1] = true;
+      computePAWNNextPositions(piecePosition);
 
       break;
     case ROOK:
-      // Moving forward
-      for(dy = 1; piecePosition.y + dy < 8; dy++){
-        if(boardAt(piecePosition.x, piecePosition.y + dy) <= 0)
-          allowedNextPositions[piecePosition.x][piecePosition.y + dy] = true;
-        if(boardAt(piecePosition.x, piecePosition.y + dy) != EMPTY)
-          break;
-      }
-
-      // Moving backward
-      for(dy = 1; piecePosition.y - dy >= 0; dy++){
-        if(boardAt(piecePosition.x, piecePosition.y - dy) <= 0)
-          allowedNextPositions[piecePosition.x][piecePosition.y - dy] = true;
-        if(boardAt(piecePosition.x, piecePosition.y - dy) != EMPTY)
-          break;
-      }
-
-      // Moving to the right
-      for(dx = 1; piecePosition.x + dx < 8; dx++){
-        if(boardAt(piecePosition.x + dx, piecePosition.y) <= 0)
-          allowedNextPositions[piecePosition.x + dx][piecePosition.y] = true;
-        if(boardAt(piecePosition.x + dx, piecePosition.y) != EMPTY)
-          break;
-      }
-
-      // Moving to the left
-      for(dx = 1; piecePosition.x - dx >= 0; dx++){
-        if(boardAt(piecePosition.x - dx, piecePosition.y) <= 0)
-          allowedNextPositions[piecePosition.x - dx][piecePosition.y] = true;
-        if(boardAt(piecePosition.x - dx, piecePosition.y) != EMPTY)
-          break;
-      }
+      computeROOKNextPositions(piecePosition);
 
       break;
     case KNIGHT:
-      // Moving forward/right
-      if(boardAt(piecePosition.x + 1, piecePosition.y + 2) <= 0)
-        allowedNextPositions[piecePosition.x + 1][piecePosition.y + 2] = true;
-      if(boardAt(piecePosition.x + 2, piecePosition.y + 1) <= 0)
-        allowedNextPositions[piecePosition.x + 2][piecePosition.y + 1] = true;
-
-      // Moving forward/left
-      if(boardAt(piecePosition.x - 1, piecePosition.y + 2) <= 0)
-        allowedNextPositions[piecePosition.x - 1][piecePosition.y + 2] = true;
-      if(boardAt(piecePosition.x - 2, piecePosition.y + 1) <= 0)
-        allowedNextPositions[piecePosition.x - 2][piecePosition.y + 1] = true;
-
-      // Moving backward/right
-      if(boardAt(piecePosition.x + 1, piecePosition.y - 2) <= 0)
-        allowedNextPositions[piecePosition.x + 1][piecePosition.y - 2] = true;
-      if(boardAt(piecePosition.x + 2, piecePosition.y - 1) <= 0)
-        allowedNextPositions[piecePosition.x + 2][piecePosition.y - 1] = true;
-
-      // Moving backward/left
-      if(boardAt(piecePosition.x - 1, piecePosition.y - 2) <= 0)
-        allowedNextPositions[piecePosition.x - 1][piecePosition.y - 2] = true;
-      if(boardAt(piecePosition.x - 2, piecePosition.y - 1) <= 0)
-        allowedNextPositions[piecePosition.x - 2][piecePosition.y - 1] = true;
+      computeKNIGHTNextPositions(piecePosition);
 
       break;
     case BISHOP:
-      // Moving forward/right
-      for(dd = 1; piecePosition.x + dd < 8 and piecePosition.y + dd < 8; dd++){
-        if(boardAt(piecePosition.x + dd, piecePosition.y + dd) <= 0)
-          allowedNextPositions[piecePosition.x + dd][piecePosition.y + dd] = true;
-        if(boardAt(piecePosition.x + dd, piecePosition.y + dd) != EMPTY)
-          break;
-      }
-
-      // Moving forward/left
-      for(dd = 1; piecePosition.x - dd >= 0 and piecePosition.y + dd < 8; dd++){
-        if(boardAt(piecePosition.x - dd, piecePosition.y + dd) <= 0)
-          allowedNextPositions[piecePosition.x - dd][piecePosition.y + dd] = true;
-        if(boardAt(piecePosition.x - dd, piecePosition.y + dd) != EMPTY)
-          break;
-      }
-
-      // Moving backward/right
-      for(dd = 1; piecePosition.x + dd < 8 and piecePosition.y - dd < 8; dd++){
-        if(boardAt(piecePosition.x + dd, piecePosition.y - dd) <= 0)
-          allowedNextPositions[piecePosition.x + dd][piecePosition.y - dd] = true;
-        if(boardAt(piecePosition.x + dd, piecePosition.y - dd) != EMPTY)
-          break;
-      }
-
-      // Moving backward/left
-      for(dd = 1; piecePosition.x - dd >= 0 and piecePosition.y - dd < 8; dd++){
-        if(boardAt(piecePosition.x - dd, piecePosition.y - dd) <= 0)
-          allowedNextPositions[piecePosition.x - dd][piecePosition.y - dd] = true;
-        if(boardAt(piecePosition.x - dd, piecePosition.y - dd) != EMPTY)
-          break;
-      }
+      computeBISHOPNextPositions(piecePosition);
 
       break;
   }

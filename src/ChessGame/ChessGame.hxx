@@ -66,6 +66,12 @@ private:
   doesn't throw exception */
   const int boardAt(int x, int y);
 
+  /* Compute the allowedNextPositions matrix for a specific piece */
+  void computePAWNNextPositions(sf::Vector2i position);
+  void computeROOKNextPositions(sf::Vector2i position);
+  void computeKNIGHTNextPositions(sf::Vector2i position);
+  void computeBISHOPNextPositions(sf::Vector2i position);
+
   /* Compute the allowedNextPositions matrix according to the selected piece */
   void computeAllowedNextPositions();
 
