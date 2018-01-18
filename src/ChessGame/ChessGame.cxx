@@ -8,19 +8,17 @@ ChessGame::ChessGame(){
   // Start communication with stockfish
   this->stockfishConnector = new StockfishConnector();
 
-  try{
-    this->stockfishConnector->startCommunication();
-  } catch(const std::exception& e){
-    std::cerr << e.what() << std::endl;
-
-    delete this->stockfishConnector;
-
-    throw;
-  }
-
   this->lastUserMove = "";
   this->clock = new sf::Clock();
 };
+
+void ChessGame::start(){
+  try{
+    this->stockfishConnector->startCommunication();
+  } catch(const std::exception& e){
+    throw;
+  }
+}
 
 sf::Vector2i ChessGame::uciFormatToPosition(std::string position){
   int x(0), y(0);

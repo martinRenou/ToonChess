@@ -42,10 +42,14 @@ void celShadingRender(
 int main(){
   // Create an instance of the Game (This starts the communication with
   // Stockfish and could fail)
-  ChessGame* game;
+  ChessGame* game = new ChessGame();
   try{
-    game = new ChessGame();
+    game->start();
   } catch(const std::exception& e){
+    std::cerr << e.what() << std::endl;
+
+    delete game;
+
     return 1;
   }
 

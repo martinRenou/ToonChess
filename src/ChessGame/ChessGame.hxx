@@ -85,6 +85,12 @@ public:
   one was selected */
   sf::Vector2i oldSelectedPiecePosition = {-1, -1};
 
+  /* Start the game engine
+    \throw ConnectionException if communication with Stockfish didn't start
+    properly
+  */
+  void start();
+
   /* Set the new clicked position on the board */
   void setNewSelectedPiecePosition(sf::Vector2i newSelectedPiecePosition);
 
