@@ -77,6 +77,18 @@ public:
     {ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK}
   };
 
+  /* The allowed next positions for the currently selected piece */
+  bool allowedNextPositions[8][8] = {
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false}
+  };
+
   /* Position of the currently selected chess piece {-1, -1} if nothing is
   selected */
   sf::Vector2i selectedPiecePosition = {-1, -1};
