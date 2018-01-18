@@ -94,6 +94,7 @@ void ChessGame::computeAllowedNextPositions(){
 
   // In other cases, one user's piece has been selected, we compute the new
   // matrix according to this piece
+  int dx, dy;
   switch (piece) {
     case PAWN:
       // Moving one tile
@@ -113,6 +114,52 @@ void ChessGame::computeAllowedNextPositions(){
       if(this->board[piecePosition.x + 1][piecePosition.y + 1] < 0)
         this->allowedNextPositions[piecePosition.x + 1][piecePosition.y + 1] = \
           true;
+
+      break;
+    case ROOK:
+      // Moving forward
+      for(dy = 1; piecePosition.y + dy < 8; dy++){
+        if(this->board[piecePosition.x][piecePosition.y + dy] <= 0){
+          this->allowedNextPositions[piecePosition.x][piecePosition.y + dy] = \
+            true;
+        }
+        if(this->board[piecePosition.x][piecePosition.y + dy] != EMPTY){
+          break;
+        }
+      }
+
+      // Moving backward
+      for(dy = 1; piecePosition.y - dy >= 0; dy++){
+        if(this->board[piecePosition.x][piecePosition.y - dy] <= 0){
+          this->allowedNextPositions[piecePosition.x][piecePosition.y - dy] = \
+            true;
+        }
+        if(this->board[piecePosition.x][piecePosition.y - dy] != EMPTY){
+          break;
+        }
+      }
+
+      // Moving to the right
+      for(dx = 1; piecePosition.x + dx < 8; dx++){
+        if(this->board[piecePosition.x + dx][piecePosition.y] <= 0){
+          this->allowedNextPositions[piecePosition.x + dx][piecePosition.y] = \
+            true;
+        }
+        if(this->board[piecePosition.x + dx][piecePosition.y] != EMPTY){
+          break;
+        }
+      }
+
+      // Moving to the left
+      for(dx = 1; piecePosition.x - dx >= 0; dx++){
+        if(this->board[piecePosition.x - dx][piecePosition.y] <= 0){
+          this->allowedNextPositions[piecePosition.x - dx][piecePosition.y] = \
+            true;
+        }
+        if(this->board[piecePosition.x - dx][piecePosition.y] != EMPTY){
+          break;
+        }
+      }
 
       break;
   }
