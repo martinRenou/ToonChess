@@ -179,7 +179,7 @@ StockfishConnector::~StockfishConnector(){
 
   // Wait for the child process to die properly
   int status = 0;
-  while ((wait(&status)) > 0) sleep(1);
+  while((wait(&status)) > 0);
 
   int parentReadPipe = fileno(this->parentReadPipeF);
   int parentWritePipe = fileno(this->parentWritePipeF);
