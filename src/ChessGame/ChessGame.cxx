@@ -330,4 +330,5 @@ void ChessGame::perform(){
 
 ChessGame::~ChessGame(){
   delete this->stockfishConnector;
+  delete this->clock;
 };
