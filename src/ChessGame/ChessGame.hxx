@@ -61,6 +61,24 @@ private:
   */
   void movePiece(std::string movement);
 
+  /* Method used for accessing piece at position {x, y}, if {x, y} doesn't
+  correspond to a position on the board, it returns OUT_OF_BOUND constant and
+  doesn't throw exception */
+  const int boardAt(int x, int y);
+
+  /* Compute the allowedNextPositions matrix for a specific piece */
+  void computePAWNNextPositions(sf::Vector2i position);
+  void computeROOKNextPositions(sf::Vector2i position);
+  void computeKNIGHTNextPositions(sf::Vector2i position);
+  void computeBISHOPNextPositions(sf::Vector2i position);
+  void computeKINGNextPositions(sf::Vector2i position);
+
+  /* Compute the allowedNextPositions matrix according to the selected piece */
+  void computeAllowedNextPositions();
+
+  /* Reset the allowedNextPositions matrix with its default value */
+  void resetAllowedNextPositions();
+
 public:
   /* Constructor */
   ChessGame();
@@ -75,6 +93,18 @@ public:
     {BISHOP, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*BISHOP},
     {KNIGHT, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*KNIGHT},
     {ROOK, PAWN, EMPTY, EMPTY, EMPTY, EMPTY, AI*PAWN, AI*ROOK}
+  };
+
+  /* The allowed next positions for the currently selected piece */
+  bool allowedNextPositions[8][8] = {
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false},
+    {false, false, false, false, false, false, false, false}
   };
 
   /* Position of the currently selected chess piece {-1, -1} if nothing is

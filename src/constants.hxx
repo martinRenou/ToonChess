@@ -13,6 +13,9 @@ const int PAWN = 6;
 // Board cell
 const int BOARDCELL = 7;
 
+// Used when we are looking for an out of bound location
+const int OUT_OF_BOUND = 8;
+
 // Players
 const int USER = 1;
 const int AI = -1;
