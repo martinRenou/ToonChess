@@ -193,11 +193,11 @@ void ChessGame::computeKINGNextPositions(sf::Vector2i position){
 
   // Move forward forward/right forward/left
   if(boardAt(position.x, position.y - 1) <= 0)
-  allowedNextPositions[position.x][position.y - 1] = true;
+    allowedNextPositions[position.x][position.y - 1] = true;
   if(boardAt(position.x + 1, position.y - 1) <= 0)
-  allowedNextPositions[position.x + 1][position.y - 1] = true;
+    allowedNextPositions[position.x + 1][position.y - 1] = true;
   if(boardAt(position.x - 1, position.y - 1) <= 0)
-  allowedNextPositions[position.x - 1][position.y - 1] = true;
+    allowedNextPositions[position.x - 1][position.y - 1] = true;
 };
 
 void ChessGame::computeAllowedNextPositions(){
