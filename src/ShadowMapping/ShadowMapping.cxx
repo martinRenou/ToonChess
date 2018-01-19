@@ -52,9 +52,11 @@ void shadowMappingRender(
       movementMatrix = translate(&movementMatrix, translation);
       shadowMappingProgram->setMoveMatrix(&movementMatrix);
 
-      // Set if the piece is selected or not
+      // If it's the selected piece, or if it's an allowed next move, move up
+      // the piece
       (game->selectedPiecePosition.x == x and
-          game->selectedPiecePosition.y == y) ?
+          game->selectedPiecePosition.y == y) or
+          game->allowedNextPositions[x][y] ?
         shadowMappingProgram->setBoolean("selected", true) :
         shadowMappingProgram->setBoolean("selected", false);
 
