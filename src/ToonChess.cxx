@@ -382,6 +382,14 @@ void celShadingRender(
         celShadingProgram->setVector4f("color", 0.70, 0.60, 0.41, 1.0) :
         celShadingProgram->setVector4f("color", 1.0, 1.0, 1.0, 1.0);
 
+      // If it's part of the suggested user move, change its color
+      if((game->suggestedUserMoveStartPosition.x == x and
+          game->suggestedUserMoveStartPosition.y == y) or (
+          game->suggestedUserMoveEndPosition.x == x and
+          game->suggestedUserMoveEndPosition.y == y)){
+        celShadingProgram->setVector4f("color", 0.40, 0.45, 0.70, 1.0);
+      }
+
       // If it's the selected piece, or if it's an allowed next move, move up
       // the piece
       (game->selectedPiecePosition.x == x and

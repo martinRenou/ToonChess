@@ -115,6 +115,14 @@ public:
   one was selected */
   sf::Vector2i oldSelectedPiecePosition = {-1, -1};
 
+  /* Start position of the suggested user move, {-1, -1} if nothing is suggested
+  */
+  sf::Vector2i suggestedUserMoveStartPosition = {-1, -1};
+
+  /* End position of the suggested user move, {-1, -1} if nothing is suggested
+  */
+  sf::Vector2i suggestedUserMoveEndPosition = {-1, -1};
+
   /* Start the game engine
     \throw ConnectionException if communication with Stockfish didn't start
     properly

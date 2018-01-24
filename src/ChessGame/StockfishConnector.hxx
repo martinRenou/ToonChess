@@ -31,6 +31,9 @@ public:
   */
   std::string getNextIAMove(std::string userMove);
 
+  /* Suggested next user move, "(none)" is nothing is suggested by the IA */
+  std::string suggestedUserMove = "(none)";
+
   /* Destructor, this will properly stop the communication */
   ~StockfishConnector();
 };
