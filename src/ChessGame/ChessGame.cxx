@@ -321,6 +321,20 @@ void ChessGame::perform(){
 
       movePiece(iaMove);
 
+      // Get suggested user next move if available
+      if(stockfishConnector->suggestedUserMove.compare("(none)") != 0){
+        std::string startPosition_str = \
+          stockfishConnector->suggestedUserMove.substr(0, 2);
+        std::string endPosition_str = \
+          stockfishConnector->suggestedUserMove.substr(2, 2);
+
+        suggestedUserMoveStartPosition = uciFormatToPosition(startPosition_str);
+        suggestedUserMoveEndPosition = uciFormatToPosition(endPosition_str);
+      }else{
+        suggestedUserMoveStartPosition = {-1, -1};
+        suggestedUserMoveEndPosition = {-1, -1};
+      }
+
       // Transition to USER_TURN state
       this->state = USER_TURN;
       break;
