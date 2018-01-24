@@ -164,10 +164,17 @@ std::string StockfishConnector::getNextIAMove(std::string userMove){
   this->moves.append(iaMove);
   this->moves.append(" ");
 
-  // Print IA move in stdout and suggested move for the user if available
+  // Print IA move in stdout
   std::cout << "IA move: " << iaMove << std::endl;
+
+  // Get suggested next user move if available
   if(splittedLine.size() == 4){
+    suggestedUserMove = splittedLine.at(3);
+
+    // Print it
     std::cout << "Suggested user move: " << splittedLine.at(3);
+  }else{
+    suggestedUserMove = "(none)";
   }
 
   return iaMove;
