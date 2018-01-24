@@ -384,9 +384,9 @@ void celShadingRender(
 
       // If it's part of the suggested user move, change its color
       if((game->suggestedUserMoveStartPosition.x == x and
-        game->suggestedUserMoveStartPosition.y == y) or (
-        game->suggestedUserMoveEndPosition.x == x and
-        game->suggestedUserMoveEndPosition.y == y)){
+          game->suggestedUserMoveStartPosition.y == y) or (
+          game->suggestedUserMoveEndPosition.x == x and
+          game->suggestedUserMoveEndPosition.y == y)){
         celShadingProgram->setVector4f("color", 0.40, 0.45, 0.70, 1.0);
       }
 
