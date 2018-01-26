@@ -319,8 +319,8 @@ void celShadingRender(
       (game->selectedPiecePosition.x == x and
           game->selectedPiecePosition.y == y) or
           game->allowedNextPositions[x][y] ?
-        blackBorderProgram->setBoolean("selected", true) :
-        blackBorderProgram->setBoolean("selected", false);
+        blackBorderProgram->setBoolean("elevated", true) :
+        blackBorderProgram->setBoolean("elevated", false);
 
       // Draw board cell
       meshes->at(BOARDCELL)->draw();
@@ -395,8 +395,8 @@ void celShadingRender(
       (game->selectedPiecePosition.x == x and
           game->selectedPiecePosition.y == y) or
           game->allowedNextPositions[x][y] ?
-        celShadingProgram->setBoolean("selected", true) :
-        celShadingProgram->setBoolean("selected", false);
+        celShadingProgram->setBoolean("elevated", true) :
+        celShadingProgram->setBoolean("elevated", false);
 
       meshes->at(BOARDCELL)->draw();
 

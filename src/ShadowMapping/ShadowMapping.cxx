@@ -57,8 +57,8 @@ void shadowMappingRender(
       (game->selectedPiecePosition.x == x and
           game->selectedPiecePosition.y == y) or
           game->allowedNextPositions[x][y] ?
-        shadowMappingProgram->setBoolean("selected", true) :
-        shadowMappingProgram->setBoolean("selected", false);
+        shadowMappingProgram->setBoolean("elevated", true) :
+        shadowMappingProgram->setBoolean("elevated", false);
 
       // Draw board cell
       meshes->at(BOARDCELL)->draw();
