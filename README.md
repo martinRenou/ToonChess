@@ -37,7 +37,7 @@ There is already plenty of open-source chess games, so why would I develop my ow
 I wanted to improve my knowledge of OpenGL and c++ programming. I am not even a chess gamer, I am just interested in real time 3D rendering. I also wanted to learn some tools like GoogleTest and Cppcheck. And here is the result, feel free to copy parts of the code for your own OpenGL projects.
 
 ## How ?
-### Toon Style
+### Toon Style
 I wanted a toon effect for my game, this effect can be performed using cel-shading technique. Instead of using "normal" enlightening, lights are computed using a threshold: if light intensity is more important than this threshold the mesh will be bright, dark otherwise. In fact in my shaders I used two threshold, meaning three levels of enlightening.
 
 <p align="center" style="display: flex"><img width="350" src="images/NormalLights.png"><img width="350" src="images/CelShading.png"></p>
