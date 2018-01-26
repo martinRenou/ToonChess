@@ -27,8 +27,6 @@ Run it!
 ./ToonChess
 ```
 
-## Tests
-
 Tests are written using [GoogleTest](https://github.com/google/googletest), you can run them after installation with:
 ```bash
 ./tests
@@ -36,9 +34,14 @@ Tests are written using [GoogleTest](https://github.com/google/googletest), you 
 
 ## Why ?
 There is already plenty of open-source chess games, so why would I develop my own one?
-I wanted to improve my knowledge of OpenGL and c++ programming. I am not even a chess gamer, I am just interested in real time 3D rendering. I also wanted to learn some tools like GoogleTest and CPPCHECK. And here is the result, feel free to copy parts of the code for your own OpenGL projects.
+I wanted to improve my knowledge of OpenGL and c++ programming. I am not even a chess gamer, I am just interested in real time 3D rendering. I also wanted to learn some tools like GoogleTest and Cppcheck. And here is the result, feel free to copy parts of the code for your own OpenGL projects.
 
 ## How ?
+### Toon Style
+I wanted a toon effect for my game, this effect can be performed using cel-shading technique. Instead of using "normal" enlightening, lights are computed using a threshold: if light intensity is more important than this threshold the mesh will be bright, dark otherwise. In fact in my shaders I used two threshold, meaning three levels of enlightening.
+
+<p align="center" style="display: flex"><img width="350" src="images/NormalLights.png"><img width="350" src="images/CelShading.png"></p>
+
 ### Shadow Mapping
 For the shadows I used the well-known Shadow Mapping technique. A separate render is performed using a Render To Texture technique, texture in which the distance from the light is saved for each mesh (See next picture, the nearest from the light the mesh is, the darkest it is in the shadowmap). And this distance from the light can be used in the main rendering process in order to know if the currently rendered part of the mesh is hidden from the light by an other object. See [this](http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/) tutorial if you want to learn more about it. I then used the Percentage Close Filtering technique in order to make the shadows smoother (See this [nvidia article](http://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch11.html) about PCF).
 
