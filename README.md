@@ -49,7 +49,7 @@ I also wanted to display black borders for chess pieces. In order to explain how
 ### Shadow Mapping
 For the shadows I used the well-known Shadow Mapping technique. A separate render is performed using a Render To Texture technique, texture in which the distance from the light is saved for each mesh (See next picture, the nearest from the light the mesh is, the darkest it is in the shadowmap). And this distance from the light can be used in the main rendering process in order to know if the currently rendered part of the mesh is hidden from the light by an other object. See [this](http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/) tutorial if you want to learn more about it. I then used the Percentage Close Filtering technique in order to make the shadows smoother (See this [nvidia article](http://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch11.html) about PCF).
 
-<p align="center"><img width="512" src="images/ShadowMapping.png"></p>
+<p align="center"><img width="700" src="images/ShadowMapping.png"></p>
 
 ### Color Picking
 Concerning mesh picking, I used a Color Picking technique. When a click event occurs, an other render is performed using a RTT technique, in which meshes are colored according to their positions on the grid (See next picture). The color on the clicked position of the screen is then extracted in order to know which piece on the grid has been selected. This technique is never used in video games, but it perfectly fits my needs for this project. Performance are ok because the RTT is performed only when a click event occurs.
