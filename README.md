@@ -60,4 +60,4 @@ Concerning mesh picking, I used a Color Picking technique. When a click event oc
 Developing the IA would have been to much work, and it wasn't the purpose of this project. I chose to use Stockfish for that. Stockfish runs in a subprocess, and communicates with the GUI using the UCI protocol.
 
 ### Meshes
-Meshes have been created on [Blender](https://www.blender.org/) and exported under ".obj" file format.
+I created meshes on [Blender](https://www.blender.org/) and exported them under ".obj" file format.
