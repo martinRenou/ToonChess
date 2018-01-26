@@ -61,6 +61,3 @@ Developing the IA would have been too much work, and it wasn't the purpose of th
 
 ### Meshes
 I created meshes on [Blender](https://www.blender.org/) and exported them under ".obj" file format.
-
-<script type="text/javascript" src="https://platform.linkedin.com/badges/js/profile.js" async defer></script>
-<div class="LI-profile-badge"  data-version="v1" data-size="medium" data-locale="fr_FR" data-type="horizontal" data-theme="light" data-vanity="martin-renou"><a class="LI-simple-link" href='https://fr.linkedin.com/in/martin-renou?trk=profile-badge'>Martin Renou</a></div>
