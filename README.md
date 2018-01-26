@@ -49,7 +49,7 @@ Concerning mesh picking, I used a Color Picking technique. When a click event oc
 
 <p align="center"><img width="700" src="images/ColorPicking.png"></p>
 
-### IA
+### IA
 Developing the IA would have been to much work, and it wasn't the purpose of this project. I chose to use Stockfish for that. Stockfish runs in a subprocess, and communicates with the GUI using the UCI protocol.
 
 ### Meshes
