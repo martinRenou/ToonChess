@@ -34,7 +34,6 @@ Tests are written using [GoogleTest](https://github.com/google/googletest), you 
 ./tests
 ```
 
-### ToonChess
 ## Why ?
 There is already plenty of open-source chess games, so why would I develop my own one?
 I wanted to improve my knowledge of OpenGL and c++ programming. I am not even a chess gamer, I am just interested in 3D real time rendering. I also wanted to learn some tools like GoogleTest and CPPCHECK. And here is the result, it would have been a shame not to share my work.
