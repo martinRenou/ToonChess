@@ -40,7 +40,11 @@ I wanted to improve my knowledge of OpenGL and c++ programming. I am not even a 
 ### Toon Style
 I wanted a toon effect for my game, this effect can be performed using cel-shading technique. Instead of using "normal" enlightening, lights are computed using a threshold: if light intensity is more important than this threshold the mesh will be bright, dark otherwise. In fact in ToonChess shaders I used three thresholds, that is to say four levels of enlightening.
 
-<p align="center" style="display: flex"><img width="350" src="images/NormalLights.png"><img width="350" src="images/CelShading.png"></p>
+<p align="center"><img width="350" src="images/NormalLights.png"><img width="350" src="images/CelShading.png"></p>
+
+I also wanted to display black borders for chess pieces. In order to explain how I did it I'll have to explain what is Backface Culling. Backface Culling is a step in the rendering in which hidden triangle faces of the mesh (not visible from the camera point of view) are sorted and not rendered in order to save computation time. Now, in order to display black borders I chose to display those "hidden triangle faces" in black and to enlarge them. It results in a nice black border effect, without the need of a filtering step (I could have used a sobel filter for example).
+
+<p align="center"><img width="350" src="images/BlackBorders.png"></p>
 
 ### Shadow Mapping
 For the shadows I used the well-known Shadow Mapping technique. A separate render is performed using a Render To Texture technique, texture in which the distance from the light is saved for each mesh (See next picture, the nearest from the light the mesh is, the darkest it is in the shadowmap). And this distance from the light can be used in the main rendering process in order to know if the currently rendered part of the mesh is hidden from the light by an other object. See [this](http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/) tutorial if you want to learn more about it. I then used the Percentage Close Filtering technique in order to make the shadows smoother (See this [nvidia article](http://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch11.html) about PCF).
