@@ -1,4 +1,4 @@
-<p align="center"><img width="700" src="./ToonChess.png"></p>
+<p align="center"><img width="700" src="images/ToonChess.png"></p>
 <h1 align="center"> 3D Chess game based on OpenGL and Stockfish </h1>
 
 [![Build Status](https://travis-ci.org/martinRenou/ToonChess.svg?branch=master)](https://travis-ci.org/martinRenou/ToonChess)
@@ -33,7 +33,3 @@ Tests are written using [GoogleTest](https://github.com/google/googletest), you 
 ```bash
 ./tests
 ```
-
-## Assets
-
-Meshes have been created on [Blender](https://www.blender.org/) and exported under ".obj" file format.
