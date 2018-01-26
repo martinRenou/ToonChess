@@ -38,7 +38,7 @@ I wanted to improve my knowledge of OpenGL and c++ programming. I am not even a 
 
 ## How ?
 ### Toon Style
-I wanted a toon effect for my game, this effect can be performed using cel-shading technique. Instead of using "normal" enlightening, lights are computed using a threshold: if light intensity is more important than this threshold the mesh will be bright, dark otherwise. In fact in ToonChess shaders I used two thresholds, meaning three levels of enlightening.
+I wanted a toon effect for my game, this effect can be performed using cel-shading technique. Instead of using "normal" enlightening, lights are computed using a threshold: if light intensity is more important than this threshold the mesh will be bright, dark otherwise. In fact in ToonChess shaders I used three thresholds, that is to say four levels of enlightening.
 
 <p align="center" style="display: flex"><img width="350" src="images/NormalLights.png"><img width="350" src="images/CelShading.png"></p>
 
