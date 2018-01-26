@@ -1,7 +1,7 @@
 varying float vLightIntensity;
 varying vec3 vLightPosition;
 
-uniform bool selected;
+uniform bool elevated;
 
 uniform vec3 lightDirection;
 
@@ -29,8 +29,8 @@ void main(void){
 
   vLightIntensity = - dot(lightDir, normalize(normal));
 
-  // If the mesh is selected, move it
-  if(selected){
+  // If the mesh should be elevated
+  if(elevated){
     position = gl_Vertex + vec4(0, 0, 0.6, 0);
   } else {
     position = gl_Vertex;
