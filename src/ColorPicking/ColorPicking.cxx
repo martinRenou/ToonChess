@@ -65,6 +65,14 @@ void colorPickingRender(
       movementMatrix = translate(&movementMatrix, translation);
       colorPickingProgram->setMoveMatrix(&movementMatrix);
 
+      // If it's the selected piece, or if it's an allowed next move, move up
+      // the piece
+      (game->selectedPiecePosition.x == x and
+          game->selectedPiecePosition.y == y) or
+          game->allowedNextPositions[x][y] ?
+        colorPickingProgram->setBoolean("elevated", true) :
+        colorPickingProgram->setBoolean("elevated", false);
+
       // Set color depending on the position
       colorPickingProgram->setVector4f("color", x/8.0, y/8.0, 0.0, 1.0);
 
