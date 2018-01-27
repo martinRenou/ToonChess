@@ -122,6 +122,12 @@ void StockfishConnector::startCommunication(){
   if(splittedLine.at(0).compare("Stockfish") != 0) throw ConnectionException(
     "Communication with stockfish did'nt start properly, closing");
 
+  // Set the difficulty option
+  std::string difficultyOption = "setoption name Skill Level value ";
+  difficultyOption.append(std::to_string(this->difficultyLevel));
+  difficultyOption.append("\n");
+  writeLine(this->parentWritePipeF, difficultyOption, true);
+
   // Say to stockfish that we are ready
   writeLine(this->parentWritePipeF, "isready\n", true);
 

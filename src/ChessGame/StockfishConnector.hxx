@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 
+#include "../constants.hxx"
+
 class StockfishConnector {
 private:
   /* Communication pipes between child and parent processes
@@ -14,6 +16,9 @@ private:
 
   /* All the moves since the beginning of the game */
   std::string moves;
+
+  /* Game difficulty */
+  int difficultyLevel = DIFFICULTY_EASY;
 
 public:
   /* Constructor */

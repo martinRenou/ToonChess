@@ -45,4 +45,10 @@ const int ANTIALIASING_HIGH = 4;
 const int ANTIALIASING_LOW = 2;
 const int ANTIALIASING_NONE = 0;
 
+// Game difficulty
+const int DIFFICULTY_VERY_HIGH = 20;
+const int DIFFICULTY_HIGH = 15;
+const int DIFFICULTY_NORMAL = 5;
+const int DIFFICULTY_EASY = 0;
+
 #endif
