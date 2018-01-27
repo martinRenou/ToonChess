@@ -104,8 +104,7 @@ void ColorPicking::initBuffers(){
   // Create render buffer for depth test
   glGenRenderbuffers(1, &depthRenderBufferId);
   glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBufferId);
-  glRenderbufferStorage(
-    GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
   glFramebufferRenderbuffer(
     GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
     GL_RENDERBUFFER, depthRenderBufferId
