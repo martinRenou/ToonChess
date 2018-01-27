@@ -1,9 +1,10 @@
 <p align="center"><img width="700" src="images/ToonChess.png"></p>
+<h1 align="center"><a href="https://martinrenou.github.io/ToonChess/">ToonChess</a></h1>
 <h1 align="center"> 3D Chess game based on OpenGL and Stockfish </h1>
 
 [![Build Status](https://travis-ci.org/martinRenou/ToonChess.svg?branch=master)](https://travis-ci.org/martinRenou/ToonChess)
 
-## Installation (Only linux compatible)
+## Installation (linux only)
 
 Install [CMake](https://cmake.org/), [SFML](https://www.sfml-dev.org/index.php) and [Stockfish](https://stockfishchess.org/):
 ```bash
