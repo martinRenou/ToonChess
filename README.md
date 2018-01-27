@@ -3,7 +3,7 @@
 
 [![Build Status](https://travis-ci.org/martinRenou/ToonChess.svg?branch=master)](https://travis-ci.org/martinRenou/ToonChess)
 
-## Installation (Only linux compatible)
+## Installation (linux only)
 
 Install [CMake](https://cmake.org/), [SFML](https://www.sfml-dev.org/index.php) and [Stockfish](https://stockfishchess.org/):
 ```bash

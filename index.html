@@ -16,7 +16,7 @@
       <img src="images/ToonChess.png" class="rounded mx-auto d-block" style="max-width: 60%;height: auto;">
       <h1 class="display-4 text-center"> 3D Chess game based on OpenGL and Stockfish </h1>
 
-      <h2 class="mt-4" style="border-top-style: solid;border-top-color: #e7e7e7;border-top-width: thin;"><b> Installation (Only linux compatible) </b></h2>
+      <h2 class="mt-4" style="border-top-style: solid;border-top-color: #e7e7e7;border-top-width: thin;"><b> Installation (linux only) </b></h2>
 
       <p> Install <a href="https://cmake.org/">CMake</a>, <a href="https://www.sfml-dev.org/index.php">SFML</a> and <a href="https://stockfishchess.org/">Stockfish</a>:
         <pre style="background: #e7e7e7;"><code>
@@ -38,13 +38,19 @@
         </code></pre>
       </p>
 
-      <h2 class="mt-4" style="border-top-style: solid;border-top-color: #e7e7e7;border-top-width: thin;"><b> Why ? </b></h2>
+      <p> Run it!
+        <pre style="background: #e7e7e7;"><code>
+          ./ToonChess
+        </code></pre>
+      </p>
+
+      <h2 class="mt-4" style="border-top-style: solid;border-top-color: #e7e7e7;border-top-width: thin;"><b> Why did I create this game? </b></h2>
       <p class="text-justify">
         There are already plenty of open-source chess games, so why would I develop my own?
         I am not even a chess gamer, I am simply interested in real time 3D rendering. Working on this project made me improve on my OpenGL and C++ skills. I also wanted the opportunity to learn tools such as GoogleTest and Cppcheck. And here is the result! Feel free to copy parts of the code for your own OpenGL projects.
       </p>
 
-      <h2 class="mt-4" style="border-top-style: solid;border-top-color: #e7e7e7;border-top-width: thin;"><b> How ? </b></h2>
+      <h2 class="mt-4" style="border-top-style: solid;border-top-color: #e7e7e7;border-top-width: thin;"><b> How did I create this game? </b></h2>
       <h3 class="mt-3"> Toon Style </h3>
       <p class="text-justify">
         I wanted a toon effect for my game, this effect can be performed using the cel-shading technique. Instead of using "normal" lighting, lights are computed using a threshold: if light intensity is more important than this threshold then the 3D-object will be bright and dark otherwise.  In ToonChess shaders, I actually used three thresholds, meaning four levels of lighting.
@@ -62,7 +68,7 @@
 
       <h3 class="mt-3"> Shadow Mapping </h3>
       <p class="text-justify">
-        For the shadows I used the well-known Shadow Mapping technique. A separate render is performed using a Render To Texture technique, in which the distance from the light is saved for each mesh in a texture. (See picture below, the nearer the mesh is from the light, the darker it is in the shadowmap). And this distance from the light can be used in the main rendering process in order to know if the currently rendered part of the mesh is hidden from the light by another object. See
+        For the shadows I used the well-known Shadow Mapping technique. A separate render is performed using a Render To Texture technique (RTT), in which the distance from the light is saved for each mesh in a texture. (See picture below, the nearer the mesh is from the light, the darker it is in the shadowmap). And this distance from the light can be used in the main rendering process in order to know if the currently rendered part of the mesh is hidden from the light by another object. See
         <a href="http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/">this</a> tutorial if you want to learn more about it. I then used the Percentage Close Filtering technique in order to make the shadows smoother (See this <a href="http://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch11.html">nvidia article</a> about PCF).
         <img src="images/ShadowMapping.png" class="rounded mx-auto d-block" style="max-width: 50%;height: auto;">
       </p>
