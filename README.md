@@ -1,4 +1,5 @@
 <p align="center"><img width="700" src="images/ToonChess.png"></p>
+<h1 align="center">[ToonChess](https://martinrenou.github.io/ToonChess/)</h1>
 <h1 align="center"> 3D Chess game based on OpenGL and Stockfish </h1>
 
 [![Build Status](https://travis-ci.org/martinRenou/ToonChess.svg?branch=master)](https://travis-ci.org/martinRenou/ToonChess)
