@@ -304,7 +304,7 @@ void celShadingRender(
       // Set movement matrix to identity
       movementMatrix = getIdentityMatrix();
 
-      // Rotate the piece depending on the team (user or IA)
+      // Rotate the piece depending on the team (user or AI)
       movementMatrix = piece > 0 ?
         rotate(&movementMatrix, -90.0, rotation) :
         rotate(&movementMatrix, 90.0, rotation);
@@ -362,7 +362,7 @@ void celShadingRender(
       // Set movement matrix to identity
       movementMatrix = getIdentityMatrix();
 
-      // Rotate the piece depending on the team (user or IA)
+      // Rotate the piece depending on the team (user or AI)
       movementMatrix = piece > 0 ?
         rotate(&movementMatrix, -90.0, rotation) :
         rotate(&movementMatrix, 90.0, rotation);

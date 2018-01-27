@@ -209,7 +209,7 @@ void ChessGame::computeAllowedNextPositions(){
   const int piece = boardAt(piecePosition.x, piecePosition.y);
 
   // If the new selected piece position is {-1, -1} which means that nothing is
-  // selected, or if the new selected piece is one of IA's pieces (< 0), or if
+  // selected, or if the new selected piece is one of AI's pieces (< 0), or if
   // the selected position corresponds to an EMPTY space (== 0), we only reset
   // the allowedNextPositions matrix
   if((piecePosition.x == -1 and piecePosition.y == -1) or
@@ -304,22 +304,22 @@ void ChessGame::perform(){
     }
     case WAITING: {
       if(this->clock->getElapsedTime().asSeconds() >= 1.0)
-        this->state = IA_TURN;
+        this->state = AI_TURN;
       break;
     }
-    case IA_TURN: {
-      // Get IA decision according to the last user move
-      std::string iaMove = stockfishConnector->getNextIAMove(
+    case AI_TURN: {
+      // Get AI decision according to the last user move
+      std::string aiMove = stockfishConnector->getNextAIMove(
         this->lastUserMove);
 
-      // If the IA tried to move one user's pawn, stop the game
-      sf::Vector2i iaMoveStartPosition = uciFormatToPosition(
-        iaMove.substr(0, 2));
-      if(boardAt(iaMoveStartPosition.x, iaMoveStartPosition.y) >= 0){
+      // If the AI tried to move one user's pawn, stop the game
+      sf::Vector2i aiMoveStartPosition = uciFormatToPosition(
+        aiMove.substr(0, 2));
+      if(boardAt(aiMoveStartPosition.x, aiMoveStartPosition.y) >= 0){
         throw GameException("A forbiden move has been performed!");
       }
 
-      movePiece(iaMove);
+      movePiece(aiMove);
 
       // Get suggested user next move if available
       if(stockfishConnector->suggestedUserMove.compare("(none)") != 0){
