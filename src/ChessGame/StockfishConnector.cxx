@@ -131,7 +131,7 @@ void StockfishConnector::startCommunication(){
     "Stockfish not ready, closing");
 }
 
-std::string StockfishConnector::getNextIAMove(std::string userMove){
+std::string StockfishConnector::getNextAIMove(std::string userMove){
   std::string line;
   std::vector<std::string> splittedLine;
 
@@ -157,15 +157,15 @@ std::string StockfishConnector::getNextIAMove(std::string userMove){
     if(splittedLine.at(0).compare("bestmove") == 0) break;
   }
 
-  // Get IA decision and append to moves
-  std::string iaMove = splittedLine.at(1);
+  // Get AI decision and append to moves
+  std::string aiMove = splittedLine.at(1);
   // Remove '\n' if there is one
-  iaMove.erase(std::remove(iaMove.begin(), iaMove.end(), '\n'), iaMove.end());
-  this->moves.append(iaMove);
+  aiMove.erase(std::remove(aiMove.begin(), aiMove.end(), '\n'), aiMove.end());
+  this->moves.append(aiMove);
   this->moves.append(" ");
 
-  // Print IA move in stdout
-  std::cout << "IA move: " << iaMove << std::endl;
+  // Print AI move in stdout
+  std::cout << "AI move: " << aiMove << std::endl;
 
   // Get suggested next user move if available
   if(splittedLine.size() == 4){
@@ -177,7 +177,7 @@ std::string StockfishConnector::getNextIAMove(std::string userMove){
     suggestedUserMove = "(none)";
   }
 
-  return iaMove;
+  return aiMove;
 }
 
 StockfishConnector::~StockfishConnector(){

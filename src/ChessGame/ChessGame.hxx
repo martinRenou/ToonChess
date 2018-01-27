@@ -18,10 +18,10 @@ private:
   /* The connector with Stockfish */
   StockfishConnector* stockfishConnector;
 
-  /* The state of the game, should be USER_TURN, IA_TURN or WAITING */
+  /* The state of the game, should be USER_TURN, AI_TURN or WAITING */
   int state = USER_TURN;
 
-  /* Clock used for waiting between the USER_TURN and the IA_TURN */
+  /* Clock used for waiting between the USER_TURN and the AI_TURN */
   sf::Clock* clock;
 
   /* Grid used for conversions between position and UCI format */
@@ -134,8 +134,8 @@ public:
 
   /* Perform the chess rules depending on the game state, if it's the USER_TURN
     it will move one chess piece according to the currently clicked piece, if
-    it's WAITING it will wait one second before changing to IA_TURN, if it's
-    IA_TURN it will ask Stockfish what is the next IA move
+    it's WAITING it will wait one second before changing to AI_TURN, if it's
+    AI_TURN it will ask Stockfish what is the next AI move
     \throw GameException if chess rules are not respected
   */
   void perform();
