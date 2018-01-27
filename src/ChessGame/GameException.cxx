@@ -8,5 +8,5 @@ GameException::GameException(const std::string& msg) :
 GameException::~GameException() throw(){};
 
 const char* GameException::what() const throw(){
-  return this->msg.c_str();
+  return msg.c_str();
 };
