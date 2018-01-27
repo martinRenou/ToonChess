@@ -72,36 +72,36 @@ ShadowMapping::ShadowMapping(GLuint resolution) : resolution{resolution}{}
 
 void ShadowMapping::initBuffers(){
   // Create FBO for shadow mapping
-  glGenFramebuffers(1, &this->fboId);
-  glBindFramebuffer(GL_FRAMEBUFFER, this->fboId);
+  glGenFramebuffers(1, &fboId);
+  glBindFramebuffer(GL_FRAMEBUFFER, fboId);
 
   // Create the shadowMap texture
-  glGenTextures(1, &this->shadowMapId);
-  glBindTexture(GL_TEXTURE_2D, this->shadowMapId);
+  glGenTextures(1, &shadowMapId);
+  glBindTexture(GL_TEXTURE_2D, shadowMapId);
 
   // Set the texture
   glTexImage2D(
     GL_TEXTURE_2D, 0, GL_RGB,
-    this->resolution, this->resolution,
+    resolution, resolution,
     0, GL_RGB, GL_UNSIGNED_BYTE, 0
   );
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 
   glFramebufferTexture2D(
-    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, this->shadowMapId, 0
+    GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, shadowMapId, 0
   );
 
   // Create render buffer for depth test
-  glGenRenderbuffers(1, &this->depthRenderBufferId);
-  glBindRenderbuffer(GL_RENDERBUFFER, this->depthRenderBufferId);
+  glGenRenderbuffers(1, &depthRenderBufferId);
+  glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBufferId);
   glRenderbufferStorage(
     GL_RENDERBUFFER, GL_DEPTH_COMPONENT,
-    this->resolution, this->resolution
+    resolution, resolution
   );
   glFramebufferRenderbuffer(
     GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-    GL_RENDERBUFFER, this->depthRenderBufferId
+    GL_RENDERBUFFER, depthRenderBufferId
   );
 
   if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
@@ -116,15 +116,15 @@ void ShadowMapping::initBuffers(){
 
 void ShadowMapping::deleteBuffers(){
   // Delete framebuffer
-  GLuint framebuffer[1] = {this->fboId};
+  GLuint framebuffer[1] = {fboId};
   glDeleteFramebuffers(1, framebuffer);
 
   // Delete render buffer
-  GLuint buffers[1] = {this->depthRenderBufferId};
+  GLuint buffers[1] = {depthRenderBufferId};
   glDeleteRenderbuffers(1, buffers);
 
   // Delete texture
-  GLuint textures[1] = {this->shadowMapId};
+  GLuint textures[1] = {shadowMapId};
   glDeleteTextures(1, textures);
 }
 
@@ -132,20 +132,20 @@ GLuint ShadowMapping::getShadowMap(
     ChessGame* game, GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs){
   // Bind the framebuffer
-  glBindFramebuffer(GL_FRAMEBUFFER, this->fboId);
+  glBindFramebuffer(GL_FRAMEBUFFER, fboId);
 
   // Clear buffers and render
   glClearColor(1, 0, 0, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glViewport(0, 0, this->resolution, this->resolution);
+  glViewport(0, 0, resolution, resolution);
 
   shadowMappingRender(game, gameInfo, meshes, programs);
 
   // Return the shadowmap id
-  return this->shadowMapId;
+  return shadowMapId;
 };
 
 ShadowMapping::~ShadowMapping(){
-  this->deleteBuffers();
+  deleteBuffers();
 };

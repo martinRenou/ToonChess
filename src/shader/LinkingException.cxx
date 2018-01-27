@@ -8,5 +8,5 @@ LinkingException::LinkingException(const std::string& msg) :
 LinkingException::~LinkingException() throw(){};
 
 const char* LinkingException::what() const throw(){
-  return this->msg.c_str();
+  return msg.c_str();
 };

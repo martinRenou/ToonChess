@@ -10,5 +10,5 @@ CompilationException::CompilationException(
 CompilationException::~CompilationException() throw(){};
 
 const char* CompilationException::what() const throw(){
-  return this->msg.c_str();
+  return msg.c_str();
 };

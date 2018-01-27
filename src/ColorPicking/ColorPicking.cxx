@@ -89,26 +89,25 @@ ColorPicking::ColorPicking(GLuint width, GLuint height) :
 
 void ColorPicking::initBuffers(){
   // Create frameBuffer object
-  glGenFramebuffers(1, &this->fboId);
-  glBindFramebuffer(GL_FRAMEBUFFER, this->fboId);
+  glGenFramebuffers(1, &fboId);
+  glBindFramebuffer(GL_FRAMEBUFFER, fboId);
 
   // Create render buffer for color
-  glGenRenderbuffers(1, &this->colorRenderBufferId);
-  glBindRenderbuffer(GL_RENDERBUFFER, this->colorRenderBufferId);
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, this->width, this->height);
+  glGenRenderbuffers(1, &colorRenderBufferId);
+  glBindRenderbuffer(GL_RENDERBUFFER, colorRenderBufferId);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_RGBA, width, height);
   glFramebufferRenderbuffer(
     GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-    GL_RENDERBUFFER, this->colorRenderBufferId
+    GL_RENDERBUFFER, colorRenderBufferId
   );
 
   // Create render buffer for depth test
-  glGenRenderbuffers(1, &this->depthRenderBufferId);
-  glBindRenderbuffer(GL_RENDERBUFFER, this->depthRenderBufferId);
-  glRenderbufferStorage(
-    GL_RENDERBUFFER, GL_DEPTH_COMPONENT, this->width, this->height);
+  glGenRenderbuffers(1, &depthRenderBufferId);
+  glBindRenderbuffer(GL_RENDERBUFFER, depthRenderBufferId);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
   glFramebufferRenderbuffer(
     GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-    GL_RENDERBUFFER, this->depthRenderBufferId
+    GL_RENDERBUFFER, depthRenderBufferId
   );
 
   if(glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE){
@@ -123,30 +122,30 @@ void ColorPicking::initBuffers(){
 void ColorPicking::resizeBuffers(GLuint width, GLuint height){
   // If the resize is a shrinking of the screen, then don't do anything because
   // the buffer will do the job
-  if(this->width >= width and this->height >= height){
-    this->width = width;
-    this->height = height;
+  if(width >= width and height >= height){
+    width = width;
+    height = height;
 
     return;
   };
 
   // Change the size for the buffers
-  this->width = width;
-  this->height = height;
+  width = width;
+  height = height;
 
-  this->deleteBuffers();
+  deleteBuffers();
 
   // Recreate buffers with the new size
-  this->initBuffers();
+  initBuffers();
 }
 
 void ColorPicking::deleteBuffers(){
   // Delete framebuffer
-  GLuint framebuffer[1] = {this->fboId};
+  GLuint framebuffer[1] = {fboId};
   glDeleteFramebuffers(1, framebuffer);
 
   // Delete render buffers
-  GLuint buffers[2] = {this->colorRenderBufferId, this->depthRenderBufferId};
+  GLuint buffers[2] = {colorRenderBufferId, depthRenderBufferId};
   glDeleteRenderbuffers(2, buffers);
 }
 
@@ -156,13 +155,13 @@ sf::Vector2i ColorPicking::getClickedPiecePosition(
     GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs){
   // Bind the framebuffer
-  glBindFramebuffer(GL_FRAMEBUFFER, this->fboId);
+  glBindFramebuffer(GL_FRAMEBUFFER, fboId);
 
   // Clear buffers and render
   glClearColor(1, 1, 1, 1);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glViewport(0, 0, this->width, this->height);
+  glViewport(0, 0, width, height);
 
   colorPickingRender(game, gameInfo, meshes, programs);
 
@@ -189,5 +188,5 @@ sf::Vector2i ColorPicking::getClickedPiecePosition(
 }
 
 ColorPicking::~ColorPicking(){
-  this->deleteBuffers();
+  deleteBuffers();
 }

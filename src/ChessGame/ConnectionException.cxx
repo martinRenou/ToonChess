@@ -8,5 +8,5 @@ ConnectionException::ConnectionException(const std::string& msg) :
 ConnectionException::~ConnectionException() throw(){};
 
 const char* ConnectionException::what() const throw(){
-  return this->msg.c_str();
+  return msg.c_str();
 };

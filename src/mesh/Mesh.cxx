@@ -49,12 +49,12 @@ Mesh::Mesh(const std::string& filePath) : filePath{filePath}{}
 
 void Mesh::initBuffers(){
   // Read obj file
-  std::ifstream fobj(this->filePath);
+  std::ifstream fobj(filePath);
   std::string line;
 
-  this->vertices.clear();
-  this->normals.clear();
-  this->indices.clear();
+  vertices.clear();
+  normals.clear();
+  indices.clear();
 
   std::vector<GLfloat> unsortedVertices;
   std::vector<GLfloat> unsortedNormals;
@@ -75,41 +75,41 @@ void Mesh::initBuffers(){
     }
 
     if(splittedLine.at(0).compare("f") == 0){
-      extractVertices(&splittedLine, &unsortedVertices, &this->vertices);
-      extractNormals(&splittedLine, &unsortedNormals, &this->normals);
+      extractVertices(&splittedLine, &unsortedVertices, &vertices);
+      extractNormals(&splittedLine, &unsortedNormals, &normals);
 
       for(int i = 0; i <= 2; i++){
-        this->indices.push_back(this->indices.size());
+        indices.push_back(indices.size());
       }
       continue;
     }
   }
 
   // Vertex buffer
-  glGenBuffers(1, &this->vertexBufferId);
-  glBindBuffer(GL_ARRAY_BUFFER, this->vertexBufferId);
+  glGenBuffers(1, &vertexBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
   glBufferData(
     GL_ARRAY_BUFFER,
-    this->vertices.size()*sizeof(GLfloat),
-    this->vertices.data(),
+    vertices.size()*sizeof(GLfloat),
+    vertices.data(),
     GL_STATIC_DRAW);
 
   // Normal buffer
-  glGenBuffers(1, &this->normalBufferId);
-  glBindBuffer(GL_ARRAY_BUFFER, this->normalBufferId);
+  glGenBuffers(1, &normalBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, normalBufferId);
   glBufferData(
     GL_ARRAY_BUFFER,
-    this->normals.size()*sizeof(GLfloat),
-    this->normals.data(),
+    normals.size()*sizeof(GLfloat),
+    normals.data(),
     GL_STATIC_DRAW);
 
   // Index buffer
-  glGenBuffers(1, &this->indexBufferId);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBufferId);
+  glGenBuffers(1, &indexBufferId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId);
   glBufferData(
     GL_ELEMENT_ARRAY_BUFFER,
-    this->indices.size()*sizeof(GLuint),
-    this->indices.data(),
+    indices.size()*sizeof(GLuint),
+    indices.data(),
     GL_STATIC_DRAW);
 
   // Unbind buffers
@@ -124,7 +124,7 @@ void Mesh::draw(){
   glEnableClientState(GL_NORMAL_ARRAY);
 
   // Send vertices
-  glBindBuffer(GL_ARRAY_BUFFER, this->vertexBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
   glVertexPointer(
     3,
     GL_FLOAT,
@@ -133,7 +133,7 @@ void Mesh::draw(){
   );
 
   // Send normals
-  glBindBuffer(GL_ARRAY_BUFFER, this->normalBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, normalBufferId);
   glNormalPointer(
     GL_FLOAT,
     0,
@@ -141,10 +141,10 @@ void Mesh::draw(){
   );
 
   // Draw triangles
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBufferId);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, indexBufferId);
   glDrawElements(
     GL_TRIANGLES,
-    this->indices.size(),
+    indices.size(),
     GL_UNSIGNED_INT,
     (void*)0
   );
@@ -158,7 +158,7 @@ void Mesh::draw(){
 }
 
 Mesh::~Mesh(){
-  glDeleteBuffers(1, &this->vertexBufferId);
-  glDeleteBuffers(1, &this->normalBufferId);
-  glDeleteBuffers(1, &this->indexBufferId);
+  glDeleteBuffers(1, &vertexBufferId);
+  glDeleteBuffers(1, &normalBufferId);
+  glDeleteBuffers(1, &indexBufferId);
 }

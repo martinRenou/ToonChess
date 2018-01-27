@@ -53,8 +53,8 @@ void writeLine(FILE* writePipe, std::string line, bool print){
 };
 
 StockfishConnector::StockfishConnector() : moves{""}{
-  this->parentWritePipeF = NULL;
-  this->parentReadPipeF = NULL;
+  parentWritePipeF = NULL;
+  parentReadPipeF = NULL;
 };
 
 void StockfishConnector::startCommunication(){
@@ -110,29 +110,29 @@ void StockfishConnector::startCommunication(){
   close(childWritePipe);
 
   // Get file from file descriptor
-  this->parentReadPipeF = fdopen(parentReadPipe, readMode);
-  this->parentWritePipeF = fdopen(parentWritePipe, writeMode);
+  parentReadPipeF = fdopen(parentReadPipe, readMode);
+  parentWritePipeF = fdopen(parentWritePipe, writeMode);
 
   std::string line;
   std::vector<std::string> splittedLine;
 
   // Check that stockfish properly started
-  line = readLine(this->parentReadPipeF, true);
+  line = readLine(parentReadPipeF, true);
   splittedLine = split(line, ' ');
   if(splittedLine.at(0).compare("Stockfish") != 0) throw ConnectionException(
     "Communication with stockfish did'nt start properly, closing");
 
   // Set the difficulty option
   std::string difficultyOption = "setoption name Skill Level value ";
-  difficultyOption.append(std::to_string(this->difficultyLevel));
+  difficultyOption.append(std::to_string(difficultyLevel));
   difficultyOption.append("\n");
-  writeLine(this->parentWritePipeF, difficultyOption, true);
+  writeLine(parentWritePipeF, difficultyOption, true);
 
   // Say to stockfish that we are ready
-  writeLine(this->parentWritePipeF, "isready\n", true);
+  writeLine(parentWritePipeF, "isready\n", true);
 
   // Wait for stockfish answer
-  line = readLine(this->parentReadPipeF, true);
+  line = readLine(parentReadPipeF, true);
   if(line.compare("readyok\n") != 0) throw ConnectionException(
     "Stockfish not ready, closing");
 }
@@ -145,18 +145,18 @@ std::string StockfishConnector::getNextAIMove(std::string userMove){
   std::cout << std::endl << "User move: " << userMove << std::endl;
 
   // Append the user move to moves
-  this->moves.append(userMove);
-  this->moves.append(" ");
+  moves.append(userMove);
+  moves.append(" ");
 
   // Send message to stockfish
   line = "position startpos moves ";
-  line.append(this->moves);
+  line.append(moves);
   line.append("\ngo\n");
-  writeLine(this->parentWritePipeF, line, false);
+  writeLine(parentWritePipeF, line, false);
 
   // Get answer
   while(true){
-    line = readLine(this->parentReadPipeF, false);
+    line = readLine(parentReadPipeF, false);
 
     // Check if stockfish took a decision
     splittedLine = split(line, ' ');
@@ -167,8 +167,8 @@ std::string StockfishConnector::getNextAIMove(std::string userMove){
   std::string aiMove = splittedLine.at(1);
   // Remove '\n' if there is one
   aiMove.erase(std::remove(aiMove.begin(), aiMove.end(), '\n'), aiMove.end());
-  this->moves.append(aiMove);
-  this->moves.append(" ");
+  moves.append(aiMove);
+  moves.append(" ");
 
   // Print AI move in stdout
   std::cout << "AI move: " << aiMove << std::endl;
@@ -188,17 +188,17 @@ std::string StockfishConnector::getNextAIMove(std::string userMove){
 
 StockfishConnector::~StockfishConnector(){
   // Say to stockfish that we are closing
-  writeLine(this->parentWritePipeF, "quit\n", true);
+  writeLine(parentWritePipeF, "quit\n", true);
 
   // Wait for the child process to die properly
   int status = 0;
   while((wait(&status)) > 0);
 
-  int parentReadPipe = fileno(this->parentReadPipeF);
-  int parentWritePipe = fileno(this->parentWritePipeF);
+  int parentReadPipe = fileno(parentReadPipeF);
+  int parentWritePipe = fileno(parentWritePipeF);
 
-  fclose(this->parentReadPipeF);
-  fclose(this->parentWritePipeF);
+  fclose(parentReadPipeF);
+  fclose(parentWritePipeF);
 
   close(parentReadPipe);
   close(parentWritePipe);
