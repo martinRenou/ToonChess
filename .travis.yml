@@ -10,6 +10,13 @@ before_install:
   - make SRCDIR=build CFGDIR=/usr/share/cppcheck/ HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
   - sudo make install CFGDIR=/usr/share/cppcheck/
   - popd
+  # Install Bullet Physics
+  - wget https://github.com/bulletphysics/bullet3/archive/2.87.tar.gz
+  - tar -xzf 2.87.tar.gz
+  - pushd bullet3-2.87/
+  - mkdir build && pushd build && cmake ..
+  - sudo make install
+  - popd && popd
 
 script:
   - cppcheck --quiet --error-exitcode=1 --enable=all --inline-suppr src/

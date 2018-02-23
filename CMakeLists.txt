@@ -80,3 +80,10 @@ if (OPENGL_FOUND)
   target_link_libraries(${TEST_NAME} ${OPENGL_LIBRARIES})
   # target_link_libraries(${EXECUTABLE_NAME} m)
 endif()
+
+# Detect and add Bullet Physics
+find_package(Bullet 2.8 REQUIRED)
+if(BULLET_FOUND)
+  include_directories(${BULLET_INCLUDE_DIR})
+  target_link_libraries(${EXECUTABLE_NAME} ${BULLET_LIBRARIES})
+endif()
