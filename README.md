@@ -16,7 +16,7 @@ Install [Bullet Physics](http://bulletphysics.org/wordpress/):
 wget https://github.com/bulletphysics/bullet3/archive/2.87.tar.gz
 tar -xzf 2.87.tar.gz
 cd bullet3-2.87/
-mkdir build && cd build && cmake ..
+mkdir build && cd build && cmake .. -DBUILD_EXTRAS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF
 sudo make install
 cd ..
 ```
