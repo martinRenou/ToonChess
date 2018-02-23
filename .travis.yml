@@ -1,8 +1,10 @@
 language: c++
 
 before_install:
+  # Install dependencies
   - sudo apt-get update -qq
   - sudo apt-get install -qq libsfml-dev cmake stockfish
+
   # Install cppcheck (version provided by apt is too old)
   - wget github.com/danmar/cppcheck/releases/download/1.81/cppcheck-1.81.tar.gz
   - tar -xvf cppcheck-1.81.tar.gz
@@ -10,13 +12,17 @@ before_install:
   - make SRCDIR=build CFGDIR=/usr/share/cppcheck/ HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
   - sudo make install CFGDIR=/usr/share/cppcheck/
   - popd
+
   # Install Bullet Physics
   - wget https://github.com/bulletphysics/bullet3/archive/2.87.tar.gz
   - tar -xzf 2.87.tar.gz
   - pushd bullet3-2.87/
-  - mkdir build && pushd build && cmake .. -DBUILD_EXTRAS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_UNIT_TESTS=OFF
+  - mkdir build
+  - pushd build
+  - cmake .. -DBUILD_EXTRAS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_UNIT_TESTS=OFF
   - sudo make install
-  - popd && popd
+  - popd
+  - popd
 
 script:
   - cppcheck --quiet --error-exitcode=1 --enable=all --inline-suppr src/
