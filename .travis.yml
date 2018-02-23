@@ -14,7 +14,7 @@ before_install:
   - wget https://github.com/bulletphysics/bullet3/archive/2.87.tar.gz
   - tar -xzf 2.87.tar.gz
   - pushd bullet3-2.87/
-  - mkdir build && pushd build && cmake ..
+  - mkdir build && pushd build && cmake .. -DBUILD_EXTRAS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF
   - sudo make install
   - popd && popd
 
