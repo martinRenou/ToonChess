@@ -17,6 +17,7 @@ set(
   CXX_FILES
   ${CMAKE_SOURCE_DIR}/src/mesh/Mesh.cxx
   ${CMAKE_SOURCE_DIR}/src/mesh/meshes.cxx
+  ${CMAKE_SOURCE_DIR}/src/mesh/loadObjFile.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/CompilationException.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/LinkingException.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/Shader.cxx

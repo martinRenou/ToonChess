@@ -1,5 +1,6 @@
 #include <map>
 
+#include "loadObjFile.hxx"
 #include "Mesh.hxx"
 #include "../constants.hxx"
 
@@ -7,26 +8,19 @@
 
 std::map<int, Mesh*> initMeshes(){
   // Create and load meshes
-  Mesh* king = new Mesh("../assets/king.obj");
-  king->initBuffers();
+  Mesh* king = loadObjFile("../assets/king.obj").at(0);
 
-  Mesh* queen = new Mesh("../assets/queen.obj");
-  queen->initBuffers();
+  Mesh* queen = loadObjFile("../assets/queen.obj").at(0);
 
-  Mesh* bishop = new Mesh("../assets/bishop.obj");
-  bishop->initBuffers();
+  Mesh* bishop = loadObjFile("../assets/bishop.obj").at(0);
 
-  Mesh* rook = new Mesh("../assets/rook.obj");
-  rook->initBuffers();
+  Mesh* rook = loadObjFile("../assets/rook.obj").at(0);
 
-  Mesh* knight = new Mesh("../assets/knight.obj");
-  knight->initBuffers();
+  Mesh* knight = loadObjFile("../assets/knight.obj").at(0);
 
-  Mesh* pawn = new Mesh("../assets/pawn.obj");
-  pawn->initBuffers();
+  Mesh* pawn = loadObjFile("../assets/pawn.obj").at(0);
 
-  Mesh* boardCell = new Mesh("../assets/boardCell.obj");
-  boardCell->initBuffers();
+  Mesh* boardCell = loadObjFile("../assets/boardCell.obj").at(0);
 
   std::map<int, Mesh*> meshes = {
     {KING, king},
