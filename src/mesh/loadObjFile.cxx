@@ -68,9 +68,6 @@ std::vector<Mesh *> loadObjFile(const std::string& filePath){
       currentMesh = new Mesh();
       meshes.push_back(currentMesh);
 
-      unsortedVertices.clear();
-      unsortedNormals.clear();
-
       continue;
     }
 
