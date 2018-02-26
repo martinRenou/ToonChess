@@ -37,23 +37,35 @@ let celShadingMaterial = new THREE.RawShaderMaterial({
 
 let mesh;
 let objLoader = new THREE.OBJLoader();
-objLoader.load(
-  'assets/king.obj',
-  function (object) {
-    object.traverse(function (child) {
-      if (child instanceof THREE.Mesh) {
-        mesh = child;
-      }
-    });
 
-    // Add celShadingMaterial
-    mesh.material = celShadingMaterial;
-    mesh.rotateX(-Math.PI/2);
-    mesh.translateZ(-2.5);
+// Callback function for the mesh selecting element
+function loadMesh(name) {
+  objLoader.load(
+    'assets/' + name + '.obj',
+    function (object) {
+      object.traverse(function (child) {
+        if (child instanceof THREE.Mesh) {
+          mesh = child;
+        }
+      });
 
-    scene.add(mesh);
-  }
-);
+      // Add celShadingMaterial
+      mesh.material = celShadingMaterial;
+      mesh.rotateX(-Math.PI/2);
+      mesh.translateZ(-2.5);
+
+      scene.add(mesh);
+    }
+  );
+}
+document.getElementById('mesh_selector').onchange = function(element) {
+  scene.remove(mesh);
+
+  loadMesh(element.target.value.toLowerCase());
+};
+
+// Display king by default
+loadMesh('king');
 
 function animate() {
   requestAnimationFrame(animate);
