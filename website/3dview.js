@@ -11,7 +11,7 @@ camera.position.y = 5.18;
 camera.position.z = 9.83;
 camera.lookAt(0.0, 0.0, 0.0);
 
-let renderer = new THREE.WebGLRenderer();
+let renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(width, height);
 container.appendChild(renderer.domElement);
 
