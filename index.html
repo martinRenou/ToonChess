@@ -53,15 +53,43 @@
       <h2 class="mt-4" style="border-top-style: solid;border-top-color: #e7e7e7;border-top-width: thin;"><b> How did I create this game? </b></h2>
       <h3 class="mt-3"> Toon Style </h3>
       <p class="text-justify">
-        I wanted a toon effect for my game, this effect can be performed using the cel-shading technique. Instead of using "normal" lighting, lights are computed using a threshold: if light intensity is more important than this threshold then the 3D-object will be bright and dark otherwise.  In ToonChess shaders, I actually used three thresholds, meaning four levels of lighting.
-        <div class="d-inline-block" style="text-align: center;">
-          <img src="images/NormalLights.png" class="rounded" style="max-width: 30%;height: auto;">
-          <img src="images/CelShading.png" class="rounded" style="max-width: 30%;height: auto;">
+        I wanted a toon effect for my game, this effect can be performed using the cel-shading technique. Instead of using "normal" lighting,
+        lights are computed using a threshold: if light intensity is more important than this threshold then the 3D-object will be bright and dark otherwise.
+        In ToonChess shaders, I actually used three thresholds, meaning four levels of lighting.
+        <div class="d-flex justify-content-center">
+          <div id="3dview_container"></div>
+          <form class="ml-3">
+            <div class="form-group">
+              <label for="mesh_selector">Mesh:</label>
+              <select class="form-control" id="mesh_selector">
+                <option>King</option>
+                <option>Queen</option>
+                <option>Bishop</option>
+                <option>Knight</option>
+                <option>Rook</option>
+                <option>Pawn</option>
+              </select>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="shading_checkbox" checked>
+              <label class="form-check-label" for="shading_checkbox">
+                Toon-Shading
+              </label>
+            </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="blackborder_checkbox" checked>
+              <label class="form-check-label" for="blackborder_checkbox">
+                Black Border
+              </label>
+            </div>
+          </form>
         </div>
       </p>
+      <div class="alert alert-light" role="alert">
+        3D view implemented with <a href="https://threejs.org/" class="alert-link">ThreeJS</a>.
+      </div>
       <p class="text-justify">
         I also wanted to display black borders for chess pieces. In order to explain how I did it I'll have to explain what Backface Culling is. Backface Culling is a step during rendering in which triangles of the mesh are sorted between displayed triangles (visible on the screen) and hidden triangles (not visible because of camera point of view). Hidden triangles are not rendered in order to save computation time. Now, in order to display black borders I chose to display those "hidden triangles" in black and to enlarge them. It results in a nice black border effect, without the need of a filtering step (I could have used a sobel filter for example).
-        <img src="images/BlackBorders.png" class="rounded mx-auto d-block" style="max-width: 30%;height: auto;">
       </p>
 
       <h3 class="mt-3"> Shadow Mapping </h3>
@@ -104,5 +132,114 @@
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+    <!-- Import THREEJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/90/three.min.js"></script>
+    <script src="website/THREEJS_plugins.js"></script>
+
+    <!-- Define Shaders -->
+    <script id="celShadingVertexShader" type="x-shader/x-vertex">
+    precision mediump float;
+    precision mediump int;
+
+    varying float vLightIntensity;
+
+    uniform vec3 lightDirection;
+
+    // View/Movement/Projection matrices
+    uniform mat4 modelViewMatrix;
+		uniform mat4 projectionMatrix;
+
+    // Normal matrix
+    uniform mat3 normalMatrix;
+
+    attribute vec3 position;
+    attribute vec3 normal;
+
+    void main(void){
+      // Compute the normal of the vertex and the light intensity
+      vec3 computedNormal = normalize(normalMatrix * normal);
+
+      vLightIntensity = - dot(normalize(lightDirection), computedNormal);
+
+      // The position of the vertex
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+    </script>
+
+    <script id="celShadingFragmentShader" type="x-shader/x-fragment">
+    precision mediump float;
+    precision mediump int;
+
+    varying float vLightIntensity;
+
+    uniform vec4 color;
+
+    float getLightFactor(){
+      float factor = 0.5;
+      if(vLightIntensity > 0.8) factor = 1.0;
+      else if (vLightIntensity > 0.3) factor = 0.9;
+      else if (vLightIntensity > 0.0) factor = 0.7;
+
+      return factor;
+    }
+
+    void main(void){
+      // Compute light factor
+      float factor = getLightFactor();
+
+      gl_FragColor = color * vec4(factor, factor, factor, 1.0);
+    }
+    </script>
+
+    <script id="normalShadingFragmentShader" type="x-shader/x-fragment">
+    precision mediump float;
+    precision mediump int;
+
+    varying float vLightIntensity;
+
+    uniform vec4 color;
+
+    float getLightFactor(){
+      return 0.5 * vLightIntensity + 0.5;
+    }
+
+    void main(void){
+      // Compute light factor
+      float factor = getLightFactor();
+
+      gl_FragColor = color * vec4(factor, factor, factor, 1.0);
+    }
+    </script>
+
+    <script id="blackBorderVertexShader" type="x-shader/x-vertex">
+    precision mediump float;
+    precision mediump int;
+
+    // View/Movement/Projection matrices
+    uniform mat4 modelViewMatrix;
+		uniform mat4 projectionMatrix;
+
+    attribute vec3 position;
+
+    void main(void){
+      // Enlarge the mesh
+      float factor = 0.1;
+      vec3 deformation = vec3(factor, factor, factor) * normalize(position);
+      vec3 deformedPosition = deformation + position;
+
+      // The position of the vertex
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(deformedPosition, 1.0);
+    }
+    </script>
+
+    <script id="blackBorderFragmentShader" type="x-shader/x-fragment">
+    void main(void){
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    </script>
+
+    <!-- JavaScript for the 3D view -->
+    <script src="website/3dview.js"></script>
   </body>
 </html>
