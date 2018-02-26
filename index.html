@@ -113,9 +113,13 @@
     <!-- Import THREEJS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/90/three.min.js"></script>
     <script src="website/OBJLoader.js"></script>
+    <script src="website/TrackballControls.js"></script>
 
     <!-- Define Shaders -->
     <script id="celShadingVertexShader" type="x-shader/x-vertex">
+    precision mediump float;
+    precision mediump int;
+
     varying float vLightIntensity;
 
     uniform vec3 lightDirection;
@@ -128,13 +132,13 @@
     uniform mat3 normalMatrix;
 
     attribute vec3 position;
-    vec3 normal;
+    attribute vec3 normal;
 
     void main(void){
       // Compute the normal of the vertex and the light intensity
-      normal = normalMatrix * gl_Normal;
+      vec3 computedNormal = normalize(normalMatrix * normal);
 
-      vLightIntensity = - dot(normalize(lightDirection), normalize(normal));
+      vLightIntensity = - dot(normalize(lightDirection), computedNormal);
 
       // The position of the vertex
       gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -142,6 +146,9 @@
     </script>
 
     <script id="celShadingFragmentShader" type="x-shader/x-fragment">
+    precision mediump float;
+    precision mediump int;
+
     varying float vLightIntensity;
 
     uniform vec4 color;
