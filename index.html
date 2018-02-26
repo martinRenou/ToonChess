@@ -76,6 +76,12 @@
                 Toon-Shading
               </label>
             </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="blackborder_checkbox">
+              <label class="form-check-label" for="blackborder_checkbox">
+                Black Border
+              </label>
+            </div>
           </form>
         </div>
       </p>
@@ -201,6 +207,33 @@
       float factor = getLightFactor();
 
       gl_FragColor = color * vec4(factor, factor, factor, 1.0);
+    }
+    </script>
+
+    <script id="blackBorderVertexShader" type="x-shader/x-vertex">
+    precision mediump float;
+    precision mediump int;
+
+    // View/Movement/Projection matrices
+    uniform mat4 modelViewMatrix;
+		uniform mat4 projectionMatrix;
+
+    attribute vec3 position;
+
+    void main(void){
+      // Enlarge the mesh
+      float factor = 0.1;
+      vec3 deformation = vec3(factor, factor, factor) * normalize(position);
+      vec3 deformedPosition = deformation + position;
+
+      // The position of the vertex
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(deformedPosition, 1.0);
+    }
+    </script>
+
+    <script id="blackBorderFragmentShader" type="x-shader/x-fragment">
+    void main(void){
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 1.0);
     }
     </script>
 

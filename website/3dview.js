@@ -24,7 +24,7 @@ controls.dynamicDampingFactor = 0.3;
 let lightDirection = new THREE.Vector3(-1.0, 1.0, -1.0);
 let meshColor = new THREE.Vector4(1.0, 0.93, 0.70, 1.0);
 
-// Load cel shading material
+// Load shaders material
 let celShadingMaterial = new THREE.RawShaderMaterial({
   uniforms: {
     lightDirection: { value: lightDirection },
@@ -43,7 +43,14 @@ let normalShadingMaterial = new THREE.RawShaderMaterial({
   fragmentShader: document.getElementById('normalShadingFragmentShader').textContent,
 });
 
+let blackBorderMaterial = new THREE.RawShaderMaterial({
+  vertexShader: document.getElementById('blackBorderVertexShader').textContent,
+  fragmentShader: document.getElementById('blackBorderFragmentShader').textContent,
+  side: THREE.BackSide,
+});
+
 let mesh;
+let blackBorder;
 let objLoader = new THREE.OBJLoader();
 
 // Callback function for the mesh selecting element
@@ -54,6 +61,7 @@ function loadMesh(name) {
       object.traverse(function (child) {
         if (child instanceof THREE.Mesh) {
           mesh = child;
+          blackBorder = child.clone();
         }
       });
 
@@ -63,15 +71,25 @@ function loadMesh(name) {
       } else {
         mesh.material = normalShadingMaterial;
       }
+
+      // Dispay black border according to the checkbox value
+      blackBorder.material = blackBorderMaterial;
+      blackBorder.visible = document.getElementById('blackborder_checkbox').checked;
+
+      blackBorder.rotateX(-Math.PI/2);
+      blackBorder.translateZ(-2.5);
+
       mesh.rotateX(-Math.PI/2);
       mesh.translateZ(-2.5);
 
       scene.add(mesh);
+      scene.add(blackBorder);
     }
   );
 }
 document.getElementById('mesh_selector').onchange = function(element) {
   scene.remove(mesh);
+  scene.remove(blackBorder);
 
   loadMesh(element.target.value.toLowerCase());
 };
@@ -83,6 +101,11 @@ document.getElementById('shading_checkbox').onchange = function(element) {
   } else {
     mesh.material = normalShadingMaterial;
   };
+};
+
+// Callback function for the blackborder
+document.getElementById('blackborder_checkbox').onchange = function(element) {
+  blackBorder.visible = document.getElementById('blackborder_checkbox').checked;
 };
 
 // Display king by default
