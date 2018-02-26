@@ -34,6 +34,15 @@ let celShadingMaterial = new THREE.RawShaderMaterial({
   fragmentShader: document.getElementById('celShadingFragmentShader').textContent,
 });
 
+let normalShadingMaterial = new THREE.RawShaderMaterial({
+  uniforms: {
+    lightDirection: { value: lightDirection },
+    color: { value: meshColor },
+  },
+  vertexShader: document.getElementById('celShadingVertexShader').textContent,
+  fragmentShader: document.getElementById('normalShadingFragmentShader').textContent,
+});
+
 let mesh;
 let objLoader = new THREE.OBJLoader();
 
@@ -48,8 +57,12 @@ function loadMesh(name) {
         }
       });
 
-      // Add celShadingMaterial
-      mesh.material = celShadingMaterial;
+      // Add material according to the checkbox value
+      if (document.getElementById('shading_checkbox').checked) {
+        mesh.material = celShadingMaterial;
+      } else {
+        mesh.material = normalShadingMaterial;
+      }
       mesh.rotateX(-Math.PI/2);
       mesh.translateZ(-2.5);
 
@@ -61,6 +74,15 @@ document.getElementById('mesh_selector').onchange = function(element) {
   scene.remove(mesh);
 
   loadMesh(element.target.value.toLowerCase());
+};
+
+// Callback function for the shading
+document.getElementById('shading_checkbox').onchange = function(element) {
+  if (element.target.checked) {
+    mesh.material = celShadingMaterial;
+  } else {
+    mesh.material = normalShadingMaterial;
+  };
 };
 
 // Display king by default

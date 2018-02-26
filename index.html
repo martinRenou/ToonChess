@@ -70,6 +70,12 @@
                 <option>Pawn</option>
               </select>
             </div>
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="shading_checkbox">
+              <label class="form-check-label" for="shading_checkbox">
+                Toon-Shading
+              </label>
+            </div>
           </form>
         </div>
       </p>
@@ -168,6 +174,26 @@
       else if (vLightIntensity > 0.0) factor = 0.7;
 
       return factor;
+    }
+
+    void main(void){
+      // Compute light factor
+      float factor = getLightFactor();
+
+      gl_FragColor = color * vec4(factor, factor, factor, 1.0);
+    }
+    </script>
+
+    <script id="normalShadingFragmentShader" type="x-shader/x-fragment">
+    precision mediump float;
+    precision mediump int;
+
+    varying float vLightIntensity;
+
+    uniform vec4 color;
+
+    float getLightFactor(){
+      return 0.5 * vLightIntensity + 0.5;
     }
 
     void main(void){
