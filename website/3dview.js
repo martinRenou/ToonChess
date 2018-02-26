@@ -6,8 +6,9 @@ scene.background = new THREE.Color('white');
 let width = 800;
 let height = 600;
 let camera = new THREE.PerspectiveCamera(75, width/height, 0.001, 400);
-camera.position.y = 10;
-camera.position.z = 5;
+camera.position.x = -6.36;
+camera.position.y = 5.18;
+camera.position.z = 9.83;
 camera.lookAt(0.0, 0.0, 0.0);
 
 let renderer = new THREE.WebGLRenderer();
