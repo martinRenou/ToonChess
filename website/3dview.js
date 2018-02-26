@@ -19,7 +19,6 @@ let controls = new THREE.TrackballControls(camera, renderer.domElement);
 controls.rotateSpeed = 3.0;
 controls.zoomSpeed = 1.2;
 controls.noPan = true;
-controls.staticMoving = true;
 controls.dynamicDampingFactor = 0.3;
 
 let lightDirection = new THREE.Vector3(-1.0, 1.0, -1.0);
