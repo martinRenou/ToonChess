@@ -56,17 +56,12 @@
         I wanted a toon effect for my game, this effect can be performed using the cel-shading technique. Instead of using "normal" lighting,
         lights are computed using a threshold: if light intensity is more important than this threshold then the 3D-object will be bright and dark otherwise.
         In ToonChess shaders, I actually used three thresholds, meaning four levels of lighting.
-        <div class="d-inline-block" style="text-align: center;">
-          <img src="images/NormalLights.png" class="rounded" style="max-width: 30%;height: auto;">
-          <img src="images/CelShading.png" class="rounded" style="max-width: 30%;height: auto;">
-        </div>
         <div class="d-flex justify-content-center">
           <div id="3dview_container"></div>
         </div>
       </p>
       <p class="text-justify">
         I also wanted to display black borders for chess pieces. In order to explain how I did it I'll have to explain what Backface Culling is. Backface Culling is a step during rendering in which triangles of the mesh are sorted between displayed triangles (visible on the screen) and hidden triangles (not visible because of camera point of view). Hidden triangles are not rendered in order to save computation time. Now, in order to display black borders I chose to display those "hidden triangles" in black and to enlarge them. It results in a nice black border effect, without the need of a filtering step (I could have used a sobel filter for example).
-        <img src="images/BlackBorders.png" class="rounded mx-auto d-block" style="max-width: 30%;height: auto;">
       </p>
 
       <h3 class="mt-3"> Shadow Mapping </h3>
