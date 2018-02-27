@@ -19,6 +19,7 @@ container.appendChild(renderer.domElement);
 let controls = new THREE.TrackballControls(camera, renderer.domElement);
 controls.rotateSpeed = 3.0;
 controls.zoomSpeed = 1.2;
+controls.maxDistance = 15;
 controls.noPan = true;
 controls.dynamicDampingFactor = 0.3;
 
