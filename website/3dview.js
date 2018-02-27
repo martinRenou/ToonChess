@@ -3,9 +3,10 @@ let container = document.getElementById('3dview_container');
 let scene = new THREE.Scene();
 scene.background = new THREE.Color('white');
 
-let width = 800;
-let height = 600;
-let camera = new THREE.PerspectiveCamera(75, width/height, 0.001, 400);
+let containerBoundingBox = container.getBoundingClientRect()
+let width = containerBoundingBox.width;
+let height = containerBoundingBox.height;
+let camera = new THREE.PerspectiveCamera(75, width/height, 0.01, 40);
 camera.position.x = -6.36;
 camera.position.y = 5.18;
 camera.position.z = 9.83;
@@ -110,6 +111,18 @@ document.getElementById('blackborder_checkbox').onchange = function(element) {
 
 // Display king by default
 loadMesh('king');
+
+// Event listener for window resizing
+function onWindowResize(){
+  containerBoundingBox = container.getBoundingClientRect()
+  width = containerBoundingBox.width;
+  height = containerBoundingBox.height;
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(width, height);
+}
+window.addEventListener('resize', onWindowResize, false);
 
 function animate() {
   requestAnimationFrame(animate);
