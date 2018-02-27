@@ -139,8 +139,8 @@
 
     <!-- Define Shaders -->
     <script id="celShadingVertexShader" type="x-shader/x-vertex">
-    precision mediump float;
-    precision mediump int;
+    precision highp float;
+    precision highp int;
 
     varying float vLightIntensity;
 
@@ -168,8 +168,8 @@
     </script>
 
     <script id="celShadingFragmentShader" type="x-shader/x-fragment">
-    precision mediump float;
-    precision mediump int;
+    precision highp float;
+    precision highp int;
 
     varying float vLightIntensity;
 
@@ -193,8 +193,8 @@
     </script>
 
     <script id="normalShadingFragmentShader" type="x-shader/x-fragment">
-    precision mediump float;
-    precision mediump int;
+    precision highp float;
+    precision highp int;
 
     varying float vLightIntensity;
 
@@ -213,8 +213,8 @@
     </script>
 
     <script id="blackBorderVertexShader" type="x-shader/x-vertex">
-    precision mediump float;
-    precision mediump int;
+    precision highp float;
+    precision highp int;
 
     // View/Movement/Projection matrices
     uniform mat4 modelViewMatrix;

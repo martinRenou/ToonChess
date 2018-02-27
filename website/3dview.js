@@ -6,7 +6,7 @@ scene.background = new THREE.Color('white');
 let containerBoundingBox = container.getBoundingClientRect()
 let width = containerBoundingBox.width;
 let height = containerBoundingBox.height;
-let camera = new THREE.PerspectiveCamera(75, width/height, 0.01, 40);
+let camera = new THREE.PerspectiveCamera(75, width/height, 0.01, 18);
 camera.position.x = -6.36;
 camera.position.y = 5.18;
 camera.position.z = 9.83;
@@ -19,6 +19,7 @@ container.appendChild(renderer.domElement);
 let controls = new THREE.TrackballControls(camera, renderer.domElement);
 controls.rotateSpeed = 3.0;
 controls.zoomSpeed = 1.2;
+controls.maxDistance = 15;
 controls.noPan = true;
 controls.dynamicDampingFactor = 0.3;
 
