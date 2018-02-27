@@ -5,7 +5,7 @@ scene.background = new THREE.Color('white');
 
 let width = 800;
 let height = 600;
-let camera = new THREE.PerspectiveCamera(75, width/height, 0.001, 400);
+let camera = new THREE.PerspectiveCamera(75, width/height, 0.01, 40);
 camera.position.x = -6.36;
 camera.position.y = 5.18;
 camera.position.z = 9.83;
