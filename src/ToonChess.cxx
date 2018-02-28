@@ -28,14 +28,14 @@
 /* Perform a cel-shading rendering in the current frameBuffer
   \param game The game instance
   \param gameInfo The current game informations
-  \param meshes The map of meshes
+  \param pieces The map of meshes
   \param programs The map of shader programs
   \param shadowMap The shadowMap texture
 */
 void celShadingRender(
   ChessGame* game,
   GameInfo* gameInfo,
-  std::map<int, Mesh*>* meshes,
+  std::map<int, Mesh*>* pieces,
   std::map<int, ShaderProgram*>* programs,
   GLuint shadowMap);
 
@@ -88,8 +88,11 @@ int main(){
     return 1;
   }
 
-  // Load meshes
-  std::map<int, Mesh*> meshes = initMeshes();
+  // Load pieces
+  std::map<int, Mesh*> pieces = initPieces();
+
+  // Load fragments
+  std::map<int, std::vector<Mesh*>> fragments = initFragments();
 
   // Initialize color picking
   ColorPicking* colorPicking = new ColorPicking(
@@ -181,7 +184,7 @@ int main(){
           // Get selected piece using color picking
           game->setNewSelectedPiecePosition(
             colorPicking->getClickedPiecePosition(
-                selectedPixelPosition, game, &gameInfo, &meshes, &programs
+                selectedPixelPosition, game, &gameInfo, &pieces, &programs
             )
           );
         }
@@ -228,7 +231,7 @@ int main(){
 
     // Create the shadowMap
     shadowMap = shadowMapping->getShadowMap(
-      game, &gameInfo, &meshes, &programs);
+      game, &gameInfo, &pieces, &programs);
 
     // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -239,7 +242,7 @@ int main(){
     glViewport(0, 0, gameInfo.width, gameInfo.height);
 
     // Display all pieces on the screen using the cel-shading effect
-    celShadingRender(game, &gameInfo, &meshes, &programs, shadowMap);
+    celShadingRender(game, &gameInfo, &pieces, &programs, shadowMap);
 
     // Perform the chess rules
     try{
@@ -249,7 +252,8 @@ int main(){
 
       window.close();
 
-      deleteMeshes(&meshes);
+      deletePieces(&pieces);
+      deleteFragments(&fragments);
       deletePrograms(&programs);
       delete colorPicking;
       delete shadowMapping;
@@ -265,7 +269,8 @@ int main(){
 
   window.close();
 
-  deleteMeshes(&meshes);
+  deletePieces(&pieces);
+  deleteFragments(&fragments);
   deletePrograms(&programs);
   delete colorPicking;
   delete shadowMapping;
@@ -277,7 +282,7 @@ int main(){
 void celShadingRender(
     ChessGame* game,
     GameInfo* gameInfo,
-    std::map<int, Mesh*>* meshes,
+    std::map<int, Mesh*>* pieces,
     std::map<int, ShaderProgram*>* programs,
     GLuint shadowMap){
   // The movement Matrix
@@ -323,14 +328,14 @@ void celShadingRender(
         blackBorderProgram->setBoolean("elevated", false);
 
       // Draw board cell
-      meshes->at(BOARDCELL)->draw();
+      pieces->at(BOARDCELL)->draw();
 
       // Draw piece
-      if(piece != EMPTY) meshes->at(abs(piece))->draw();
+      if(piece != EMPTY) pieces->at(abs(piece))->draw();
     }
   }
 
-  // Render all meshes with cell shading
+  // Render all pieces with cell shading
   glUseProgram(celShadingProgram->id);
   glCullFace(GL_BACK);
 
@@ -398,7 +403,7 @@ void celShadingRender(
         celShadingProgram->setBoolean("elevated", true) :
         celShadingProgram->setBoolean("elevated", false);
 
-      meshes->at(BOARDCELL)->draw();
+      pieces->at(BOARDCELL)->draw();
 
       if(piece != EMPTY){
         // Display cel-shading mesh
@@ -406,7 +411,7 @@ void celShadingRender(
           celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
           celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
 
-        meshes->at(abs(piece))->draw();
+        pieces->at(abs(piece))->draw();
       }
     }
   }
