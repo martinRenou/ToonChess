@@ -1,12 +1,12 @@
-#include <btShapeHull.h>
-#include <btConvexHullShape.h>
+#include <BulletCollision/CollisionShapes/btShapeHull.h>
+#include <BulletCollision/CollisionShapes/btConvexHullShape.h>
 
 #include "Fragment.hxx"
 
 Fragment::Fragment(Mesh* mesh) : mesh{mesh}{
   // Create a simplified version of the original mesh for optimization purppose
   btConvexHullShape* originalConvexHullShape = new btConvexHullShape();
-  for(unsigned int i = 0; i < mesh->vertices.size(); i++){
+  for(unsigned int i = 0; i < mesh->vertices.size() - 3; i += 3){
     originalConvexHullShape->addPoint(btVector3(
       mesh->vertices.at(i),
       mesh->vertices.at(i + 1),
