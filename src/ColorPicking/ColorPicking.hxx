@@ -45,7 +45,7 @@ public:
     \param width The screen width
     \param height The screen height
   */
-  void resizeBuffers(GLuint width, GLuint height);
+  void resizeBuffers(GLuint newWidth, GLuint newHeight);
 
   /* Get the cliked piece position according to the clicked pixel on the screen.
     This will perform a rendering in the framebuffer

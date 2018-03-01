@@ -119,19 +119,19 @@ void ColorPicking::initBuffers(){
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void ColorPicking::resizeBuffers(GLuint width, GLuint height){
+void ColorPicking::resizeBuffers(GLuint newWidth, GLuint newHeight){
   // If the resize is a shrinking of the screen, then don't do anything because
   // the buffer will do the job
-  if(width >= width and height >= height){
-    width = width;
-    height = height;
+  if(width >= newWidth and height >= newHeight){
+    width = newWidth;
+    height = newHeight;
 
     return;
   };
 
   // Change the size for the buffers
-  width = width;
-  height = height;
+  width = newWidth;
+  height = newHeight;
 
   deleteBuffers();
 
