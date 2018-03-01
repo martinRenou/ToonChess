@@ -25,6 +25,8 @@ set(
   ${CMAKE_SOURCE_DIR}/src/shader/shaderPrograms.cxx
   ${CMAKE_SOURCE_DIR}/src/ColorPicking/ColorPicking.cxx
   ${CMAKE_SOURCE_DIR}/src/ShadowMapping/ShadowMapping.cxx
+  ${CMAKE_SOURCE_DIR}/src/PhysicsWorld/Fragment.cxx
+  ${CMAKE_SOURCE_DIR}/src/PhysicsWorld/PhysicsWorld.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/ConnectionException.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/StockfishConnector.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/GameException.cxx
@@ -87,4 +89,5 @@ find_package(Bullet 2.8 REQUIRED)
 if(BULLET_FOUND)
   include_directories(${BULLET_INCLUDE_DIR})
   target_link_libraries(${EXECUTABLE_NAME} ${BULLET_LIBRARIES})
+  target_link_libraries(${TEST_NAME} ${BULLET_LIBRARIES})
 endif()
