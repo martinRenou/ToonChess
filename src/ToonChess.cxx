@@ -18,6 +18,8 @@
 #include "ColorPicking/ColorPicking.hxx"
 #include "ShadowMapping/ShadowMapping.hxx"
 
+#include "PhysicsWorld/PhysicsWorld.hxx"
+
 #include "constants.hxx"
 #include "GameInfo.hxx"
 #include "utils/utils.hxx"
@@ -40,6 +42,8 @@ void celShadingRender(
   GLuint shadowMap);
 
 int main(){
+  PhysicsWorld* physicsWorld = new PhysicsWorld();
+
   // Create an instance of the Game (This starts the communication with
   // Stockfish and could fail)
   ChessGame* game = new ChessGame();
@@ -49,6 +53,7 @@ int main(){
     std::cerr << e.what() << std::endl;
 
     delete game;
+    delete physicsWorld;
 
     return 1;
   }
@@ -84,6 +89,7 @@ int main(){
     std::cerr << e.what() << std::endl;
 
     delete game;
+    delete physicsWorld;
 
     return 1;
   }
@@ -226,6 +232,9 @@ int main(){
       }
     }
 
+    // Simulate dynamics world
+    physicsWorld->simulate();
+
     // Create the shadowMap
     shadowMap = shadowMapping->getShadowMap(
       game, &gameInfo, &pieces, &programs);
@@ -254,6 +263,7 @@ int main(){
       delete colorPicking;
       delete shadowMapping;
       delete game;
+      delete physicsWorld;
 
       return 1;
     }
@@ -270,6 +280,7 @@ int main(){
   delete colorPicking;
   delete shadowMapping;
   delete game;
+  delete physicsWorld;
 
   return 0;
 }
