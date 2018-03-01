@@ -6,6 +6,8 @@
 
 #include <GL/gl.h>
 
+#include <SFML/Graphics.hpp>
+
 #include "../mesh/Mesh.hxx"
 
 
@@ -18,6 +20,15 @@ class PhysicsWorld {
   public:
     /* Constructor */
     PhysicsWorld();
+
+    /* This will load fragment meshes and create the dynamic world */
+    void initWorld();
+
+    /* Adds a piece to the dynamic world and collapse it
+      \param piece Piece that you want to collapse: KING, QUEEN, BISHOP...
+      \param position The position of the piece on the grid
+    */
+    void collapsePiece(int piece, sf::Vector2i position);
 
     /* Fragment pool, it contains each fragment actually in the dynamic world as
       a Mesh*, and its placement as a movement matrix */
