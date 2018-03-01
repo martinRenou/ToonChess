@@ -1,9 +1,11 @@
 #include <gtest/gtest.h>
 
 #include "../../src/ChessGame/ChessGame.hxx"
+#include "../../src/PhysicsWorld/PhysicsWorld.hxx"
 
 TEST(chess_game, initialization){
-  ChessGame* game = new ChessGame();
+  PhysicsWorld* physicsWorld = new PhysicsWorld();
+  ChessGame* game = new ChessGame(physicsWorld);
   game->start();
 
   EXPECT_EQ(game->oldSelectedPiecePosition.x, -1);
@@ -32,10 +34,12 @@ TEST(chess_game, initialization){
       EXPECT_EQ(game->board[x][y], expectedBoard[x][y]);
 
   delete game;
+  delete physicsWorld;
 };
 
 TEST(chess_game, unselect_piece){
-  ChessGame* game = new ChessGame();
+  PhysicsWorld* physicsWorld = new PhysicsWorld();
+  ChessGame* game = new ChessGame(physicsWorld);
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -70,10 +74,12 @@ TEST(chess_game, unselect_piece){
       EXPECT_EQ(game->board[x][y], expectedBoard[x][y]);
 
   delete game;
+  delete physicsWorld;
 };
 
 TEST(chess_game, pawn_move_1){
-  ChessGame* game = new ChessGame();
+  PhysicsWorld* physicsWorld = new PhysicsWorld();
+  ChessGame* game = new ChessGame(physicsWorld);
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -108,10 +114,12 @@ TEST(chess_game, pawn_move_1){
       EXPECT_EQ(game->board[x][y], expectedBoard[x][y]);
 
   delete game;
+  delete physicsWorld;
 };
 
 TEST(chess_game, pawn_move_2){
-  ChessGame* game = new ChessGame();
+  PhysicsWorld* physicsWorld = new PhysicsWorld();
+  ChessGame* game = new ChessGame(physicsWorld);
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -140,10 +148,12 @@ TEST(chess_game, pawn_move_2){
       EXPECT_EQ(game->board[x][y], expectedBoard[x][y]);
 
   delete game;
+  delete physicsWorld;
 };
 
 TEST(chess_game, pawn_forbiden_move){
-  ChessGame* game = new ChessGame();
+  PhysicsWorld* physicsWorld = new PhysicsWorld();
+  ChessGame* game = new ChessGame(physicsWorld);
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -172,10 +182,12 @@ TEST(chess_game, pawn_forbiden_move){
       EXPECT_EQ(game->board[x][y], expectedBoard[x][y]);
 
   delete game;
+  delete physicsWorld;
 };
 
 TEST(chess_game, knight_move_1){
-  ChessGame* game = new ChessGame();
+  PhysicsWorld* physicsWorld = new PhysicsWorld();
+  ChessGame* game = new ChessGame(physicsWorld);
   game->start();
 
   // Select KNIGHT (simulating click on a pawn)
@@ -204,10 +216,12 @@ TEST(chess_game, knight_move_1){
       EXPECT_EQ(game->board[x][y], expectedBoard[x][y]);
 
   delete game;
+  delete physicsWorld;
 };
 
 TEST(chess_game, knight_move_2){
-  ChessGame* game = new ChessGame();
+  PhysicsWorld* physicsWorld = new PhysicsWorld();
+  ChessGame* game = new ChessGame(physicsWorld);
   game->start();
 
   // Select KNIGHT (simulating click on a pawn)
@@ -236,4 +250,5 @@ TEST(chess_game, knight_move_2){
       EXPECT_EQ(game->board[x][y], expectedBoard[x][y]);
 
   delete game;
+  delete physicsWorld;
 };

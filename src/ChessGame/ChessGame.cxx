@@ -4,7 +4,7 @@
 #include "ChessGame.hxx"
 
 
-ChessGame::ChessGame(){
+ChessGame::ChessGame(PhysicsWorld* physicsWorld) : physicsWorld{physicsWorld}{
   // Start communication with stockfish
   stockfishConnector = new StockfishConnector();
 
@@ -278,6 +278,11 @@ void ChessGame::perform(){
       // user wants to move a piece
       if(allowedNextPositions[selectedPiecePosition.x]
                              [selectedPiecePosition.y] == true){
+        // If the user took a AI piece, collapse it in the physicsWorld
+        int newPos = boardAt(selectedPiecePosition.x, selectedPiecePosition.y);
+        if(newPos < 0)
+          physicsWorld->collapsePiece(newPos, selectedPiecePosition);
+
         // Move the piece
         movePiece(oldSelectedPiecePosition, selectedPiecePosition);
 

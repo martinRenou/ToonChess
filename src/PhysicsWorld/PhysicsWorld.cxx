@@ -75,6 +75,8 @@ void PhysicsWorld::deleteFragments(int piece){
 
 void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
   // Create a rigid body for each fragment associated to the piece
+  //TODO: Be able to know if it's AI or user
+  piece = abs(piece);
   for(unsigned int i = 0; i < fragments.at(piece).size(); i++){
     btDefaultMotionState* fragmentMotionState = new btDefaultMotionState(
       btTransform(btQuaternion(0, 0, 0, 1),
@@ -90,7 +92,10 @@ void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
     btRigidBody* fragmentRigidBody = new btRigidBody(fallRigidBodyCI);
 
     // Add it to the fragmentPool
-    fragmentPool.push_back(fragmentRigidBody);
+    std::pair<btRigidBody*, Mesh*> pair(
+      fragmentRigidBody,
+      fragments.at(piece).at(i)->mesh);
+    fragmentPool.push_back(pair);
 
     // And add it to the world
     dynamicsWorld->addRigidBody(fragmentRigidBody);
@@ -119,8 +124,8 @@ PhysicsWorld::~PhysicsWorld(){
   // Delete rigid bodies
   if(fragmentPool.size() != 0)
     for(unsigned int i = fragmentPool.size() - 1; i > 0; i--){
-      delete fragmentPool.at(i)->getMotionState();
-      delete fragmentPool.at(i);
+      delete fragmentPool.at(i).first->getMotionState();
+      delete fragmentPool.at(i).first;
     }
 
   // Delete ground

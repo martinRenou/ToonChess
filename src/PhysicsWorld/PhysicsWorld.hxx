@@ -54,8 +54,8 @@ class PhysicsWorld {
     void collapsePiece(int piece, sf::Vector2i position);
 
     /* Fragment pool, it contains each fragment actually in the dynamics world
-      as a btRigidBody*, and its placement as a movement matrix */
-    std::vector<btRigidBody*> fragmentPool;
+      as a a pair of btRigidBody* and Mesh* */
+    std::vector<std::pair<btRigidBody*, Mesh*>> fragmentPool;
 
     /* Simulate method, this will update the position of each fragment of the
       fragment pool */

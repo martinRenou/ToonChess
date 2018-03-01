@@ -36,6 +36,7 @@
 */
 void celShadingRender(
   ChessGame* game,
+  PhysicsWorld* physicsWorld,
   GameInfo* gameInfo,
   std::map<int, Mesh*>* pieces,
   std::map<int, ShaderProgram*>* programs,
@@ -46,7 +47,7 @@ int main(){
 
   // Create an instance of the Game (This starts the communication with
   // Stockfish and could fail)
-  ChessGame* game = new ChessGame();
+  ChessGame* game = new ChessGame(physicsWorld);
   try{
     game->start();
   } catch(const std::exception& e){
@@ -248,7 +249,8 @@ int main(){
     glViewport(0, 0, gameInfo.width, gameInfo.height);
 
     // Display all pieces on the screen using the cel-shading effect
-    celShadingRender(game, &gameInfo, &pieces, &programs, shadowMap);
+    celShadingRender(
+      game, physicsWorld, &gameInfo, &pieces, &programs, shadowMap);
 
     // Perform the chess rules
     try{
@@ -287,6 +289,7 @@ int main(){
 
 void celShadingRender(
     ChessGame* game,
+    PhysicsWorld* physicsWorld,
     GameInfo* gameInfo,
     std::map<int, Mesh*>* pieces,
     std::map<int, ShaderProgram*>* programs,
@@ -308,6 +311,7 @@ void celShadingRender(
   blackBorderProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
   blackBorderProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
 
+  // Display pieces
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = game->board[x][y];
@@ -366,6 +370,31 @@ void celShadingRender(
     gameInfo->lightDirection.y, gameInfo->lightDirection.z
   );
 
+  // Display fragments
+  for(unsigned int i = 0; i < physicsWorld->fragmentPool.size(); i++){
+    btRigidBody* fragment = physicsWorld->fragmentPool.at(i).first;
+
+    // Get fragment placement
+    btTransform transform;
+    fragment->getMotionState()->getWorldTransform(transform);
+    btScalar _matrix[16];
+    transform.getOpenGLMatrix(_matrix);
+    std::vector<GLfloat> matrix(
+      _matrix,
+      _matrix + sizeof _matrix / sizeof _matrix[0]
+    );
+
+    // Set movement matrix
+    movementMatrix = matrix;
+
+    celShadingProgram->setBoolean("elevated", false);
+    celShadingProgram->setMoveMatrix(&movementMatrix);
+
+    // Draw fragment
+    // physicsWorld->fragmentPool.at(i).second->draw(true);
+  }
+
+  // Display pieces
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = game->board[x][y];

@@ -6,12 +6,16 @@
 #include <SFML/Graphics.hpp>
 
 #include "../constants.hxx"
+#include "../PhysicsWorld/PhysicsWorld.hxx"
 #include "StockfishConnector.hxx"
 
 
 // cppcheck-suppress noCopyConstructor
 class ChessGame {
 private:
+  /* PhysicsWorld */
+  PhysicsWorld* physicsWorld;
+
   /* Last user move */
   std::string lastUserMove;
 
@@ -81,7 +85,7 @@ private:
 
 public:
   /* Constructor */
-  ChessGame();
+  explicit ChessGame(PhysicsWorld* physicsWorld);
 
   /* The checkerboard */
   int board[8][8] = {
