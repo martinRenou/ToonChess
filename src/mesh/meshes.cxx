@@ -42,7 +42,7 @@ void deletePieces(std::map<int, Mesh*>* meshes){
   meshes->clear();
 };
 
-std::map<int, std::vector<Mesh*>> initFragments(){
+std::map<int, std::vector<Mesh*>> initFragmentMeshes(){
   // Create and load meshes
   std::vector<Mesh*> king_fragments = loadObjFile("../assets/king_fragments.obj");
   std::vector<Mesh*> queen_fragments = \
@@ -68,19 +68,19 @@ std::map<int, std::vector<Mesh*>> initFragments(){
   return meshes;
 };
 
-void _deleteFragments(std::vector<Mesh*>* fragments){
+void _deleteFragmentMeshes(std::vector<Mesh*>* fragments){
   if(fragments->size() != 0)
     for(unsigned int i = fragments->size() - 1; i > 0; i--)
       delete fragments->at(i);
 }
 
-void deleteFragments(std::map<int, std::vector<Mesh*>>* fragments){
-  _deleteFragments(&fragments->at(KING));
-  _deleteFragments(&fragments->at(QUEEN));
-  _deleteFragments(&fragments->at(BISHOP));
-  _deleteFragments(&fragments->at(ROOK));
-  _deleteFragments(&fragments->at(KNIGHT));
-  _deleteFragments(&fragments->at(PAWN));
+void deleteFragmentMeshes(std::map<int, std::vector<Mesh*>>* fragments){
+  _deleteFragmentMeshes(&fragments->at(KING));
+  _deleteFragmentMeshes(&fragments->at(QUEEN));
+  _deleteFragmentMeshes(&fragments->at(BISHOP));
+  _deleteFragmentMeshes(&fragments->at(ROOK));
+  _deleteFragmentMeshes(&fragments->at(KNIGHT));
+  _deleteFragmentMeshes(&fragments->at(PAWN));
 
   fragments->clear();
 };

@@ -91,9 +91,6 @@ int main(){
   // Load pieces
   std::map<int, Mesh*> pieces = initPieces();
 
-  // Load fragments
-  std::map<int, std::vector<Mesh*>> fragments = initFragments();
-
   // Initialize color picking
   ColorPicking* colorPicking = new ColorPicking(
     gameInfo.width, gameInfo.height);
@@ -253,7 +250,6 @@ int main(){
       window.close();
 
       deletePieces(&pieces);
-      deleteFragments(&fragments);
       deletePrograms(&programs);
       delete colorPicking;
       delete shadowMapping;
@@ -270,7 +266,6 @@ int main(){
   window.close();
 
   deletePieces(&pieces);
-  deleteFragments(&fragments);
   deletePrograms(&programs);
   delete colorPicking;
   delete shadowMapping;
