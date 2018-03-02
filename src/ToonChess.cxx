@@ -386,12 +386,18 @@ void celShadingRender(
 
     // Set movement matrix
     movementMatrix = matrix;
-
-    celShadingProgram->setBoolean("elevated", false);
     celShadingProgram->setMoveMatrix(&movementMatrix);
 
+    // Compute normal matrix (=inverse(transpose(movementMatrix)))
+    std::vector<GLfloat> normalMatrix = inverse(&movementMatrix);
+    normalMatrix = transpose(&normalMatrix);
+    celShadingProgram->setNormalMatrix(&normalMatrix);
+
+    celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0);
+    celShadingProgram->setBoolean("elevated", false);
+
     // Draw fragment
-    // physicsWorld->fragmentPool.at(i).second->draw(true);
+    physicsWorld->fragmentPool.at(i).second->draw();
   }
 
   // Display pieces
