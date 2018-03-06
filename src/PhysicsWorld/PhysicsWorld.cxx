@@ -39,64 +39,22 @@ PhysicsWorld::PhysicsWorld(std::map<int, std::vector<Mesh*>>* fragmentMeshes)
     0, groundMotionState, groundShape, btVector3(0, 0, 0));
   groundRigidBody = new btRigidBody(groundRigidBodyCI);
   dynamicsWorld->addRigidBody(groundRigidBody);
-
-  fragments.insert(std::pair<int, std::vector<Fragment*>>(
-    KING, initFragments(KING)));
-  fragments.insert(std::pair<int, std::vector<Fragment*>>(
-    QUEEN, initFragments(QUEEN)));
-  fragments.insert(std::pair<int, std::vector<Fragment*>>(
-    BISHOP, initFragments(BISHOP)));
-  fragments.insert(std::pair<int, std::vector<Fragment*>>(
-    KNIGHT, initFragments(KNIGHT)));
-  fragments.insert(std::pair<int, std::vector<Fragment*>>(
-    ROOK, initFragments(ROOK)));
-  fragments.insert(std::pair<int, std::vector<Fragment*>>(
-    PAWN, initFragments(PAWN)));
-};
-
-std::vector<Fragment*> PhysicsWorld::initFragments(int piece){
-  std::vector<Fragment*> pieceFragments;
-
-  // Create a Fragment instance for each Mesh instance
-  for(unsigned int i = 0; i < fragmentMeshes->at(piece).size(); i++){
-    pieceFragments.push_back(new Fragment(fragmentMeshes->at(piece).at(i)));
-  }
-
-  return pieceFragments;
-};
-
-void PhysicsWorld::deleteFragments(int piece){
-  if(fragments.at(piece).size() != 0)
-    for(unsigned int i = fragments.at(piece).size() - 1; i > 0; i--)
-      delete fragments.at(piece).at(i);
 };
 
 void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
-  // Create a rigid body for each fragment associated to the piece
-  //TODO: Be able to know if it's AI or user
-  piece = abs(piece);
-  for(unsigned int i = 0; i < fragments.at(piece).size(); i++){
-    btDefaultMotionState* fragmentMotionState = new btDefaultMotionState(
-      btTransform(btQuaternion(0, 0, 0, 1),
-      btVector3(position.x * 4 - 14, position.y * 4 - 14, 0))
-    );
-
-    btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(
-      fragments.at(piece).at(i)->mass,
-      fragmentMotionState,
-      fragments.at(piece).at(i)->convexHullShape,
-      fragments.at(piece).at(i)->inertia
-    );
-    btRigidBody* fragmentRigidBody = new btRigidBody(fallRigidBodyCI);
+  // Create a fragment for each fragmentMesh of the piece
+  int absPiece = abs(piece);
+  for(unsigned int i = 0; i < fragmentMeshes->at(absPiece).size(); i++){
+    // Create Fragment instance
+    Fragment* fragment = new Fragment(
+      fragmentMeshes->at(absPiece).at(i), position);
 
     // Add it to the fragmentPool
-    std::pair<btRigidBody*, Mesh*> pair(
-      fragmentRigidBody,
-      fragments.at(piece).at(i)->mesh);
+    std::pair<int, Fragment*> pair(piece, fragment);
     fragmentPool.push_back(pair);
 
     // And add it to the world
-    dynamicsWorld->addRigidBody(fragmentRigidBody);
+    dynamicsWorld->addRigidBody(fragment->rigidBody);
   }
 };
 
@@ -108,20 +66,12 @@ void PhysicsWorld::simulate(){
 };
 
 PhysicsWorld::~PhysicsWorld(){
-  // Delete fragments
-  deleteFragments(KING);
-  deleteFragments(QUEEN);
-  deleteFragments(BISHOP);
-  deleteFragments(KNIGHT);
-  deleteFragments(ROOK);
-  deleteFragments(PAWN);
-
   // Delete rigid bodies
   if(fragmentPool.size() != 0)
     for(unsigned int i = fragmentPool.size() - 1; i > 0; i--){
-      delete fragmentPool.at(i).first->getMotionState();
-      delete fragmentPool.at(i).first;
+      delete fragmentPool.at(i).second;
     }
+  fragmentPool.clear();
 
   // Delete ground
   delete groundShape;

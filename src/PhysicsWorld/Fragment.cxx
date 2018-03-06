@@ -1,9 +1,11 @@
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 #include <BulletCollision/CollisionShapes/btConvexHullShape.h>
 
+#include <SFML/Graphics.hpp>
+
 #include "Fragment.hxx"
 
-Fragment::Fragment(Mesh* mesh) : mesh{mesh}{
+Fragment::Fragment(Mesh* mesh, sf::Vector2i position) : mesh{mesh}{
   // Create a simplified version of the original mesh for optimization purppose
   btConvexHullShape* originalConvexHullShape = new btConvexHullShape();
   for(unsigned int i = 0; i < mesh->vertices.size() / 3; i ++){
@@ -24,9 +26,26 @@ Fragment::Fragment(Mesh* mesh) : mesh{mesh}{
   mass = 1;
   inertia = btVector3(0, 0, 0);
   convexHullShape->calculateLocalInertia(1, inertia);
+
+  // Create the motion state
+  motionState = new btDefaultMotionState(
+    btTransform(btQuaternion(0, 0, 0, 1),
+    btVector3(position.x * 4 - 14, position.y * 4 - 14, 0))
+  );
+
+  // And the rigid body
+  btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(
+    mass,
+    motionState,
+    convexHullShape,
+    inertia
+  );
+  rigidBody = new btRigidBody(fallRigidBodyCI);
 }
 
 Fragment::~Fragment(){
   delete convexHullShape;
   delete hull;
+  delete motionState;
+  delete rigidBody;
 }

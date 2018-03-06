@@ -21,10 +21,6 @@ class PhysicsWorld {
       piece */
     std::map<int, std::vector<Mesh*>>* fragmentMeshes;
 
-    /* Map of fragments, it contains the Fragment instances associated to each
-      piece */
-    std::map<int, std::vector<Fragment*>> fragments;
-
     /* Dynamics world */
     btBroadphaseInterface* broadphase;
     btDefaultCollisionConfiguration* collisionConfiguration;
@@ -37,12 +33,6 @@ class PhysicsWorld {
     btDefaultMotionState* groundMotionState;
     btRigidBody* groundRigidBody;
 
-    /* Initialize the list of fragment instances, given the piece */
-    std::vector<Fragment*> initFragments(int piece);
-
-    /* Delete fragments from memory, given the piece */
-    void deleteFragments(int piece);
-
   public:
     /* Constructor */
     explicit PhysicsWorld(std::map<int, std::vector<Mesh*>>* fragmentMeshes);
@@ -54,8 +44,8 @@ class PhysicsWorld {
     void collapsePiece(int piece, sf::Vector2i position);
 
     /* Fragment pool, it contains each fragment actually in the dynamics world
-      as a a pair of btRigidBody* and Mesh* */
-    std::vector<std::pair<btRigidBody*, Mesh*>> fragmentPool;
+      as a a pair of int (PAWN, KING...) and Fragment* */
+    std::vector<std::pair<int, Fragment*>> fragmentPool;
 
     /* Simulate method, this will update the position of each fragment of the
       fragment pool */

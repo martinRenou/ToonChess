@@ -4,6 +4,8 @@
 #include <btBulletDynamicsCommon.h>
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 
+#include <SFML/Graphics.hpp>
+
 #include "../mesh/Mesh.hxx"
 
 
@@ -11,11 +13,17 @@
 class Fragment {
   public:
     /* Constructor */
-    explicit Fragment(Mesh* mesh);
+    explicit Fragment(Mesh* mesh, sf::Vector2i position);
 
-    /* Fragment shape */
+    /* Shape */
     btShapeHull* hull;
     btConvexHullShape* convexHullShape;
+
+    /* Motion State */
+    btDefaultMotionState* motionState;
+
+    /* Rigid body */
+    btRigidBody* rigidBody;
 
     /* Mesh */
     Mesh* mesh;

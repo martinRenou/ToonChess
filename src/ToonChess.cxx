@@ -377,11 +377,11 @@ void celShadingRender(
 
   // Display fragments
   for(unsigned int i = 0; i < physicsWorld->fragmentPool.size(); i++){
-    btRigidBody* fragment = physicsWorld->fragmentPool.at(i).first;
+    Fragment* fragment = physicsWorld->fragmentPool.at(i).second;
 
     // Get fragment placement
     btTransform transform;
-    fragment->getMotionState()->getWorldTransform(transform);
+    fragment->rigidBody->getMotionState()->getWorldTransform(transform);
     btScalar _matrix[16];
     transform.getOpenGLMatrix(_matrix);
     std::vector<GLfloat> matrix(
@@ -398,11 +398,14 @@ void celShadingRender(
     normalMatrix = transpose(&normalMatrix);
     celShadingProgram->setNormalMatrix(&normalMatrix);
 
-    celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0);
+    // Compute color depending of the team
+    physicsWorld->fragmentPool.at(i).first > 0 ?
+      celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
+      celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
     celShadingProgram->setBoolean("elevated", false);
 
     // Draw fragment
-    physicsWorld->fragmentPool.at(i).second->draw();
+    fragment->mesh->draw();
   }
 
   // Display pieces
