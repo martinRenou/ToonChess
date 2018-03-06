@@ -6,11 +6,11 @@
 Fragment::Fragment(Mesh* mesh) : mesh{mesh}{
   // Create a simplified version of the original mesh for optimization purppose
   btConvexHullShape* originalConvexHullShape = new btConvexHullShape();
-  for(unsigned int i = 0; i < mesh->vertices.size() - 3; i += 3){
+  for(unsigned int i = 0; i < mesh->vertices.size() / 3; i ++){
     originalConvexHullShape->addPoint(btVector3(
-      mesh->vertices.at(i),
-      mesh->vertices.at(i + 1),
-      mesh->vertices.at(i + 2)
+      mesh->vertices.at(3 * i),
+      mesh->vertices.at(3 * i + 1),
+      mesh->vertices.at(3 * i + 2)
     ));
   }
   btShapeHull* hull = new btShapeHull(originalConvexHullShape);
