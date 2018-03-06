@@ -19,7 +19,7 @@ class PhysicsWorld {
   private:
     /* Map of fragments, it contains the Mesh instances associated to each
       piece */
-    std::map<int, std::vector<Mesh*>> fragmentMeshes;
+    std::map<int, std::vector<Mesh*>>* fragmentMeshes;
 
     /* Map of fragments, it contains the Fragment instances associated to each
       piece */
@@ -45,7 +45,7 @@ class PhysicsWorld {
 
   public:
     /* Constructor */
-    PhysicsWorld();
+    explicit PhysicsWorld(std::map<int, std::vector<Mesh*>>* fragmentMeshes);
 
     /* Adds a piece to the dynamics world and collapse it
       \param piece Piece that you want to collapse: KING, QUEEN, BISHOP...

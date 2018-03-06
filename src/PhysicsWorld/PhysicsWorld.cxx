@@ -13,7 +13,8 @@
 
 #include "PhysicsWorld.hxx"
 
-PhysicsWorld::PhysicsWorld(){
+PhysicsWorld::PhysicsWorld(std::map<int, std::vector<Mesh*>>* fragmentMeshes)
+    : fragmentMeshes{fragmentMeshes}{
   // Create dynamics world
   broadphase = new btDbvtBroadphase();
   collisionConfiguration = new btDefaultCollisionConfiguration();
@@ -39,9 +40,6 @@ PhysicsWorld::PhysicsWorld(){
   groundRigidBody = new btRigidBody(groundRigidBodyCI);
   dynamicsWorld->addRigidBody(groundRigidBody);
 
-  // Load fragment meshes and initialize fragment of each chess piece
-  fragmentMeshes = initFragmentMeshes();
-
   fragments.insert(std::pair<int, std::vector<Fragment*>>(
     KING, initFragments(KING)));
   fragments.insert(std::pair<int, std::vector<Fragment*>>(
@@ -60,8 +58,8 @@ std::vector<Fragment*> PhysicsWorld::initFragments(int piece){
   std::vector<Fragment*> pieceFragments;
 
   // Create a Fragment instance for each Mesh instance
-  for(unsigned int i = 0; i < fragmentMeshes.at(piece).size(); i++){
-    pieceFragments.push_back(new Fragment(fragmentMeshes.at(piece).at(i)));
+  for(unsigned int i = 0; i < fragmentMeshes->at(piece).size(); i++){
+    pieceFragments.push_back(new Fragment(fragmentMeshes->at(piece).at(i)));
   }
 
   return pieceFragments;
@@ -110,9 +108,6 @@ void PhysicsWorld::simulate(){
 };
 
 PhysicsWorld::~PhysicsWorld(){
-  // Delete fragments
-  deleteFragmentMeshes(&fragmentMeshes);
-
   // Delete fragments
   deleteFragments(KING);
   deleteFragments(QUEEN);
