@@ -13,11 +13,12 @@ Fragment::Fragment(Mesh* mesh) : mesh{mesh}{
       mesh->vertices.at(3 * i + 2)
     ));
   }
-  btShapeHull* hull = new btShapeHull(originalConvexHullShape);
+  hull = new btShapeHull(originalConvexHullShape);
   btScalar margin = originalConvexHullShape->getMargin();
   hull->buildHull(margin);
   convexHullShape = new btConvexHullShape(
     (btScalar*)hull->getVertexPointer(), hull->numVertices());
+  delete originalConvexHullShape;
 
   // Compute inertia of the shape
   mass = 1;
@@ -27,4 +28,5 @@ Fragment::Fragment(Mesh* mesh) : mesh{mesh}{
 
 Fragment::~Fragment(){
   delete convexHullShape;
+  delete hull;
 }

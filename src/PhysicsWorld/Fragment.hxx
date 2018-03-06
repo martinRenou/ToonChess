@@ -2,6 +2,7 @@
 #define FRAGMENT_HXX_
 
 #include <btBulletDynamicsCommon.h>
+#include <BulletCollision/CollisionShapes/btShapeHull.h>
 
 #include "../mesh/Mesh.hxx"
 
@@ -13,6 +14,7 @@ class Fragment {
     explicit Fragment(Mesh* mesh);
 
     /* Fragment shape */
+    btShapeHull* hull;
     btConvexHullShape* convexHullShape;
 
     /* Mesh */
