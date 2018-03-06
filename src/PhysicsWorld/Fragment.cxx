@@ -43,6 +43,19 @@ Fragment::Fragment(Mesh* mesh, sf::Vector2i position) : mesh{mesh}{
   rigidBody = new btRigidBody(fallRigidBodyCI);
 }
 
+std::vector<GLfloat> Fragment::getMoveMatrix(){
+  btTransform transform;
+  rigidBody->getMotionState()->getWorldTransform(transform);
+  btScalar _matrix[16];
+  transform.getOpenGLMatrix(_matrix);
+  std::vector<GLfloat> matrix(
+    _matrix,
+    _matrix + sizeof _matrix / sizeof _matrix[0]
+  );
+
+  return matrix;
+};
+
 Fragment::~Fragment(){
   delete convexHullShape;
   delete hull;

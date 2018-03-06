@@ -31,6 +31,11 @@ class Fragment {
     btVector3 inertia;
     float mass;
 
+    /* Returns the movement matrix of the Fragment
+      \return movement matrix as a vector of GLfloat
+    */
+    std::vector<GLfloat> getMoveMatrix();
+
     /* Destructor */
     ~Fragment();
 };

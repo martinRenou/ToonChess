@@ -320,18 +320,8 @@ void celShadingRender(
   for(unsigned int i = 0; i < physicsWorld->fragmentPool.size(); i++){
     Fragment* fragment = physicsWorld->fragmentPool.at(i).second;
 
-    // Get fragment placement
-    btTransform transform;
-    fragment->rigidBody->getMotionState()->getWorldTransform(transform);
-    btScalar _matrix[16];
-    transform.getOpenGLMatrix(_matrix);
-    std::vector<GLfloat> matrix(
-      _matrix,
-      _matrix + sizeof _matrix / sizeof _matrix[0]
-    );
-
     // Set movement matrix
-    movementMatrix = matrix;
+    movementMatrix = fragment->getMoveMatrix();
     blackBorderProgram->setMoveMatrix(&movementMatrix);
 
     // Compute normal matrix (=inverse(transpose(movementMatrix)))
@@ -408,18 +398,8 @@ void celShadingRender(
   for(unsigned int i = 0; i < physicsWorld->fragmentPool.size(); i++){
     Fragment* fragment = physicsWorld->fragmentPool.at(i).second;
 
-    // Get fragment placement
-    btTransform transform;
-    fragment->rigidBody->getMotionState()->getWorldTransform(transform);
-    btScalar _matrix[16];
-    transform.getOpenGLMatrix(_matrix);
-    std::vector<GLfloat> matrix(
-      _matrix,
-      _matrix + sizeof _matrix / sizeof _matrix[0]
-    );
-
     // Set movement matrix
-    movementMatrix = matrix;
+    movementMatrix = fragment->getMoveMatrix();
     celShadingProgram->setMoveMatrix(&movementMatrix);
 
     // Compute normal matrix (=inverse(transpose(movementMatrix)))
