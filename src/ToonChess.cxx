@@ -316,6 +316,35 @@ void celShadingRender(
   blackBorderProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
   blackBorderProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
 
+  // Display fragments black borders
+  for(unsigned int i = 0; i < physicsWorld->fragmentPool.size(); i++){
+    Fragment* fragment = physicsWorld->fragmentPool.at(i).second;
+
+    // Get fragment placement
+    btTransform transform;
+    fragment->rigidBody->getMotionState()->getWorldTransform(transform);
+    btScalar _matrix[16];
+    transform.getOpenGLMatrix(_matrix);
+    std::vector<GLfloat> matrix(
+      _matrix,
+      _matrix + sizeof _matrix / sizeof _matrix[0]
+    );
+
+    // Set movement matrix
+    movementMatrix = matrix;
+    blackBorderProgram->setMoveMatrix(&movementMatrix);
+
+    // Compute normal matrix (=inverse(transpose(movementMatrix)))
+    std::vector<GLfloat> normalMatrix = inverse(&movementMatrix);
+    normalMatrix = transpose(&normalMatrix);
+    blackBorderProgram->setNormalMatrix(&normalMatrix);
+
+    blackBorderProgram->setBoolean("elevated", false);
+
+    // Draw fragment
+    fragment->mesh->draw();
+  }
+
   // Display pieces
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
