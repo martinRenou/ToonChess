@@ -33,6 +33,9 @@ class PhysicsWorld {
     btDefaultMotionState* groundMotionState;
     btRigidBody* groundRigidBody;
 
+    /* Inner clock for stepping simulation */
+    sf::Clock* innerClock;
+
   public:
     /* Constructor */
     explicit PhysicsWorld(std::map<int, std::vector<Mesh*>>* fragmentMeshes);

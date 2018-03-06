@@ -39,6 +39,9 @@ PhysicsWorld::PhysicsWorld(std::map<int, std::vector<Mesh*>>* fragmentMeshes)
     0, groundMotionState, groundShape, btVector3(0, 0, 0));
   groundRigidBody = new btRigidBody(groundRigidBodyCI);
   dynamicsWorld->addRigidBody(groundRigidBody);
+
+  // Start the innerClock
+  innerClock = new sf::Clock();
 };
 
 void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
@@ -60,9 +63,8 @@ void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
 
 void PhysicsWorld::simulate(){
   // Simulate the dynamics world
-  //TODO: Clock that computes the time since the last simlation call
-  //TODO: Check what is needed for the second argument
-  dynamicsWorld->stepSimulation(1 / 60.f, 10);
+  dynamicsWorld->stepSimulation(innerClock->getElapsedTime().asSeconds(), 7);
+  innerClock->restart();
 };
 
 PhysicsWorld::~PhysicsWorld(){
@@ -84,4 +86,7 @@ PhysicsWorld::~PhysicsWorld(){
   delete dispatcher;
   delete collisionConfiguration;
   delete broadphase;
+
+  // Delete clock
+  delete innerClock;
 }
