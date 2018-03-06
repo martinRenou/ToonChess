@@ -44,16 +44,6 @@ void ChessGame::movePiece(sf::Vector2i lastPosition, sf::Vector2i newPosition){
   board[newPosition.x][newPosition.y] = piece;
 };
 
-void ChessGame::movePiece(std::string movement){
-  std::string lastPosition_str = movement.substr(0, 2);
-  std::string newPosition_str = movement.substr(2, 2);
-
-  sf::Vector2i lastPosition = uciFormatToPosition(lastPosition_str);
-  sf::Vector2i newPosition = uciFormatToPosition(newPosition_str);
-
-  movePiece(lastPosition, newPosition);
-};
-
 const int ChessGame::boardAt(int x, int y){
   if(0 <= x and x < 8 and 0 <= y and y < 8){
     return board[x][y];
@@ -279,9 +269,10 @@ void ChessGame::perform(){
       if(allowedNextPositions[selectedPiecePosition.x]
                              [selectedPiecePosition.y] == true){
         // If the user took a AI piece, collapse it in the physicsWorld
-        int newPos = boardAt(selectedPiecePosition.x, selectedPiecePosition.y);
-        if(newPos < 0)
-          physicsWorld->collapsePiece(newPos, selectedPiecePosition);
+        int pieceAtPosition = boardAt(
+          selectedPiecePosition.x, selectedPiecePosition.y);
+        if(pieceAtPosition < 0)
+          physicsWorld->collapsePiece(pieceAtPosition, selectedPiecePosition);
 
         // Move the piece
         movePiece(oldSelectedPiecePosition, selectedPiecePosition);
@@ -324,7 +315,15 @@ void ChessGame::perform(){
         throw GameException("A forbiden move has been performed!");
       }
 
-      movePiece(aiMove);
+      // If the AI took a user's piece, collapse it in the physicsWorld
+      sf::Vector2i aiMoveEndPosition = uciFormatToPosition(
+        aiMove.substr(2, 2));
+      int pieceAtPosition = boardAt(
+        aiMoveEndPosition.x, aiMoveEndPosition.y);
+      if(pieceAtPosition > 0)
+        physicsWorld->collapsePiece(pieceAtPosition, aiMoveEndPosition);
+
+      movePiece(aiMoveStartPosition, aiMoveEndPosition);
 
       // Get suggested user next move if available
       if(stockfishConnector->suggestedUserMove.compare("(none)") != 0){
