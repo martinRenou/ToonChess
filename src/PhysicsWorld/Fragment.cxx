@@ -40,6 +40,9 @@ Fragment::Fragment(Mesh* mesh, sf::Vector2i position) : mesh{mesh}{
     convexHullShape,
     inertia
   );
+  fallRigidBodyCI.m_friction = 0.5;
+  fallRigidBodyCI.m_linearDamping = 0.4;
+  fallRigidBodyCI.m_angularDamping = 0.4;
   rigidBody = new btRigidBody(fallRigidBodyCI);
 }
 
