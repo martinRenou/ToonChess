@@ -60,7 +60,7 @@ int main(){
       sf::Style::Default,
       settings
   );
-  window.setFramerateLimit(60);
+  window.setFramerateLimit(30);
   // Enable depth test
   glEnable(GL_DEPTH_TEST);
   // Enable backface culling
