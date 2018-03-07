@@ -22,6 +22,9 @@ class Mesh {
     /* ID of the indices buffer */
     GLuint indexBufferId;
 
+    /* Mass of the mesh */
+    GLfloat mass = 1;
+
     /* Constructor */
     explicit Mesh();
 

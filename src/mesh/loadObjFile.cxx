@@ -71,6 +71,13 @@ std::vector<Mesh *> loadObjFile(const std::string& filePath){
       continue;
     }
 
+    // The line starts with an "m", it's the mesh's mass
+    if(splittedLine.at(0).compare("m") == 0){
+      currentMesh->mass = std::stoi(splittedLine.at(1));
+
+      continue;
+    }
+
     // The line starts with a "v", it's a new vertex
     if(splittedLine.at(0).compare("v") == 0){
       extractFloatVec3(&splittedLine, &unsortedVertices);

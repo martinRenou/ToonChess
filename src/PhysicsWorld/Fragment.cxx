@@ -23,7 +23,7 @@ Fragment::Fragment(Mesh* mesh, sf::Vector2i position) : mesh{mesh}{
   delete originalConvexHullShape;
 
   // Compute inertia of the shape
-  mass = 1;
+  mass = mesh->mass;
   inertia = btVector3(0, 0, 0);
   convexHullShape->calculateLocalInertia(1, inertia);
 
