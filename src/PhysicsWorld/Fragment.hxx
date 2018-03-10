@@ -13,7 +13,7 @@
 class Fragment {
   public:
     /* Constructor */
-    explicit Fragment(Mesh* mesh, sf::Vector2i position);
+    explicit Fragment(Mesh* mesh, sf::Vector2i position, GLfloat rotation);
 
     /* Shape */
     btShapeHull* hull;

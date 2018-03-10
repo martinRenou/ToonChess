@@ -49,8 +49,9 @@ void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
   int absPiece = abs(piece);
   for(unsigned int i = 0; i < fragmentMeshes->at(absPiece).size(); i++){
     // Create Fragment instance
+    GLfloat rotation = piece > 0 ? -90 : 90;
     Fragment* fragment = new Fragment(
-      fragmentMeshes->at(absPiece).at(i), position);
+      fragmentMeshes->at(absPiece).at(i), position, rotation);
 
     // Add it to the fragmentPool
     std::pair<int, Fragment*> pair(piece, fragment);

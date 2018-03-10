@@ -1,3 +1,5 @@
+#include <math.h>
+
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 #include <BulletCollision/CollisionShapes/btConvexHullShape.h>
 
@@ -5,7 +7,8 @@
 
 #include "Fragment.hxx"
 
-Fragment::Fragment(Mesh* mesh, sf::Vector2i position) : mesh{mesh}{
+Fragment::Fragment(Mesh* mesh, sf::Vector2i position, GLfloat rotation)
+    : mesh{mesh}{
   // Create a simplified version of the original mesh for optimization purppose
   btConvexHullShape* originalConvexHullShape = new btConvexHullShape();
   for(unsigned int i = 0; i < mesh->vertices.size() / 3; i ++){
@@ -30,7 +33,7 @@ Fragment::Fragment(Mesh* mesh, sf::Vector2i position) : mesh{mesh}{
 
   // Create the motion state
   motionState = new btDefaultMotionState(
-    btTransform(btQuaternion(0, 0, 0, 1),
+    btTransform(btQuaternion(btVector3(0, 0, 1), rotation * M_PI/180.),
     btVector3(
       position.x * 4 - 14 + origin.x,
       position.y * 4 - 14 + origin.y,
