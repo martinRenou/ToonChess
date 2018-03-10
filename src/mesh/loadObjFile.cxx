@@ -2,6 +2,8 @@
 
 #include <GL/gl.h>
 
+#include <SFML/Graphics.hpp>
+
 #include "loadObjFile.hxx"
 
 #include <string>
@@ -74,6 +76,17 @@ std::vector<Mesh *> loadObjFile(const std::string& filePath){
     // The line starts with an "m", it's the mesh's mass
     if(splittedLine.at(0).compare("m") == 0){
       currentMesh->mass = std::stoi(splittedLine.at(1));
+
+      continue;
+    }
+
+    // The line starts with "origin", it's the mesh's origin
+    if(splittedLine.at(0).compare("origin") == 0){
+      currentMesh->origin = sf::Vector3f(
+        std::stof(splittedLine.at(1)),
+        std::stof(splittedLine.at(2)),
+        std::stof(splittedLine.at(3))
+      );
 
       continue;
     }

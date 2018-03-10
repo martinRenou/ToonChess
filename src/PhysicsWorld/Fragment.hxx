@@ -31,6 +31,9 @@ class Fragment {
     btVector3 inertia;
     float mass;
 
+    /* Origin of the fragment */
+    sf::Vector3f origin;
+
     /* Returns the movement matrix of the Fragment
       \return movement matrix as a vector of GLfloat
     */

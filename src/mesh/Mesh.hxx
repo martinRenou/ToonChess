@@ -3,6 +3,8 @@
 
 #include <GL/gl.h>
 
+#include <SFML/Graphics.hpp>
+
 #include <vector>
 
 
@@ -24,6 +26,9 @@ class Mesh {
 
     /* Mass of the mesh */
     GLfloat mass = 1;
+
+    /* Origin of the mesh */
+    sf::Vector3f origin = {0.0, 0.0, 0.0};
 
     /* Constructor */
     explicit Mesh();

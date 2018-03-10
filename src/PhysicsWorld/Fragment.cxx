@@ -24,13 +24,18 @@ Fragment::Fragment(Mesh* mesh, sf::Vector2i position) : mesh{mesh}{
 
   // Compute inertia of the shape
   mass = mesh->mass;
+  origin = mesh->origin;
   inertia = btVector3(0, 0, 0);
   convexHullShape->calculateLocalInertia(1, inertia);
 
   // Create the motion state
   motionState = new btDefaultMotionState(
     btTransform(btQuaternion(0, 0, 0, 1),
-    btVector3(position.x * 4 - 14, position.y * 4 - 14, 0))
+    btVector3(
+      position.x * 4 - 14 + origin.x,
+      position.y * 4 - 14 + origin.y,
+      origin.z
+    ))
   );
 
   // And the rigid body
