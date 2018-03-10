@@ -4,7 +4,7 @@
 #include "ChessGame.hxx"
 
 
-ChessGame::ChessGame(PhysicsWorld* physicsWorld) : physicsWorld{physicsWorld}{
+ChessGame::ChessGame(IPhysicsWorld* physicsWorld) : physicsWorld{physicsWorld}{
   // Start communication with stockfish
   stockfishConnector = new StockfishConnector();
 
