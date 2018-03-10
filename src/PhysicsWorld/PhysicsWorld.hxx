@@ -33,6 +33,11 @@ class PhysicsWorld {
     btDefaultMotionState* groundMotionState;
     btRigidBody* groundRigidBody;
 
+    /* Limit ground rigid body */
+    btCollisionShape* limitGroundShape;
+    btDefaultMotionState* limitGroundMotionState;
+    btRigidBody* limitGroundRigidBody;
+
     /* Inner clock for stepping simulation */
     sf::Clock* innerClock;
 

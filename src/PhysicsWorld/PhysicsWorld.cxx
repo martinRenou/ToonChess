@@ -30,15 +30,23 @@ PhysicsWorld::PhysicsWorld(std::map<int, std::vector<Mesh*>>* fragmentMeshes)
   // Set gravity
   dynamicsWorld->setGravity(btVector3(0, 0, -9.81));
 
-  // Create the ground as a static plane with equation:
-  // 0*X + 0*Y + 1*Z + 0 = 0 => Z = 0
-  groundShape = new btStaticPlaneShape(btVector3(0, 0, 1), 0);
+  // Create the ground as a box:
+  groundShape = new btBoxShape(btVector3(16, 16, 0.2));
   groundMotionState = new btDefaultMotionState(
-    btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, 0)));
+    btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, -0.2)));
   btRigidBody::btRigidBodyConstructionInfo groundRigidBodyCI(
     0, groundMotionState, groundShape, btVector3(0, 0, 0));
   groundRigidBody = new btRigidBody(groundRigidBodyCI);
   dynamicsWorld->addRigidBody(groundRigidBody);
+
+  // Create another ground as a 2D plane:
+  limitGroundShape = new btStaticPlaneShape(btVector3(0, 0, 1), 0);
+  limitGroundMotionState = new btDefaultMotionState(
+    btTransform(btQuaternion(0, 0, 0, 1), btVector3(0, 0, -40)));
+  btRigidBody::btRigidBodyConstructionInfo limitGroundRigidBodyCI(
+    0, limitGroundMotionState, limitGroundShape, btVector3(0, 0, 0));
+  limitGroundRigidBody = new btRigidBody(limitGroundRigidBodyCI);
+  dynamicsWorld->addRigidBody(limitGroundRigidBody);
 
   // Start the innerClock
   innerClock = new sf::Clock();
