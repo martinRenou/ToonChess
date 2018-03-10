@@ -63,7 +63,7 @@ add_subdirectory(
 # Create test executable
 set(TEST_NAME "tests")
 add_executable(${TEST_NAME} tests/test_main.cxx ${CXX_FILES})
-target_link_libraries(${TEST_NAME} gtest_main)
+target_link_libraries(${TEST_NAME} gmock_main)
 
 # Detect and add SFML
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})

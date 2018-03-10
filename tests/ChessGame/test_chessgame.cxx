@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "../../src/ChessGame/ChessGame.hxx"
-#include "../test_utils.hxx"
+#include "../test_utils.cxx"
 
 
 TEST(chess_game, initialization){

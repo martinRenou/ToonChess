@@ -2,8 +2,6 @@
 
 #include <SFML/Graphics.hpp>
 
-#include
-
 
 class MockPhysicsWorld : public PhysicsWorld {
 public:
