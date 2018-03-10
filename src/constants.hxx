@@ -22,8 +22,10 @@ const int AI = -1;
 
 // State machine for the game
 const int USER_TURN = 0;
-const int WAITING = 1;
-const int AI_TURN = 2;
+const int USER_MOVING = 1;
+const int WAITING = 2;
+const int AI_TURN = 3;
+const int AI_MOVING = 4;
 
 // Shaders
 const int BLACK_BORDER = 10;
