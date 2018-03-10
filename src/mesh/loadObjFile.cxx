@@ -74,8 +74,8 @@ std::vector<Mesh *> loadObjFile(const std::string& filePath){
     }
 
     // The line starts with an "m", it's the mesh's mass
-    if(splittedLine.at(0).compare("m") == 0){
-      currentMesh->mass = std::stoi(splittedLine.at(1));
+    if(splittedLine.at(0).compare("mass") == 0){
+      currentMesh->mass = std::stof(splittedLine.at(1));
 
       continue;
     }

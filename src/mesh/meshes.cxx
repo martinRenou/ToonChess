@@ -44,17 +44,17 @@ void deletePieces(std::map<int, Mesh*>* meshes){
 
 std::map<int, std::vector<Mesh*>> initFragmentMeshes(){
   // Create and load meshes
-  std::vector<Mesh*> king_fragments = loadObjFile("../assets/king_fragments.obj");
+  std::vector<Mesh*> king_fragments = loadObjFile("../assets/king_fragments.cobj");
   std::vector<Mesh*> queen_fragments = \
-    loadObjFile("../assets/queen_fragments.obj");
+    loadObjFile("../assets/queen_fragments.cobj");
   std::vector<Mesh*> bishop_fragments = \
-    loadObjFile("../assets/bishop_fragments.obj");
+    loadObjFile("../assets/bishop_fragments.cobj");
   std::vector<Mesh*> rook_fragments = \
-    loadObjFile("../assets/rook_fragments.obj");
+    loadObjFile("../assets/rook_fragments.cobj");
   std::vector<Mesh*> knight_fragments = \
-    loadObjFile("../assets/knight_fragments.obj");
+    loadObjFile("../assets/knight_fragments.cobj");
   std::vector<Mesh*> pawn_fragments = \
-    loadObjFile("../assets/pawn_fragments.obj");
+    loadObjFile("../assets/pawn_fragments.cobj");
 
   std::map<int, std::vector<Mesh*>> meshes = {
     {KING, king_fragments},
