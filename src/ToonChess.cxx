@@ -18,6 +18,8 @@
 #include "ColorPicking/ColorPicking.hxx"
 #include "ShadowMapping/ShadowMapping.hxx"
 
+#include "PhysicsWorld/PhysicsWorld.hxx"
+
 #include "constants.hxx"
 #include "GameInfo.hxx"
 #include "utils/utils.hxx"
@@ -28,31 +30,19 @@
 /* Perform a cel-shading rendering in the current frameBuffer
   \param game The game instance
   \param gameInfo The current game informations
-  \param meshes The map of meshes
+  \param pieces The map of meshes
   \param programs The map of shader programs
   \param shadowMap The shadowMap texture
 */
 void celShadingRender(
   ChessGame* game,
+  PhysicsWorld* physicsWorld,
   GameInfo* gameInfo,
-  std::map<int, Mesh*>* meshes,
+  std::map<int, Mesh*>* pieces,
   std::map<int, ShaderProgram*>* programs,
   GLuint shadowMap);
 
 int main(){
-  // Create an instance of the Game (This starts the communication with
-  // Stockfish and could fail)
-  ChessGame* game = new ChessGame();
-  try{
-    game->start();
-  } catch(const std::exception& e){
-    std::cerr << e.what() << std::endl;
-
-    delete game;
-
-    return 1;
-  }
-
   // Initialize game informations
   GameInfo gameInfo;
 
@@ -70,7 +60,7 @@ int main(){
       sf::Style::Default,
       settings
   );
-  window.setFramerateLimit(60);
+  window.setFramerateLimit(30);
   // Enable depth test
   glEnable(GL_DEPTH_TEST);
   // Enable backface culling
@@ -83,13 +73,33 @@ int main(){
   } catch(const std::exception& e){
     std::cerr << e.what() << std::endl;
 
-    delete game;
-
     return 1;
   }
 
-  // Load meshes
-  std::map<int, Mesh*> meshes = initMeshes();
+  // Load pieces
+  std::map<int, Mesh*> pieces = initPieces();
+
+  // Load fragmented pieces
+  std::map<int, std::vector<Mesh*>> fragmentMeshes = initFragmentMeshes();
+
+  // Create physicsWorld
+  PhysicsWorld* physicsWorld = new PhysicsWorld(&fragmentMeshes);
+
+  // Create an instance of the Game (This starts the communication with
+  // Stockfish and could fail)
+  ChessGame* game = new ChessGame(physicsWorld);
+  try{
+    game->start();
+  } catch(const std::exception& e){
+    std::cerr << e.what() << std::endl;
+
+    delete game;
+    delete physicsWorld;
+    deletePieces(&pieces);
+    deleteFragmentMeshes(&fragmentMeshes);
+
+    return 1;
+  }
 
   // Initialize color picking
   ColorPicking* colorPicking = new ColorPicking(
@@ -181,7 +191,7 @@ int main(){
           // Get selected piece using color picking
           game->setNewSelectedPiecePosition(
             colorPicking->getClickedPiecePosition(
-                selectedPixelPosition, game, &gameInfo, &meshes, &programs
+                selectedPixelPosition, game, &gameInfo, &pieces, &programs
             )
           );
         }
@@ -226,9 +236,12 @@ int main(){
       }
     }
 
+    // Simulate dynamics world
+    physicsWorld->simulate();
+
     // Create the shadowMap
     shadowMap = shadowMapping->getShadowMap(
-      game, &gameInfo, &meshes, &programs);
+      game, &gameInfo, &pieces, &programs);
 
     // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -239,7 +252,8 @@ int main(){
     glViewport(0, 0, gameInfo.width, gameInfo.height);
 
     // Display all pieces on the screen using the cel-shading effect
-    celShadingRender(game, &gameInfo, &meshes, &programs, shadowMap);
+    celShadingRender(
+      game, physicsWorld, &gameInfo, &pieces, &programs, shadowMap);
 
     // Perform the chess rules
     try{
@@ -249,11 +263,13 @@ int main(){
 
       window.close();
 
-      deleteMeshes(&meshes);
+      deletePieces(&pieces);
+      deleteFragmentMeshes(&fragmentMeshes);
       deletePrograms(&programs);
       delete colorPicking;
       delete shadowMapping;
       delete game;
+      delete physicsWorld;
 
       return 1;
     }
@@ -265,19 +281,22 @@ int main(){
 
   window.close();
 
-  deleteMeshes(&meshes);
+  deletePieces(&pieces);
+  deleteFragmentMeshes(&fragmentMeshes);
   deletePrograms(&programs);
   delete colorPicking;
   delete shadowMapping;
   delete game;
+  delete physicsWorld;
 
   return 0;
 }
 
 void celShadingRender(
     ChessGame* game,
+    PhysicsWorld* physicsWorld,
     GameInfo* gameInfo,
-    std::map<int, Mesh*>* meshes,
+    std::map<int, Mesh*>* pieces,
     std::map<int, ShaderProgram*>* programs,
     GLuint shadowMap){
   // The movement Matrix
@@ -297,6 +316,26 @@ void celShadingRender(
   blackBorderProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
   blackBorderProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
 
+  // Display fragments black borders
+  for(unsigned int i = 0; i < physicsWorld->fragmentPool.size(); i++){
+    Fragment* fragment = physicsWorld->fragmentPool.at(i).second;
+
+    // Set movement matrix
+    movementMatrix = fragment->getMoveMatrix();
+    blackBorderProgram->setMoveMatrix(&movementMatrix);
+
+    // Compute normal matrix (=inverse(transpose(movementMatrix)))
+    std::vector<GLfloat> normalMatrix = inverse(&movementMatrix);
+    normalMatrix = transpose(&normalMatrix);
+    blackBorderProgram->setNormalMatrix(&normalMatrix);
+
+    blackBorderProgram->setBoolean("elevated", false);
+
+    // Draw fragment
+    fragment->mesh->draw();
+  }
+
+  // Display pieces
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = game->board[x][y];
@@ -323,14 +362,14 @@ void celShadingRender(
         blackBorderProgram->setBoolean("elevated", false);
 
       // Draw board cell
-      meshes->at(BOARDCELL)->draw();
+      pieces->at(BOARDCELL)->draw();
 
       // Draw piece
-      if(piece != EMPTY) meshes->at(abs(piece))->draw();
+      if(piece != EMPTY) pieces->at(abs(piece))->draw();
     }
   }
 
-  // Render all meshes with cell shading
+  // Render all pieces with cell shading
   glUseProgram(celShadingProgram->id);
   glCullFace(GL_BACK);
 
@@ -355,6 +394,30 @@ void celShadingRender(
     gameInfo->lightDirection.y, gameInfo->lightDirection.z
   );
 
+  // Display fragments
+  for(unsigned int i = 0; i < physicsWorld->fragmentPool.size(); i++){
+    Fragment* fragment = physicsWorld->fragmentPool.at(i).second;
+
+    // Set movement matrix
+    movementMatrix = fragment->getMoveMatrix();
+    celShadingProgram->setMoveMatrix(&movementMatrix);
+
+    // Compute normal matrix (=inverse(transpose(movementMatrix)))
+    std::vector<GLfloat> normalMatrix = inverse(&movementMatrix);
+    normalMatrix = transpose(&normalMatrix);
+    celShadingProgram->setNormalMatrix(&normalMatrix);
+
+    // Compute color depending of the team
+    physicsWorld->fragmentPool.at(i).first > 0 ?
+      celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
+      celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
+    celShadingProgram->setBoolean("elevated", false);
+
+    // Draw fragment
+    fragment->mesh->draw();
+  }
+
+  // Display pieces
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       int piece = game->board[x][y];
@@ -398,7 +461,7 @@ void celShadingRender(
         celShadingProgram->setBoolean("elevated", true) :
         celShadingProgram->setBoolean("elevated", false);
 
-      meshes->at(BOARDCELL)->draw();
+      pieces->at(BOARDCELL)->draw();
 
       if(piece != EMPTY){
         // Display cel-shading mesh
@@ -406,7 +469,7 @@ void celShadingRender(
           celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
           celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
 
-        meshes->at(abs(piece))->draw();
+        pieces->at(abs(piece))->draw();
       }
     }
   }

@@ -6,12 +6,16 @@
 #include <SFML/Graphics.hpp>
 
 #include "../constants.hxx"
+#include "../PhysicsWorld/IPhysicsWorld.hxx"
 #include "StockfishConnector.hxx"
 
 
 // cppcheck-suppress noCopyConstructor
 class ChessGame {
 private:
+  /* PhysicsWorld */
+  IPhysicsWorld* physicsWorld;
+
   /* Last user move */
   std::string lastUserMove;
 
@@ -56,11 +60,6 @@ private:
   */
   void movePiece(sf::Vector2i lastPosition, sf::Vector2i newPosition);
 
-  /* Move function, this will move a chess piece on the board
-    \param movement The movement in the UCI format "a2a4"
-  */
-  void movePiece(std::string movement);
-
   /* Method used for accessing piece at position {x, y}, if {x, y} doesn't
   correspond to a position on the board, it returns OUT_OF_BOUND constant and
   doesn't throw exception */
@@ -81,7 +80,7 @@ private:
 
 public:
   /* Constructor */
-  ChessGame();
+  explicit ChessGame(IPhysicsWorld* physicsWorld);
 
   /* The checkerboard */
   int board[8][8] = {

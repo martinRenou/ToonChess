@@ -24,6 +24,17 @@
         </code></pre>
       </p>
 
+      <p> Install <a href="http://bulletphysics.org/wordpress/">Bullet Physics</a>:
+        <pre style="background: #e7e7e7;"><code>
+          wget https://github.com/bulletphysics/bullet3/archive/2.87.tar.gz
+          tar -xzf 2.87.tar.gz
+          cd bullet3-2.87/
+          mkdir build && cd build && cmake .. -DBUILD_EXTRAS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_UNIT_TESTS=OFF -DBUILD_PYBULLET=OFF
+          sudo make install
+          cd ..
+        </code></pre>
+      </p>
+
       <p> Download source code:
         <pre style="background: #e7e7e7;"><code>
           git clone https://github.com/martinRenou/ToonChess.git

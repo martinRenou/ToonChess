@@ -17,6 +17,7 @@ set(
   CXX_FILES
   ${CMAKE_SOURCE_DIR}/src/mesh/Mesh.cxx
   ${CMAKE_SOURCE_DIR}/src/mesh/meshes.cxx
+  ${CMAKE_SOURCE_DIR}/src/mesh/loadObjFile.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/CompilationException.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/LinkingException.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/Shader.cxx
@@ -24,6 +25,8 @@ set(
   ${CMAKE_SOURCE_DIR}/src/shader/shaderPrograms.cxx
   ${CMAKE_SOURCE_DIR}/src/ColorPicking/ColorPicking.cxx
   ${CMAKE_SOURCE_DIR}/src/ShadowMapping/ShadowMapping.cxx
+  ${CMAKE_SOURCE_DIR}/src/PhysicsWorld/Fragment.cxx
+  ${CMAKE_SOURCE_DIR}/src/PhysicsWorld/PhysicsWorld.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/ConnectionException.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/StockfishConnector.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/GameException.cxx
@@ -60,7 +63,7 @@ add_subdirectory(
 # Create test executable
 set(TEST_NAME "tests")
 add_executable(${TEST_NAME} tests/test_main.cxx ${CXX_FILES})
-target_link_libraries(${TEST_NAME} gtest_main)
+target_link_libraries(${TEST_NAME} gmock_main)
 
 # Detect and add SFML
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
@@ -79,4 +82,12 @@ if (OPENGL_FOUND)
   target_link_libraries(${EXECUTABLE_NAME} ${OPENGL_LIBRARIES})
   target_link_libraries(${TEST_NAME} ${OPENGL_LIBRARIES})
   # target_link_libraries(${EXECUTABLE_NAME} m)
+endif()
+
+# Detect and add Bullet Physics
+find_package(Bullet 2.8 REQUIRED)
+if(BULLET_FOUND)
+  include_directories(${BULLET_INCLUDE_DIR})
+  target_link_libraries(${EXECUTABLE_NAME} ${BULLET_LIBRARIES})
+  target_link_libraries(${TEST_NAME} ${BULLET_LIBRARIES})
 endif()

@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 
 #include "../../src/mesh/Mesh.hxx"
+#include "../../src/mesh/loadObjFile.hxx"
 
 TEST(extract_float_vec, can_extract) {
   std::vector<std::string> in = {"v", "1.2", "3.5", "6.2"};
@@ -67,18 +68,8 @@ TEST(extract_normal, can_extract) {
   EXPECT_EQ(3.2f, out[8]);
 }
 
-TEST(mesh, init) {
-  Mesh* test = new Mesh("../tests/testFixtures/test.obj");
-
-  EXPECT_EQ("../tests/testFixtures/test.obj", test->filePath);
-
-  delete test;
-}
-
 TEST(mesh, vertices) {
-  Mesh* test = new Mesh("../tests/testFixtures/test.obj");
-
-  test->initBuffers();
+  Mesh* test = loadObjFile("../tests/testFixtures/test.obj").at(0);
 
   EXPECT_EQ(0.0, test->vertices.at(0));
   EXPECT_EQ(0.0, test->vertices.at(1));
@@ -96,9 +87,7 @@ TEST(mesh, vertices) {
 }
 
 TEST(mesh, indices) {
-  Mesh* test = new Mesh("../tests/testFixtures/test.obj");
-
-  test->initBuffers();
+  Mesh* test = loadObjFile("../tests/testFixtures/test.obj").at(0);
 
   EXPECT_EQ(0, test->indices.at(0));
   EXPECT_EQ(1, test->indices.at(1));
@@ -119,9 +108,7 @@ TEST(mesh, indices) {
 }
 
 TEST(mesh, normals) {
-  Mesh* test = new Mesh("../tests/testFixtures/test.obj");
-
-  test->initBuffers();
+  Mesh* test = loadObjFile("../tests/testFixtures/test.obj").at(0);
 
   EXPECT_EQ(0.0f, test->normals.at(0));
   EXPECT_EQ(0.0f, test->normals.at(1));
@@ -132,4 +119,18 @@ TEST(mesh, normals) {
   EXPECT_EQ(0.0f, test->normals.at(20));
 
   delete test;
+}
+
+TEST(mesh, second_mesh) {
+  std::vector<Mesh*> meshes = loadObjFile("../tests/testFixtures/test.obj");
+
+  EXPECT_NE(meshes.at(0), meshes.at(1));
+
+  EXPECT_EQ(0.0f, meshes.at(1)->normals.at(0));
+  EXPECT_EQ(0.0f, meshes.at(1)->normals.at(1));
+  EXPECT_EQ(-1.36f, meshes.at(1)->normals.at(2));
+
+  EXPECT_EQ(-1.52f, meshes.at(1)->normals.at(18));
+  EXPECT_EQ(0.0f, meshes.at(1)->normals.at(19));
+  EXPECT_EQ(0.0f, meshes.at(1)->normals.at(20));
 }

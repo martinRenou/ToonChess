@@ -3,50 +3,13 @@
 
 #include <GL/gl.h>
 
+#include <SFML/Graphics.hpp>
+
 #include <vector>
-#include <string>
 
-/* Extract a vector of floats from a line of the obj file
-  \param line The line to extract in the following format:
-    ["v", "0.5", "1.0", "9.3"]
-  \param vector The vector in which to push the extracted 3D vector
-*/
-void extractFloatVec3(
-    std::vector<std::string> *line, std::vector<GLfloat> *vector);
-
-/* Extract vertices from a line representing a face in the obj file
-  \param line The line in the following format:
-    ["f", "56//32", "12//33", "44//32"]
-  \param unsortedVertices The list of vertices coordinates already extracted
-    from the file
-  \param vertices The vector of vertices in which to put the extracted vertices.
-    In this example we will extract the coordinates of the 55th, 11th and 43th
-    vertices coming from unsortedVertices
-*/
-void extractVertices(
-    std::vector<std::string> *line,
-    std::vector<GLfloat> *unsortedVertices,
-    std::vector<GLfloat> *vertices);
-
-/* Extract normals from a line representing a face in the obj file
-  \param line The line in the following format:
-    ["f", "56//32", "12//33", "44//32"]
-  \param unsortedNormals The list of normals coordinates already extracted
-    from the file
-  \param normals The vector of normals in which to put the extracted normals.
-    In this example we will extract the coordinates of the 31th, 32th and 31th
-    normals coming from unsortedNormals
-*/
-void extractNormals(
-    std::vector<std::string> *line,
-    std::vector<GLfloat> *unsortedNormals,
-    std::vector<GLfloat> *normals);
 
 class Mesh {
   public:
-    /* The path of the .obj file containing the mesh */
-    std::string filePath;
-
     /* Vector of vertices defining the mesh */
     std::vector<GLfloat> vertices;
     /* Vector of normals defining the mesh */
@@ -61,12 +24,17 @@ class Mesh {
     /* ID of the indices buffer */
     GLuint indexBufferId;
 
-    /* Constructor
-      \param filePath The path of the .obj file containing the mesh
-    */
-    explicit Mesh(const std::string& filePath);
+    /* Mass of the mesh */
+    GLfloat mass = 1;
 
-    /* Initialization of the buffer objects */
+    /* Origin of the mesh */
+    sf::Vector3f origin = {0.0, 0.0, 0.0};
+
+    /* Constructor */
+    explicit Mesh();
+
+    /* Initialization of the buffer objects, must be called after filling
+      vectors of vertices, normals and indices */
     void initBuffers();
 
     /* Draw the mesh in the 3D scene */
