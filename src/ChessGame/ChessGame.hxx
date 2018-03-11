@@ -55,12 +55,6 @@ private:
   */
   std::string positionToUciFormat(sf::Vector2i position);
 
-  /* Move function, this will move a chess piece on the board
-    \param lastPosition The last position of the piece to move
-    \param newPosition The new position of the piece to move
-  */
-  void movePiece(sf::Vector2i lastPosition, sf::Vector2i newPosition);
-
   /* Method used for accessing piece at position {x, y}, if {x, y} doesn't
   correspond to a position on the board, it returns OUT_OF_BOUND constant and
   doesn't throw exception */

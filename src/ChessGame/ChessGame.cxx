@@ -37,13 +37,6 @@ std::string ChessGame::positionToUciFormat(sf::Vector2i position){
   return uciGrid[position.x][position.y];
 };
 
-void ChessGame::movePiece(sf::Vector2i lastPosition, sf::Vector2i newPosition){
-  int piece = board[lastPosition.x][lastPosition.y];
-
-  board[lastPosition.x][lastPosition.y] = EMPTY;
-  board[newPosition.x][newPosition.y] = piece;
-};
-
 const int ChessGame::boardAt(int x, int y){
   if(0 <= x and x < 8 and 0 <= y and y < 8){
     return board[x][y];
