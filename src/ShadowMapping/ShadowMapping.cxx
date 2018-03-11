@@ -66,6 +66,29 @@ void shadowMappingRender(
       if(piece != EMPTY) meshes->at(abs(piece))->draw();
     }
   }
+
+  // Display animated piece
+  if(game->movingPiece != EMPTY){
+    // Set movement matrix to identity
+    movementMatrix = getIdentityMatrix();
+
+    // Rotate the piece depending on the team (user or AI)
+    movementMatrix = game->movingPiece > 0 ?
+      rotate(&movementMatrix, -90.0, rotation) :
+      rotate(&movementMatrix, 90.0, rotation);
+
+    // Translate the piece
+    translation = {
+      (float)(game->movingPiecePosition.x * 4.0 - 14.0),
+      (float)(game->movingPiecePosition.y * 4.0 - 14.0), 0.0
+    };
+    movementMatrix = translate(&movementMatrix, translation);
+    shadowMappingProgram->setMoveMatrix(&movementMatrix);
+
+    shadowMappingProgram->setBoolean("elevated", false);
+
+    meshes->at(abs(game->movingPiece))->draw();
+  }
 };
 
 ShadowMapping::ShadowMapping(GLuint resolution) : resolution{resolution}{}

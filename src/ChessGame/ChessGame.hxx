@@ -25,7 +25,8 @@ private:
   /* The state of the game, should be USER_TURN, AI_TURN or WAITING */
   int state = USER_TURN;
 
-  /* Clock used for waiting between the USER_TURN and the AI_TURN */
+  /* Clock used for measuring time during piece movement and
+  waiting between the USER_TURN and the AI_TURN */
   sf::Clock* clock;
 
   /* Grid used for conversions between position and UCI format */
@@ -138,6 +139,17 @@ public:
     \throw GameException if chess rules are not respected
   */
   void perform();
+
+  /* Currently moving piece: KING, QUEEN, ... EMPTY if nothing is currently
+  moving */
+  int movingPiece = EMPTY;
+
+  /* Currently moving piece position */
+  sf::Vector2f movingPiecePosition = {-1, -1};
+
+  /* The start and end position of the currently moving piece */
+  sf::Vector2i movingPieceStartPosition = {-1, -1};
+  sf::Vector2i movingPieceEndPosition = {-1, -1};
 
   /* Destructor */
   ~ChessGame();

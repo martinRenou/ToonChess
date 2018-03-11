@@ -369,6 +369,27 @@ void celShadingRender(
     }
   }
 
+  // Display animated piece
+  if(game->movingPiece != EMPTY){
+    // Set movement matrix to identity
+    movementMatrix = getIdentityMatrix();
+
+    // Rotate the piece depending on the team (user or AI)
+    movementMatrix = game->movingPiece > 0 ?
+      rotate(&movementMatrix, -90.0, rotation) :
+      rotate(&movementMatrix, 90.0, rotation);
+
+    // Translate the piece
+    translation = {
+      (float)(game->movingPiecePosition.x * 4.0 - 14.0),
+      (float)(game->movingPiecePosition.y * 4.0 - 14.0), 0.0
+    };
+    movementMatrix = translate(&movementMatrix, translation);
+    blackBorderProgram->setMoveMatrix(&movementMatrix);
+
+    pieces->at(abs(game->movingPiece))->draw();
+  }
+
   // Render all pieces with cell shading
   glUseProgram(celShadingProgram->id);
   glCullFace(GL_BACK);
@@ -472,5 +493,37 @@ void celShadingRender(
         pieces->at(abs(piece))->draw();
       }
     }
+  }
+
+  // Display animated piece
+  if(game->movingPiece != EMPTY){
+    // Set movement matrix to identity
+    movementMatrix = getIdentityMatrix();
+
+    // Rotate the piece depending on the team (user or AI)
+    movementMatrix = game->movingPiece > 0 ?
+      rotate(&movementMatrix, -90.0, rotation) :
+      rotate(&movementMatrix, 90.0, rotation);
+
+    // Translate the piece
+    translation = {
+      (float)(game->movingPiecePosition.x * 4.0 - 14.0),
+      (float)(game->movingPiecePosition.y * 4.0 - 14.0), 0.0
+    };
+    movementMatrix = translate(&movementMatrix, translation);
+    celShadingProgram->setMoveMatrix(&movementMatrix);
+
+    // Compute normal matrix (=inverse(transpose(movementMatrix)))
+    std::vector<GLfloat> normalMatrix = inverse(&movementMatrix);
+    normalMatrix = transpose(&normalMatrix);
+    celShadingProgram->setNormalMatrix(&normalMatrix);
+
+    game->movingPiece > 0 ?
+      celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
+      celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
+
+    celShadingProgram->setBoolean("elevated", false);
+
+    pieces->at(abs(game->movingPiece))->draw();
   }
 };
