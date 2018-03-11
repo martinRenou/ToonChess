@@ -243,22 +243,24 @@ void ChessGame::resetAllowedNextPositions(){
 
 void ChessGame::setNewSelectedPiecePosition(
     sf::Vector2i newSelectedPiecePosition){
-  // Register last user clicked position
-  oldSelectedPiecePosition = selectedPiecePosition;
+  if(state == USER_TURN){
+    // Register last user clicked position
+    oldSelectedPiecePosition = selectedPiecePosition;
 
-  // And set the new selected piece position
-  selectedPiecePosition = newSelectedPiecePosition;
+    // And set the new selected piece position
+    selectedPiecePosition = newSelectedPiecePosition;
 
-  // If the new selected piece is an allowed move, it surely means that the user
-  // wants to move a piece: it will be performed at the next "perform" method
-  // call
-  if(allowedNextPositions[selectedPiecePosition.x]
-                         [selectedPiecePosition.y] == true){
-    return;
+    // If the new selected piece is an allowed move, it surely means that the user
+    // wants to move a piece: it will be performed at the next "perform" method
+    // call
+    if(allowedNextPositions[selectedPiecePosition.x]
+                           [selectedPiecePosition.y] == true){
+      return;
+    }
+
+    // In other cases, compute the new allowedNextPositions matrix
+    computeAllowedNextPositions();
   }
-
-  // In other cases, compute the new allowedNextPositions matrix
-  computeAllowedNextPositions();
 };
 
 void ChessGame::perform(){
