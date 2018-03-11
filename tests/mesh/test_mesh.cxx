@@ -85,6 +85,7 @@ TEST(mesh, vertices) {
 
   for(unsigned int i = 0; i < meshes.size(); i++)
     delete meshes.at(i);
+  meshes.clear();
 }
 
 TEST(mesh, indices) {
