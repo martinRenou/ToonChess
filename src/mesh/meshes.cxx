@@ -69,9 +69,8 @@ std::map<int, std::vector<Mesh*>> initFragmentMeshes(){
 };
 
 void _deleteFragmentMeshes(std::vector<Mesh*>* fragments){
-  if(fragments->size() != 0)
-    for(unsigned int i = fragments->size() - 1; i > 0; i--)
-      delete fragments->at(i);
+  for(unsigned int i = 0; i < fragments->size(); i++)
+    delete fragments->at(i);
 }
 
 void deleteFragmentMeshes(std::map<int, std::vector<Mesh*>>* fragments){
