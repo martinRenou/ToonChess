@@ -95,6 +95,15 @@ TEST(chess_game, pawn_move_1){
 
   // Perform the move
   game->perform();
+
+  EXPECT_EQ(game->movingPiece, PAWN);
+  EXPECT_EQ(game->movingPieceStartPosition.x, 1);
+  EXPECT_EQ(game->movingPieceStartPosition.y, 1);
+  EXPECT_EQ(game->movingPieceEndPosition.x, 1);
+  EXPECT_EQ(game->movingPieceEndPosition.y, 2);
+  EXPECT_EQ(game->movingPiecePosition.x, 1);
+  EXPECT_EQ(game->movingPiecePosition.y, 1);
+
   sleep(1);
   game->perform();
 
