@@ -237,7 +237,7 @@ int main(){
     }
 
     // Simulate dynamics world
-    physicsWorld->simulate();
+    physicsWorld->simulate(game);
 
     // Create the shadowMap
     shadowMap = shadowMapping->getShadowMap(

@@ -70,7 +70,19 @@ void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
   }
 };
 
-void PhysicsWorld::simulate(){
+void PhysicsWorld::simulate(ChessGame* game){
+  // If a piece has been taken by another one, collapse it in the dynamics world
+  if(game->movingPiece != EMPTY){
+    int pieceAtEndPosition = game->boardAt(
+      game->movingPieceEndPosition.x, game->movingPieceEndPosition.y);
+
+    if(pieceAtEndPosition != EMPTY and pieceAtEndPosition != OUT_OF_BOUND){
+      game->board[game->movingPieceEndPosition.x]
+                 [game->movingPieceEndPosition.y] = EMPTY;
+      collapsePiece(pieceAtEndPosition, game->movingPieceEndPosition);
+    }
+  }
+
   // Simulate the dynamics world
   dynamicsWorld->stepSimulation(innerClock->getElapsedTime().asSeconds(), 7);
   innerClock->restart();

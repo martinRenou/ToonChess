@@ -12,6 +12,7 @@
 
 #include "Fragment.hxx"
 #include "../mesh/Mesh.hxx"
+#include "../ChessGame/ChessGame.hxx"
 
 
 // cppcheck-suppress noCopyConstructor
@@ -56,8 +57,8 @@ class PhysicsWorld{
     std::vector<std::pair<int, Fragment*>> fragmentPool;
 
     /* Simulate method, this will update the position of each fragment of the
-      fragment pool */
-    void simulate();
+      fragment pool and add new fragments when needed */
+    void simulate(ChessGame* game);
 
     /* Destructor */
     ~PhysicsWorld();
