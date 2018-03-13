@@ -41,8 +41,13 @@ class PhysicsWorld{
 
     /* Piece rigid body (used for every standing pieces) */
     btCollisionShape* pieceShape;
-    btDefaultMotionState* pieceMotionStates[8][8];
+    std::vector<btDefaultMotionState*> pieceMotionStates;
     btRigidBody* pieceRigidBodies[8][8];
+
+    /* Properties of the currently moving piece, useful for updating its
+    rigidbody */
+    btRigidBody* movingRigidBody;
+    sf::Vector2i movingRigidBodyEndPosition = {-1, -1};
 
     /* Inner clock for stepping simulation */
     sf::Clock* innerClock;

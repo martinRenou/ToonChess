@@ -54,21 +54,23 @@ PhysicsWorld::PhysicsWorld(
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
       if(game->boardAt(x, y) != EMPTY){
-        pieceMotionStates[x][y] = new btDefaultMotionState(btTransform(
+        btDefaultMotionState* motionState = new btDefaultMotionState(btTransform(
           btQuaternion(0, 0, 0, 1),
           btVector3(x * 4 - 14, y * 4 - 14, 3.75)
         ));
 
+        pieceMotionStates.push_back(motionState);
+
         btRigidBody::btRigidBodyConstructionInfo pieceRigidBodyCI(
-          0, pieceMotionStates[x][y], pieceShape, btVector3(0, 0, 0));
+          0, motionState, pieceShape, btVector3(0, 0, 0));
         pieceRigidBodies[x][y] = new btRigidBody(pieceRigidBodyCI);
-        dynamicsWorld->addRigidBody(limitGroundRigidBody);
+        dynamicsWorld->addRigidBody(pieceRigidBodies[x][y]);
       } else {
-        pieceMotionStates[x][y] = NULL;
         pieceRigidBodies[x][y] = NULL;
       }
     }
   }
+  movingRigidBody = NULL;
 
   // Start the innerClock
   innerClock = new sf::Clock();
@@ -93,16 +95,67 @@ void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
 };
 
 void PhysicsWorld::simulate(ChessGame* game){
-  // If a piece has been taken by another one, collapse it in the dynamics world
+  // If a piece is moving on the board, move its rigid body in the dynamics world
   if(game->movingPiece != EMPTY){
-    int pieceAtEndPosition = game->boardAt(
-      game->movingPieceEndPosition.x, game->movingPieceEndPosition.y);
+    sf::Vector2i startPosition = game->movingPieceStartPosition;
+    movingRigidBodyEndPosition = {
+      game->movingPieceEndPosition.x, game->movingPieceEndPosition.y};
 
+    // Get the rigid body of the moving piece
+    if(!movingRigidBody){
+      movingRigidBody = pieceRigidBodies[startPosition.x][startPosition.y];
+      pieceRigidBodies[startPosition.x][startPosition.y] = NULL;
+    }
+
+    // Move rigid body in the dynamics world
+    btTransform transform(
+      btQuaternion(0, 0, 0, 1),
+      btVector3(
+        game->movingPiecePosition.x * 4 - 14,
+        game->movingPiecePosition.y * 4 - 14,
+        3.75
+      )
+    );
+    movingRigidBody->setWorldTransform(transform);
+
+    int pieceAtEndPosition = game->boardAt(
+      movingRigidBodyEndPosition.x, movingRigidBodyEndPosition.y);
+
+    // It the piece is taking another one, remove the last and collapse it
     if(pieceAtEndPosition != EMPTY and pieceAtEndPosition != OUT_OF_BOUND){
-      game->board[game->movingPieceEndPosition.x]
-                 [game->movingPieceEndPosition.y] = EMPTY;
+      // Remove it from the dynamics world
+      dynamicsWorld->removeRigidBody(
+        pieceRigidBodies[movingRigidBodyEndPosition.x]
+                        [movingRigidBodyEndPosition.y]
+      );
+      delete pieceRigidBodies[movingRigidBodyEndPosition.x]
+                             [movingRigidBodyEndPosition.y];
+      pieceRigidBodies[movingRigidBodyEndPosition.x]
+                      [movingRigidBodyEndPosition.y] = NULL;
+
+      // Remove it from the board
+      game->board[movingRigidBodyEndPosition.x][movingRigidBodyEndPosition.y] = EMPTY;
+
+      // Collapse it
       collapsePiece(pieceAtEndPosition, game->movingPieceEndPosition);
     }
+  }
+  else if(movingRigidBody){
+    pieceRigidBodies[movingRigidBodyEndPosition.x][movingRigidBodyEndPosition.y] = movingRigidBody;
+
+    // Move the rigid body to its final position
+    btTransform transform(
+      btQuaternion(0, 0, 0, 1),
+      btVector3(
+        movingRigidBodyEndPosition.x * 4 - 14,
+        movingRigidBodyEndPosition.y * 4 - 14,
+        3.75
+      )
+    );
+    movingRigidBody->setWorldTransform(transform);
+
+    // And stop moving
+    movingRigidBody = NULL;
   }
 
   // Simulate the dynamics world
@@ -123,12 +176,11 @@ PhysicsWorld::~PhysicsWorld(){
 
   // Delete cylinders
   delete pieceShape;
-  for(int x = 0; x < 8; x++){
-    for(int y = 0; y < 8; y++){
-      if(pieceMotionStates[x][y]) delete pieceMotionStates[x][y];
+  for(unsigned int i = 0; i < pieceMotionStates.size(); i++)
+    delete pieceMotionStates.at(i);
+  for(int x = 0; x < 8; x++)
+    for(int y = 0; y < 8; y++)
       if(pieceRigidBodies[x][y]) delete pieceRigidBodies[x][y];
-    }
-  }
 
   // Delete dynamics world
   delete dynamicsWorld;
