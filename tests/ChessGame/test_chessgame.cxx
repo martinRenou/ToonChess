@@ -93,7 +93,9 @@ TEST(chess_game, pawn_move_1){
   EXPECT_EQ(game->selectedPiecePosition.x, 1);
   EXPECT_EQ(game->selectedPiecePosition.y, 2);
 
-  // Perform the move !
+  // Perform the move
+  game->perform();
+  sleep(1);
   game->perform();
 
   // Expected board after the move
@@ -128,6 +130,8 @@ TEST(chess_game, pawn_move_2){
 
   // Perform the move !
   game->perform();
+  sleep(1);
+  game->perform();
 
   // Expected board after the move
   int expectedBoard[8][8] = {
@@ -160,6 +164,8 @@ TEST(chess_game, pawn_forbiden_move){
   game->setNewSelectedPiecePosition({2, 3});
 
   // Perform nothing !
+  game->perform();
+  sleep(1);
   game->perform();
 
   // Expected board after the move
@@ -194,6 +200,8 @@ TEST(chess_game, knight_move_1){
 
   // Perform the move !
   game->perform();
+  sleep(1);
+  game->perform();
 
   // Expected board after the move
   int expectedBoard[8][8] = {
@@ -226,6 +234,8 @@ TEST(chess_game, knight_move_2){
   game->setNewSelectedPiecePosition({0, 2});
 
   // Perform the move !
+  game->perform();
+  sleep(1);
   game->perform();
 
   // Expected board after the move
