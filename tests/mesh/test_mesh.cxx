@@ -83,6 +83,8 @@ TEST(mesh, vertices) {
   EXPECT_EQ(1.0, meshes.at(0)->vertices.at(22));
   EXPECT_EQ(1.0, meshes.at(0)->vertices.at(23));
 
+  for(unsigned int i = 0; i < meshes.size(); i++)
+      delete meshes.at(i);
   meshes.clear();
 }
 
