@@ -13,11 +13,9 @@
 #include "Fragment.hxx"
 #include "../mesh/Mesh.hxx"
 
-#include "IPhysicsWorld.hxx"
-
 
 // cppcheck-suppress noCopyConstructor
-class PhysicsWorld : public IPhysicsWorld{
+class PhysicsWorld{
   private:
     /* Map of fragments, it contains the Mesh instances associated to each
       piece */

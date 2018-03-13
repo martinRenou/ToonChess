@@ -87,7 +87,7 @@ int main(){
 
   // Create an instance of the Game (This starts the communication with
   // Stockfish and could fail)
-  ChessGame* game = new ChessGame(physicsWorld);
+  ChessGame* game = new ChessGame();
   try{
     game->start();
   } catch(const std::exception& e){
