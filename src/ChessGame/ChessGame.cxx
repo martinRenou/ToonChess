@@ -37,13 +37,6 @@ std::string ChessGame::positionToUciFormat(sf::Vector2i position){
   return uciGrid[position.x][position.y];
 };
 
-void ChessGame::movePiece(sf::Vector2i lastPosition, sf::Vector2i newPosition){
-  int piece = board[lastPosition.x][lastPosition.y];
-
-  board[lastPosition.x][lastPosition.y] = EMPTY;
-  board[newPosition.x][newPosition.y] = piece;
-};
-
 const int ChessGame::boardAt(int x, int y){
   if(0 <= x and x < 8 and 0 <= y and y < 8){
     return board[x][y];
@@ -243,106 +236,149 @@ void ChessGame::resetAllowedNextPositions(){
 
 void ChessGame::setNewSelectedPiecePosition(
     sf::Vector2i newSelectedPiecePosition){
-  // Register last user clicked position
-  oldSelectedPiecePosition = selectedPiecePosition;
+  if(state == USER_TURN){
+    // Register last user clicked position
+    oldSelectedPiecePosition = selectedPiecePosition;
 
-  // And set the new selected piece position
-  selectedPiecePosition = newSelectedPiecePosition;
+    // And set the new selected piece position
+    selectedPiecePosition = newSelectedPiecePosition;
 
-  // If the new selected piece is an allowed move, it surely means that the user
-  // wants to move a piece: it will be performed at the next "perform" method
-  // call
-  if(allowedNextPositions[selectedPiecePosition.x]
-                         [selectedPiecePosition.y] == true){
-    return;
+    // If the new selected piece is an allowed move, it surely means that the user
+    // wants to move a piece: it will be performed at the next "perform" method
+    // call
+    if(allowedNextPositions[selectedPiecePosition.x]
+                           [selectedPiecePosition.y] == true){
+      return;
+    }
+
+    // In other cases, compute the new allowedNextPositions matrix
+    computeAllowedNextPositions();
   }
-
-  // In other cases, compute the new allowedNextPositions matrix
-  computeAllowedNextPositions();
 };
 
 void ChessGame::perform(){
-  switch (state) {
-    case USER_TURN: {
-      // If the selected position is an allowed move, it surely means that the
-      // user wants to move a piece
-      if(allowedNextPositions[selectedPiecePosition.x]
-                             [selectedPiecePosition.y] == true){
-        // If the user took a AI piece, collapse it in the physicsWorld
-        int pieceAtPosition = boardAt(
-          selectedPiecePosition.x, selectedPiecePosition.y);
-        if(pieceAtPosition < 0)
-          physicsWorld->collapsePiece(pieceAtPosition, selectedPiecePosition);
-
-        // Move the piece
-        movePiece(oldSelectedPiecePosition, selectedPiecePosition);
-
-        // Store the last user move as an UCI string
-        lastUserMove.clear();
-        lastUserMove.append(
-          positionToUciFormat(oldSelectedPiecePosition));
-        lastUserMove.append(
-          positionToUciFormat(selectedPiecePosition));
-
-        // Unselect piece
-        oldSelectedPiecePosition = {-1, -1};
-        selectedPiecePosition = {-1, -1};
-
-        // Reset allowedNextPositions matrix
-        resetAllowedNextPositions();
-
-        // Transition to waiting state and restart the clock for measuring
-        // waiting time
-        state = WAITING;
-        clock->restart();
-      }
-      break;
-    }
-    case WAITING: {
-      if(clock->getElapsedTime().asSeconds() >= 1.0)
-        state = AI_TURN;
-      break;
-    }
-    case AI_TURN: {
-      // Get AI decision according to the last user move
-      std::string aiMove = stockfishConnector->getNextAIMove(
-        lastUserMove);
-
-      // If the AI tried to move one user's pawn, stop the game
-      sf::Vector2i aiMoveStartPosition = uciFormatToPosition(
-        aiMove.substr(0, 2));
-      if(boardAt(aiMoveStartPosition.x, aiMoveStartPosition.y) >= 0){
-        throw GameException("A forbiden move has been performed!");
-      }
-
-      // If the AI took a user's piece, collapse it in the physicsWorld
-      sf::Vector2i aiMoveEndPosition = uciFormatToPosition(
-        aiMove.substr(2, 2));
+  if(state == USER_TURN) {
+    // If the selected position is an allowed move, it surely means that the
+    // user wants to move a piece
+    if(allowedNextPositions[selectedPiecePosition.x]
+                           [selectedPiecePosition.y] == true){
+      // If the user took a AI piece, collapse it in the physicsWorld
       int pieceAtPosition = boardAt(
-        aiMoveEndPosition.x, aiMoveEndPosition.y);
-      if(pieceAtPosition > 0)
-        physicsWorld->collapsePiece(pieceAtPosition, aiMoveEndPosition);
-
-      movePiece(aiMoveStartPosition, aiMoveEndPosition);
-
-      // Get suggested user next move if available
-      if(stockfishConnector->suggestedUserMove.compare("(none)") != 0){
-        std::string startPosition_str = \
-          stockfishConnector->suggestedUserMove.substr(0, 2);
-        std::string endPosition_str = \
-          stockfishConnector->suggestedUserMove.substr(2, 2);
-
-        suggestedUserMoveStartPosition = uciFormatToPosition(startPosition_str);
-        suggestedUserMoveEndPosition = uciFormatToPosition(endPosition_str);
-      }else{
-        suggestedUserMoveStartPosition = {-1, -1};
-        suggestedUserMoveEndPosition = {-1, -1};
+        selectedPiecePosition.x, selectedPiecePosition.y);
+      if(pieceAtPosition < 0){
+        physicsWorld->collapsePiece(pieceAtPosition, selectedPiecePosition);
+        board[selectedPiecePosition.x][selectedPiecePosition.y] = EMPTY;
       }
 
-      // Transition to USER_TURN state
-      state = USER_TURN;
-      break;
+      // Set the currently moving piece
+      movingPiece = boardAt(
+        oldSelectedPiecePosition.x, oldSelectedPiecePosition.y);
+      movingPieceStartPosition = oldSelectedPiecePosition;
+      movingPieceEndPosition = selectedPiecePosition;
+      movingPiecePosition = {
+        (float)movingPieceStartPosition.x, (float)movingPieceStartPosition.y
+      };
+
+      // Remove the piece from its old position
+      board[oldSelectedPiecePosition.x][oldSelectedPiecePosition.y] = EMPTY;
+
+      // Store the last user move as an UCI string
+      lastUserMove.clear();
+      lastUserMove.append(
+        positionToUciFormat(oldSelectedPiecePosition));
+      lastUserMove.append(
+        positionToUciFormat(selectedPiecePosition));
+
+      // Unselect piece
+      oldSelectedPiecePosition = {-1, -1};
+      selectedPiecePosition = {-1, -1};
+
+      // Reset allowedNextPositions matrix
+      resetAllowedNextPositions();
+
+      // Transition to the next state
+      state = USER_MOVING;
+      clock->restart();
     }
+  }
+  else if(state == USER_MOVING or state == AI_MOVING) {
+    float elapsedTime = clock->getElapsedTime().asSeconds();
+    if(elapsedTime < 1.0){
+      movingPiecePosition = {
+        elapsedTime * movingPieceEndPosition.x + (1 - elapsedTime) * movingPieceStartPosition.x,
+        elapsedTime * movingPieceEndPosition.y + (1 - elapsedTime) * movingPieceStartPosition.y
+      };
+    } else {
+      // Add the moving piece to its end position
+      board[movingPieceEndPosition.x][movingPieceEndPosition.y] = movingPiece;
+
+      // Reset attributes
+      movingPiece = EMPTY;
+      movingPiecePosition = {-1, -1};
+      movingPieceStartPosition = {-1, -1};
+      movingPieceEndPosition = {-1, -1};
+
+      // Transition to waiting state if it's the next turn is the AI turn, USER_TURN otherwise.
+      state = state == USER_MOVING ? WAITING : USER_TURN;
+      clock->restart();
+    }
+  }
+  else if(state == WAITING) {
+    if(clock->getElapsedTime().asSeconds() >= 1.0){
+      state = AI_TURN;
+      clock->restart();
+    }
+  }
+  else if(state == AI_TURN) {
+    // Get AI decision according to the last user move
+    std::string aiMove = stockfishConnector->getNextAIMove(
+      lastUserMove);
+
+    // If the AI tried to move one user's pawn, stop the game
+    sf::Vector2i aiMoveStartPosition = uciFormatToPosition(
+      aiMove.substr(0, 2));
+    if(boardAt(aiMoveStartPosition.x, aiMoveStartPosition.y) >= 0){
+      throw GameException("A forbiden move has been performed!");
+    }
+
+    // If the AI took a user's piece, collapse it in the physicsWorld
+    sf::Vector2i aiMoveEndPosition = uciFormatToPosition(
+      aiMove.substr(2, 2));
+    int pieceAtPosition = boardAt(
+      aiMoveEndPosition.x, aiMoveEndPosition.y);
+    if(pieceAtPosition > 0){
+      physicsWorld->collapsePiece(pieceAtPosition, aiMoveEndPosition);
+      board[aiMoveEndPosition.x][aiMoveEndPosition.y] = EMPTY;
+    }
+
+    // Set the currently moving piece
+    movingPiece = boardAt(aiMoveStartPosition.x, aiMoveStartPosition.y);
+    movingPieceStartPosition = aiMoveStartPosition;
+    movingPieceEndPosition = aiMoveEndPosition;
+    movingPiecePosition = {
+      (float)aiMoveStartPosition.x, (float)aiMoveStartPosition.y
+    };
+
+    // Remove the piece from its old position
+    board[aiMoveStartPosition.x][aiMoveStartPosition.y] = EMPTY;
+
+    // Get suggested user next move if available
+    if(stockfishConnector->suggestedUserMove.compare("(none)") != 0){
+      std::string startPosition_str = \
+        stockfishConnector->suggestedUserMove.substr(0, 2);
+      std::string endPosition_str = \
+        stockfishConnector->suggestedUserMove.substr(2, 2);
+
+      suggestedUserMoveStartPosition = uciFormatToPosition(startPosition_str);
+      suggestedUserMoveEndPosition = uciFormatToPosition(endPosition_str);
+    }else{
+      suggestedUserMoveStartPosition = {-1, -1};
+      suggestedUserMoveEndPosition = {-1, -1};
+    }
+
+    // Transition to AI_MOVING state
+    state = AI_MOVING;
+    clock->restart();
   }
 };
 
