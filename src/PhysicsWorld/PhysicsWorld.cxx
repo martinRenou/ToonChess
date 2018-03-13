@@ -90,10 +90,8 @@ void PhysicsWorld::simulate(ChessGame* game){
 
 PhysicsWorld::~PhysicsWorld(){
   // Delete rigid bodies
-  if(fragmentPool.size() != 0)
-    for(unsigned int i = fragmentPool.size() - 1; i > 0; i--){
-      delete fragmentPool.at(i).second;
-    }
+  for(unsigned int i = 0; i < fragmentPool.size(); i++)
+    delete fragmentPool.at(i).second;
   fragmentPool.clear();
 
   // Delete ground
