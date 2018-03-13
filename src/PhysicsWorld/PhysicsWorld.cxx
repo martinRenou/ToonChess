@@ -13,7 +13,8 @@
 
 #include "PhysicsWorld.hxx"
 
-PhysicsWorld::PhysicsWorld(std::map<int, std::vector<Mesh*>>* fragmentMeshes)
+PhysicsWorld::PhysicsWorld(
+    std::map<int, std::vector<Mesh*>>* fragmentMeshes, ChessGame* game)
     : fragmentMeshes{fragmentMeshes}{
   // Create dynamics world
   broadphase = new btDbvtBroadphase();
@@ -47,6 +48,27 @@ PhysicsWorld::PhysicsWorld(std::map<int, std::vector<Mesh*>>* fragmentMeshes)
     0, limitGroundMotionState, limitGroundShape, btVector3(0, 0, 0));
   limitGroundRigidBody = new btRigidBody(limitGroundRigidBodyCI);
   dynamicsWorld->addRigidBody(limitGroundRigidBody);
+
+  // Create a cylinder rigid body for each piece on the board
+  pieceShape = new btCylinderShapeZ(btVector3(1.6, 1.6, 7.5));
+  for(int x = 0; x < 8; x++){
+    for(int y = 0; y < 8; y++){
+      if(game->boardAt(x, y) != EMPTY){
+        pieceMotionStates[x][y] = new btDefaultMotionState(btTransform(
+          btQuaternion(0, 0, 0, 1),
+          btVector3(x * 4 - 14, y * 4 - 14, 3.75)
+        ));
+
+        btRigidBody::btRigidBodyConstructionInfo pieceRigidBodyCI(
+          0, pieceMotionStates[x][y], pieceShape, btVector3(0, 0, 0));
+        pieceRigidBodies[x][y] = new btRigidBody(pieceRigidBodyCI);
+        dynamicsWorld->addRigidBody(limitGroundRigidBody);
+      } else {
+        pieceMotionStates[x][y] = NULL;
+        pieceRigidBodies[x][y] = NULL;
+      }
+    }
+  }
 
   // Start the innerClock
   innerClock = new sf::Clock();
@@ -98,6 +120,15 @@ PhysicsWorld::~PhysicsWorld(){
   delete groundShape;
   delete groundMotionState;
   delete groundRigidBody;
+
+  // Delete cylinders
+  delete pieceShape;
+  for(int x = 0; x < 8; x++){
+    for(int y = 0; y < 8; y++){
+      if(pieceMotionStates[x][y]) delete pieceMotionStates[x][y];
+      if(pieceRigidBodies[x][y]) delete pieceRigidBodies[x][y];
+    }
+  }
 
   // Delete dynamics world
   delete dynamicsWorld;

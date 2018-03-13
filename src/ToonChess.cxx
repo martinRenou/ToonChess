@@ -76,15 +76,6 @@ int main(){
     return 1;
   }
 
-  // Load pieces
-  std::map<int, Mesh*> pieces = initPieces();
-
-  // Load fragmented pieces
-  std::map<int, std::vector<Mesh*>> fragmentMeshes = initFragmentMeshes();
-
-  // Create physicsWorld
-  PhysicsWorld* physicsWorld = new PhysicsWorld(&fragmentMeshes);
-
   // Create an instance of the Game (This starts the communication with
   // Stockfish and could fail)
   ChessGame* game = new ChessGame();
@@ -94,12 +85,18 @@ int main(){
     std::cerr << e.what() << std::endl;
 
     delete game;
-    delete physicsWorld;
-    deletePieces(&pieces);
-    deleteFragmentMeshes(&fragmentMeshes);
 
     return 1;
   }
+
+  // Load pieces
+  std::map<int, Mesh*> pieces = initPieces();
+
+  // Load fragmented pieces
+  std::map<int, std::vector<Mesh*>> fragmentMeshes = initFragmentMeshes();
+
+  // Create physicsWorld
+  PhysicsWorld* physicsWorld = new PhysicsWorld(&fragmentMeshes, game);
 
   // Initialize color picking
   ColorPicking* colorPicking = new ColorPicking(

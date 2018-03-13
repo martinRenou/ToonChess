@@ -39,12 +39,18 @@ class PhysicsWorld{
     btDefaultMotionState* limitGroundMotionState;
     btRigidBody* limitGroundRigidBody;
 
+    /* Piece rigid body (used for every standing pieces) */
+    btCollisionShape* pieceShape;
+    btDefaultMotionState* pieceMotionStates[8][8];
+    btRigidBody* pieceRigidBodies[8][8];
+
     /* Inner clock for stepping simulation */
     sf::Clock* innerClock;
 
   public:
     /* Constructor */
-    explicit PhysicsWorld(std::map<int, std::vector<Mesh*>>* fragmentMeshes);
+    explicit PhysicsWorld(
+      std::map<int, std::vector<Mesh*>>* fragmentMeshes, ChessGame* game);
 
     /* Adds a piece to the dynamics world and collapse it
       \param piece Piece that you want to collapse: KING, QUEEN, BISHOP...
