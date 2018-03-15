@@ -1,5 +1,6 @@
 #include <vector>
 #include <map>
+#include <algorithm>
 
 #include <GL/gl.h>
 
@@ -82,8 +83,12 @@ void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
   for(unsigned int i = 0; i < fragmentMeshes->at(absPiece).size(); i++){
     // Create Fragment instance
     GLfloat rotation = piece > 0 ? -90 : 90;
+
+    std::uniform_real_distribution<double> distribution(2.0, 3.0);
+    GLfloat lifetime = distribution(generator);
+
     Fragment* fragment = new Fragment(
-      fragmentMeshes->at(absPiece).at(i), position, rotation);
+      fragmentMeshes->at(absPiece).at(i), position, rotation, lifetime);
 
     // Add it to the fragmentPool
     std::pair<int, Fragment*> pair(piece, fragment);
@@ -158,8 +163,32 @@ void PhysicsWorld::simulate(ChessGame* game){
     movingRigidBody = NULL;
   }
 
+  float timeSinceLastCall = innerClock->getElapsedTime().asSeconds();
+
+  // Take into account fragments lifetime
+  for(unsigned int i = 0; i < fragmentPool.size(); i++){
+    Fragment* fragment = fragmentPool.at(i).second;
+    fragment->lifetime -= timeSinceLastCall;
+
+    if(fragment->lifetime <= 0.0){
+      dynamicsWorld->removeRigidBody(fragment->rigidBody);
+      delete fragment;
+      fragmentPool.at(i).second = NULL;
+    }
+  }
+  // Remove fragments which lifetime is over from the fragment pool
+  fragmentPool.erase(
+    std::remove_if(
+      fragmentPool.begin(), fragmentPool.end(),
+      [](std::pair<int, Fragment*> x){
+        return x.second == NULL;
+      }
+    ),
+    fragmentPool.end()
+  );
+
   // Simulate the dynamics world
-  dynamicsWorld->stepSimulation(innerClock->getElapsedTime().asSeconds(), 7);
+  dynamicsWorld->stepSimulation(timeSinceLastCall, 7);
   innerClock->restart();
 };
 

@@ -7,8 +7,9 @@
 
 #include "Fragment.hxx"
 
-Fragment::Fragment(Mesh* mesh, sf::Vector2i position, GLfloat rotation)
-    : mesh{mesh}{
+Fragment::Fragment(
+    Mesh* mesh, sf::Vector2i position, GLfloat rotation, GLfloat lifetime)
+    : mesh{mesh}, lifetime{lifetime}{
   // Create a simplified version of the original mesh for optimization purppose
   btConvexHullShape* originalConvexHullShape = new btConvexHullShape();
   for(unsigned int i = 0; i < mesh->vertices.size() / 3; i ++){
