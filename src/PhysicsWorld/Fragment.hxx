@@ -28,6 +28,9 @@ class Fragment {
     /* Mesh */
     Mesh* mesh;
 
+    /* Lifetime before the fragment disappear */
+    float lifetime;
+
     btVector3 inertia;
     float mass;
 

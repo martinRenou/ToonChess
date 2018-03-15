@@ -62,6 +62,11 @@ Fragment::Fragment(Mesh* mesh, sf::Vector2i position, GLfloat rotation)
   fallRigidBodyCI.m_linearDamping = 0.4;
   fallRigidBodyCI.m_angularDamping = 0.4;
   rigidBody = new btRigidBody(fallRigidBodyCI);
+
+  // Setup lifetime as a random value
+  std::default_random_engine generator;
+  std::uniform_real_distribution<float> distribution(1.0, 1.4);
+  lifetime = distribution(generator);
 }
 
 std::vector<GLfloat> Fragment::getMoveMatrix(){
