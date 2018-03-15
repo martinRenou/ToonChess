@@ -52,6 +52,9 @@ class PhysicsWorld{
     /* Inner clock for stepping simulation */
     sf::Clock* innerClock;
 
+    /* Random generator for the fragments lifetime */
+    std::default_random_engine generator;
+
   public:
     /* Constructor */
     explicit PhysicsWorld(

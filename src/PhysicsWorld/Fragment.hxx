@@ -13,7 +13,8 @@
 class Fragment {
   public:
     /* Constructor */
-    explicit Fragment(Mesh* mesh, sf::Vector2i position, GLfloat rotation);
+    explicit Fragment(
+      Mesh* mesh, sf::Vector2i position, GLfloat rotation, GLfloat lifetime);
 
     /* Shape */
     btShapeHull* hull;
@@ -28,8 +29,8 @@ class Fragment {
     /* Mesh */
     Mesh* mesh;
 
-    /* Lifetime before the fragment disappear */
-    float lifetime;
+    /* Lifetime before the fragment disappear, in seconds */
+    GLfloat lifetime;
 
     btVector3 inertia;
     float mass;
