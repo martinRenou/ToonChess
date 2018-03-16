@@ -27,6 +27,7 @@ SmokeGenerator::SmokeGenerator(){
   }
 
   // Load texture
+  smokeTexture = new sf::Texture();
   if (!smokeTexture->loadFromFile("../assets/smoke_texture.png"))
     std::cout << "Couldn't load smoke texture file..." << std::endl;
 
