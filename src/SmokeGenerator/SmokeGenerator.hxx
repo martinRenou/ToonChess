@@ -14,6 +14,8 @@ struct SmokeParticle {
   float lifetime;
 };
 
+
+// cppcheck-suppress noCopyConstructor
 class SmokeGenerator {
 private:
   /* Max number of particles */
