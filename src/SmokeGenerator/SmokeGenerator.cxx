@@ -125,6 +125,10 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
       particle.position.y += particle.speed.y * timeSinceLastCall;
       particle.position.z += particle.speed.z * timeSinceLastCall;
 
+      // Shrink smoke when dying
+      if(particle.lifetime <= 1.1)
+        particle.size *= particle.lifetime;
+
       // Update the buffer
       positionSizeBuffer[4 * p + 0] = particle.position.x;
       positionSizeBuffer[4 * p + 1] = particle.position.y;
