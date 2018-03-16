@@ -81,7 +81,7 @@ void SmokeGenerator::generate(sf::Vector3f position, int numberParticles){
 
   // Random generators
   std::uniform_real_distribution<float> getPosition(-1.0, 1.0);
-  std::uniform_real_distribution<float> getSize(1.0, 1.5);
+  std::uniform_real_distribution<float> getSize(1.5, 2.5);
   std::uniform_real_distribution<float> getLifetime(2.0, 3.0);
 
   // Create particles
@@ -103,7 +103,7 @@ void SmokeGenerator::generate(sf::Vector3f position, int numberParticles){
   nbParticles += numberParticles;
 };
 
-void SmokeGenerator::draw(){
+void SmokeGenerator::draw(GameInfo* gameInfo){
   float timeSinceLastCall = innerClock->getElapsedTime().asSeconds();
 
   if(nbParticles > 0){
@@ -125,9 +125,6 @@ void SmokeGenerator::draw(){
       particle.position.y += particle.speed.y * timeSinceLastCall;
       particle.position.z += particle.speed.z * timeSinceLastCall;
 
-      // Update particle size
-      particle.size *= particle.lifetime;
-
       // Update the buffer
       positionSizeBuffer[4 * p + 0] = particle.position.x;
       positionSizeBuffer[4 * p + 1] = particle.position.y;
@@ -135,7 +132,17 @@ void SmokeGenerator::draw(){
       positionSizeBuffer[4 * p + 3] = particle.size;
     }
 
-    //TODO: Bind shader program, bind texture
+    // Bind smoke shader program
+    glUseProgram(smokeShaderProgram->id);
+
+    // Disable face culling
+    glDisable(GL_CULL_FACE);
+
+    smokeShaderProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
+    smokeShaderProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
+
+    smokeShaderProgram->bindTexture(
+      0, GL_TEXTURE0, "smokeTexture", smokeTexture);
 
     // Bind the new positionSizeBuffer
     glBindBuffer(GL_ARRAY_BUFFER, positionSizeBufferId);
@@ -152,11 +159,13 @@ void SmokeGenerator::draw(){
 
     // Send vertices
     glEnableVertexAttribArray(0);
+    glBindAttribLocation(smokeShaderProgram->id, 0, "vertexPosition");
     glBindBuffer(GL_ARRAY_BUFFER, vertexBufferId);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // Send positions and sizes
     glEnableVertexAttribArray(1);
+    glBindAttribLocation(smokeShaderProgram->id, 1, "center_size");
     glBindBuffer(GL_ARRAY_BUFFER, positionSizeBufferId);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
@@ -167,6 +176,12 @@ void SmokeGenerator::draw(){
 
     // Draw triangles
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, nbParticles);
+
+    glDisableVertexAttribArray(0);
+    glDisableVertexAttribArray(1);
+
+    // Enable face culling
+    glEnable(GL_CULL_FACE);
   }
 
   // Restart clock

@@ -99,7 +99,7 @@ void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
   }
 };
 
-void PhysicsWorld::simulate(ChessGame* game){
+void PhysicsWorld::simulate(ChessGame* game, SmokeGenerator* smokeGenerator){
   // If a piece is moving on the board, move its rigid body in the dynamics world
   if(game->movingPiece != EMPTY){
     sf::Vector2i startPosition = game->movingPieceStartPosition;
@@ -171,6 +171,18 @@ void PhysicsWorld::simulate(ChessGame* game){
     fragment->lifetime -= timeSinceLastCall;
 
     if(fragment->lifetime <= 0.0){
+      // Generate smoke particles where the fragment disapeared
+      btTransform trans;
+      fragment->rigidBody->getMotionState()->getWorldTransform(trans);
+      smokeGenerator->generate(
+        {
+          trans.getOrigin().getX(),
+          trans.getOrigin().getY(),
+          trans.getOrigin().getZ()
+        },
+        10
+      );
+
       dynamicsWorld->removeRigidBody(fragment->rigidBody);
       delete fragment;
       fragmentPool.at(i).second = NULL;

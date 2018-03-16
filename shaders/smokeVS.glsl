@@ -15,7 +15,7 @@ void main(void){
     vertexPosition.x * particleSize, 0.0, vertexPosition.z * particleSize);
 
   // Compute UV coordinates
-  UV = vertexPosition.xy + vec2(0.5, 0.5);
+  UV = vertexPosition.xz + vec2(0.5, 0.5);
 
   // The position of the vertex
   gl_Position = PMatrix * VMatrix * vec4(position, 1.0);

@@ -8,6 +8,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "../shader/ShaderProgram.hxx"
+#include "../GameInfo.hxx"
 
 struct SmokeParticle {
   sf::Vector3f speed;
@@ -72,7 +73,7 @@ public:
   void generate(sf::Vector3f position, int numberParticles);
 
   /* Draw smoke in the currently bound framebuffer object */
-  void draw();
+  void draw(GameInfo* gameInfo);
 
   /* Destructor, this will remove the buffers from memory */
   ~SmokeGenerator();

@@ -251,7 +251,7 @@ int main(){
     }
 
     // Simulate dynamics world
-    physicsWorld->simulate(game);
+    physicsWorld->simulate(game, smokeGenerator);
 
     // Create the shadowMap
     shadowMap = shadowMapping->getShadowMap(
@@ -268,6 +268,9 @@ int main(){
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(
       game, physicsWorld, &gameInfo, &pieces, &programs, shadowMap);
+
+    // Display smoke particles
+    smokeGenerator->draw(&gameInfo);
 
     // Perform the chess rules
     try{
