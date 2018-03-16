@@ -50,6 +50,9 @@ private:
   /* Inner clock for updating particles */
   sf::Clock* innerClock;
 
+  /* Smoke texture */
+  sf::Texture* smokeTexture;
+
 public:
   /* Constructor */
   explicit SmokeGenerator();

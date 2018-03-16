@@ -26,6 +26,10 @@ SmokeGenerator::SmokeGenerator(){
     smokeParticles.push_back(particle);
   }
 
+  // Load texture
+  if (!smokeTexture->loadFromFile("../assets/smoke_texture.png"))
+    std::cout << "Couldn't load smoke texture file..." << std::endl;
+
   // Start clock
   innerClock = new sf::Clock();
 };
@@ -151,5 +155,6 @@ SmokeGenerator::~SmokeGenerator(){
   glDeleteBuffers(1, &vertexBufferId);
   glDeleteBuffers(1, &positionSizeBufferId);
 
+  delete smokeTexture;
   delete innerClock;
 };
