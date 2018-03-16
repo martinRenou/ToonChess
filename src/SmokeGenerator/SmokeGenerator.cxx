@@ -80,8 +80,8 @@ void SmokeGenerator::generate(sf::Vector3f position, int numberParticles){
   }
 
   // Random generators
-  std::uniform_real_distribution<float> getPosition(-1.0, 1.0);
-  std::uniform_real_distribution<float> getSize(1.5, 2.5);
+  std::uniform_real_distribution<float> getPosition(-0.2, 1.5);
+  std::uniform_real_distribution<float> getSize(1.0, 3.5);
   std::uniform_real_distribution<float> getLifetime(2.0, 3.0);
 
   // Create particles
