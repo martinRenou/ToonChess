@@ -18,6 +18,8 @@
 #include "ColorPicking/ColorPicking.hxx"
 #include "ShadowMapping/ShadowMapping.hxx"
 
+#include "SmokeGenerator/SmokeGenerator.hxx"
+
 #include "PhysicsWorld/PhysicsWorld.hxx"
 
 #include "constants.hxx"
@@ -88,6 +90,10 @@ int main(){
 
     return 1;
   }
+
+  // Create SmokeGenerator
+  SmokeGenerator* smokeGenerator = new SmokeGenerator();
+  smokeGenerator->initBuffers();
 
   // Load pieces
   std::map<int, Mesh*> pieces = initPieces();
@@ -265,6 +271,7 @@ int main(){
       deletePrograms(&programs);
       delete colorPicking;
       delete shadowMapping;
+      delete smokeGenerator;
       delete game;
       delete physicsWorld;
 
@@ -283,6 +290,7 @@ int main(){
   deletePrograms(&programs);
   delete colorPicking;
   delete shadowMapping;
+  delete smokeGenerator;
   delete game;
   delete physicsWorld;
 
