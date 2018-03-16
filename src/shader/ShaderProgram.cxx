@@ -124,6 +124,18 @@ void ShaderProgram::bindTexture(
   glBindTexture(GL_TEXTURE_2D, texture);
 };
 
+void ShaderProgram::bindTexture(
+    GLuint n, GLenum target, std::string name, sf::Texture* texture){
+  GLuint location = glGetUniformLocation(id, name.c_str());
+
+  glUniform1i(location, n);
+
+  glActiveTexture(target);
+
+  sf::Texture::bind(texture);
+};
+
+
 ShaderProgram::~ShaderProgram(){
   deleteShaders(&shaders);
 
