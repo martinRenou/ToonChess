@@ -12,18 +12,18 @@
 
 #include "SmokeGenerator.hxx"
 
-bool compareByLifetime(SmokeParticle p1, SmokeParticle p2){
-  return (p1.lifetime > p2.lifetime);
+bool compareByLifetime(SmokeParticle* p1, SmokeParticle* p2){
+  return (p1->lifetime > p2->lifetime);
 }
 
 SmokeGenerator::SmokeGenerator(){
   // Create smoke particles
   for(int p = 0; p < maxNbParticles; p++){
-    SmokeParticle particle;
-    particle.speed = {0.0, 0.0, 0.0};
-    particle.position = {0.0, 0.0, 0.0};
-    particle.size = 0.0;
-    particle.lifetime = 0.0;
+    SmokeParticle* particle = new SmokeParticle;
+    particle->speed = {0.0, 0.0, 0.0};
+    particle->position = {0.0, 0.0, 0.0};
+    particle->size = 0.0;
+    particle->lifetime = 0.0;
 
     smokeParticles.push_back(particle);
   }
@@ -86,15 +86,15 @@ void SmokeGenerator::generate(sf::Vector3f position, int numberParticles){
 
   // Create particles
   for(int p = nbParticles; p < nbParticles + numberParticles; p++){
-    SmokeParticle& particle = smokeParticles.at(p);
-    particle.speed = {0.1, 0.1, 0.2};
-    particle.position = {
+    SmokeParticle* particle = smokeParticles.at(p);
+    particle->speed = {0.1, 0.1, 0.2};
+    particle->position = {
       position.x + getPosition(generator),
       position.y + getPosition(generator),
       position.z + getPosition(generator)
     };
-    particle.size = getSize(generator);
-    particle.lifetime = getLifetime(generator);
+    particle->size = getSize(generator);
+    particle->lifetime = getLifetime(generator);
   }
 
   // Sort particles by lifetime
@@ -109,31 +109,31 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
   if(nbParticles > 0){
     // Update positionSizeBuffer
     for(int p = 0; p < nbParticles; p++){
-      SmokeParticle& particle = smokeParticles.at(p);
+      SmokeParticle* particle = smokeParticles.at(p);
 
       // Update particle lifetime
-      particle.lifetime -= timeSinceLastCall;
-      if(particle.lifetime <= 0.0){
-        particle.lifetime = 0.0;
+      particle->lifetime -= timeSinceLastCall;
+      if(particle->lifetime <= 0.0){
+        particle->lifetime = 0.0;
         nbParticles -= 1;
 
         continue;
       }
 
       // Update particle position
-      particle.position.x += particle.speed.x * timeSinceLastCall;
-      particle.position.y += particle.speed.y * timeSinceLastCall;
-      particle.position.z += particle.speed.z * timeSinceLastCall;
+      particle->position.x += particle->speed.x * timeSinceLastCall;
+      particle->position.y += particle->speed.y * timeSinceLastCall;
+      particle->position.z += particle->speed.z * timeSinceLastCall;
 
       // Shrink smoke when dying
-      if(particle.lifetime <= 1.1)
-        particle.size *= particle.lifetime;
+      if(particle->lifetime <= 1.1)
+        particle->size *= particle->lifetime;
 
       // Update the buffer
-      positionSizeBuffer[4 * p + 0] = particle.position.x;
-      positionSizeBuffer[4 * p + 1] = particle.position.y;
-      positionSizeBuffer[4 * p + 2] = particle.position.z;
-      positionSizeBuffer[4 * p + 3] = particle.size;
+      positionSizeBuffer[4 * p + 0] = particle->position.x;
+      positionSizeBuffer[4 * p + 1] = particle->position.y;
+      positionSizeBuffer[4 * p + 2] = particle->position.z;
+      positionSizeBuffer[4 * p + 3] = particle->size;
     }
 
     // Bind smoke shader program
@@ -195,6 +195,9 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
 SmokeGenerator::~SmokeGenerator(){
   glDeleteBuffers(1, &vertexBufferId);
   glDeleteBuffers(1, &positionSizeBufferId);
+
+  for(unsigned int p = 0; p < smokeParticles.size(); p++)
+    delete smokeParticles.at(p);
 
   delete smokeShaderProgram;
   delete smokeTexture;

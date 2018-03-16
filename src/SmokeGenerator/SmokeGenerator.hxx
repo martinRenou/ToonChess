@@ -45,7 +45,7 @@ private:
   GLfloat positionSizeBuffer[maxNbParticles];
 
   /* The array of smoke particles */
-  std::vector<SmokeParticle> smokeParticles;
+  std::vector<SmokeParticle*> smokeParticles;
 
   /* Random generator for the lifetime, speed, position and size */
   std::default_random_engine generator;
