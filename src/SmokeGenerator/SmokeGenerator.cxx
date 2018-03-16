@@ -135,6 +135,8 @@ void SmokeGenerator::draw(){
       positionSizeBuffer[4 * p + 3] = particle.size;
     }
 
+    //TODO: Bind shader program, bind texture
+
     // Bind the new positionSizeBuffer
     glBindBuffer(GL_ARRAY_BUFFER, positionSizeBufferId);
     glBufferData(
