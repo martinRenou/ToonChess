@@ -180,7 +180,7 @@ void PhysicsWorld::simulate(ChessGame* game, SmokeGenerator* smokeGenerator){
           trans.getOrigin().getY(),
           trans.getOrigin().getZ()
         },
-        10
+        (int)round(fragment->mass) + 1
       );
 
       dynamicsWorld->removeRigidBody(fragment->rigidBody);
