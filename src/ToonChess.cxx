@@ -87,12 +87,23 @@ int main(){
     std::cerr << e.what() << std::endl;
 
     delete game;
+    deletePrograms(&programs);
 
     return 1;
   }
 
   // Create SmokeGenerator
-  SmokeGenerator* smokeGenerator = new SmokeGenerator();
+  SmokeGenerator* smokeGenerator;
+  try{
+    smokeGenerator = new SmokeGenerator();
+  } catch(const std::exception& e){
+    std::cerr << e.what() << std::endl;
+
+    delete game;
+    deletePrograms(&programs);
+
+    return 1;
+  }
   smokeGenerator->initBuffers();
 
   // Load pieces

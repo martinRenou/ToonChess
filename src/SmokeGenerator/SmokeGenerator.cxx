@@ -8,6 +8,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "../shader/shaderPrograms.hxx"
+
 #include "SmokeGenerator.hxx"
 
 bool compareByLifetime(SmokeParticle p1, SmokeParticle p2){
@@ -24,6 +26,21 @@ SmokeGenerator::SmokeGenerator(){
     particle.lifetime = 0.0;
 
     smokeParticles.push_back(particle);
+  }
+
+  // Create the smoke shader program
+  smokeShaderProgram = createProgram(
+    "../shaders/smokeVS.glsl",
+    "../shaders/smokeFS.glsl"
+  );
+
+  try{
+    smokeShaderProgram->compile();
+  } catch(const std::exception& e){
+    // If something went wrong, delete the program and forward the exception
+    delete smokeShaderProgram;
+
+    throw;
   }
 
   // Load texture
@@ -156,6 +173,7 @@ SmokeGenerator::~SmokeGenerator(){
   glDeleteBuffers(1, &vertexBufferId);
   glDeleteBuffers(1, &positionSizeBufferId);
 
+  delete smokeShaderProgram;
   delete smokeTexture;
   delete innerClock;
 };

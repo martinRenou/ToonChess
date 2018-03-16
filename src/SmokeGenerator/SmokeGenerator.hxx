@@ -7,6 +7,8 @@
 
 #include <SFML/Graphics.hpp>
 
+#include "../shader/ShaderProgram.hxx"
+
 struct SmokeParticle {
   sf::Vector3f speed;
   sf::Vector3f position;
@@ -52,6 +54,9 @@ private:
 
   /* Smoke texture */
   sf::Texture* smokeTexture;
+
+  /* The shader program for displaying smoke */
+  ShaderProgram* smokeShaderProgram;
 
 public:
   /* Constructor */
