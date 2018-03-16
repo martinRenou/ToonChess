@@ -150,4 +150,6 @@ void SmokeGenerator::draw(){
 SmokeGenerator::~SmokeGenerator(){
   glDeleteBuffers(1, &vertexBufferId);
   glDeleteBuffers(1, &positionSizeBufferId);
+
+  delete innerClock;
 };
