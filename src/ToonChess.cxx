@@ -76,6 +76,19 @@ int main(){
     return 1;
   }
 
+  // Create an instance of the Game (This starts the communication with
+  // Stockfish and could fail)
+  ChessGame* game = new ChessGame();
+  try{
+    game->start();
+  } catch(const std::exception& e){
+    std::cerr << e.what() << std::endl;
+
+    delete game;
+
+    return 1;
+  }
+
   // Load pieces
   std::map<int, Mesh*> pieces = initPieces();
 
@@ -83,23 +96,7 @@ int main(){
   std::map<int, std::vector<Mesh*>> fragmentMeshes = initFragmentMeshes();
 
   // Create physicsWorld
-  PhysicsWorld* physicsWorld = new PhysicsWorld(&fragmentMeshes);
-
-  // Create an instance of the Game (This starts the communication with
-  // Stockfish and could fail)
-  ChessGame* game = new ChessGame(physicsWorld);
-  try{
-    game->start();
-  } catch(const std::exception& e){
-    std::cerr << e.what() << std::endl;
-
-    delete game;
-    delete physicsWorld;
-    deletePieces(&pieces);
-    deleteFragmentMeshes(&fragmentMeshes);
-
-    return 1;
-  }
+  PhysicsWorld* physicsWorld = new PhysicsWorld(&fragmentMeshes, game);
 
   // Initialize color picking
   ColorPicking* colorPicking = new ColorPicking(
@@ -237,7 +234,7 @@ int main(){
     }
 
     // Simulate dynamics world
-    physicsWorld->simulate();
+    physicsWorld->simulate(game);
 
     // Create the shadowMap
     shadowMap = shadowMapping->getShadowMap(

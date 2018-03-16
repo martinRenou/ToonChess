@@ -6,16 +6,12 @@
 #include <SFML/Graphics.hpp>
 
 #include "../constants.hxx"
-#include "../PhysicsWorld/IPhysicsWorld.hxx"
 #include "StockfishConnector.hxx"
 
 
 // cppcheck-suppress noCopyConstructor
 class ChessGame {
 private:
-  /* PhysicsWorld */
-  IPhysicsWorld* physicsWorld;
-
   /* Last user move */
   std::string lastUserMove;
 
@@ -55,11 +51,6 @@ private:
   */
   std::string positionToUciFormat(sf::Vector2i position);
 
-  /* Method used for accessing piece at position {x, y}, if {x, y} doesn't
-  correspond to a position on the board, it returns OUT_OF_BOUND constant and
-  doesn't throw exception */
-  const int boardAt(int x, int y);
-
   /* Compute the allowedNextPositions matrix for a specific piece */
   void computePAWNNextPositions(sf::Vector2i position);
   void computeROOKNextPositions(sf::Vector2i position);
@@ -75,7 +66,7 @@ private:
 
 public:
   /* Constructor */
-  explicit ChessGame(IPhysicsWorld* physicsWorld);
+  explicit ChessGame();
 
   /* The checkerboard */
   int board[8][8] = {
@@ -100,6 +91,11 @@ public:
     {false, false, false, false, false, false, false, false},
     {false, false, false, false, false, false, false, false}
   };
+
+  /* Method used for accessing piece at position {x, y}, if {x, y} doesn't
+  correspond to a position on the board, it returns OUT_OF_BOUND constant and
+  doesn't throw exception */
+  const int boardAt(int x, int y);
 
   /* Position of the currently selected chess piece {-1, -1} if nothing is
   selected */

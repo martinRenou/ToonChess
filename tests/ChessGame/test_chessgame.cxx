@@ -1,12 +1,10 @@
 #include <gtest/gtest.h>
 
 #include "../../src/ChessGame/ChessGame.hxx"
-#include "../test_utils.cxx"
 
 
 TEST(chess_game, initialization){
-  MockPhysicsWorld physicsWorld;
-  ChessGame* game = new ChessGame(&physicsWorld);
+  ChessGame* game = new ChessGame();
   game->start();
 
   EXPECT_EQ(game->oldSelectedPiecePosition.x, -1);
@@ -38,8 +36,7 @@ TEST(chess_game, initialization){
 };
 
 TEST(chess_game, unselect_piece){
-  MockPhysicsWorld physicsWorld;
-  ChessGame* game = new ChessGame(&physicsWorld);
+  ChessGame* game = new ChessGame();
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -77,8 +74,7 @@ TEST(chess_game, unselect_piece){
 };
 
 TEST(chess_game, pawn_move_1){
-  MockPhysicsWorld physicsWorld;
-  ChessGame* game = new ChessGame(&physicsWorld);
+  ChessGame* game = new ChessGame();
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -127,8 +123,7 @@ TEST(chess_game, pawn_move_1){
 };
 
 TEST(chess_game, pawn_move_2){
-  MockPhysicsWorld physicsWorld;
-  ChessGame* game = new ChessGame(&physicsWorld);
+  ChessGame* game = new ChessGame();
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -162,8 +157,7 @@ TEST(chess_game, pawn_move_2){
 };
 
 TEST(chess_game, pawn_forbiden_move){
-  MockPhysicsWorld physicsWorld;
-  ChessGame* game = new ChessGame(&physicsWorld);
+  ChessGame* game = new ChessGame();
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -197,8 +191,7 @@ TEST(chess_game, pawn_forbiden_move){
 };
 
 TEST(chess_game, knight_move_1){
-  MockPhysicsWorld physicsWorld;
-  ChessGame* game = new ChessGame(&physicsWorld);
+  ChessGame* game = new ChessGame();
   game->start();
 
   // Select KNIGHT (simulating click on a pawn)
@@ -232,8 +225,7 @@ TEST(chess_game, knight_move_1){
 };
 
 TEST(chess_game, knight_move_2){
-  MockPhysicsWorld physicsWorld;
-  ChessGame* game = new ChessGame(&physicsWorld);
+  ChessGame* game = new ChessGame();
   game->start();
 
   // Select KNIGHT (simulating click on a pawn)

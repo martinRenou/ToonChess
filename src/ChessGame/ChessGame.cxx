@@ -4,7 +4,7 @@
 #include "ChessGame.hxx"
 
 
-ChessGame::ChessGame(IPhysicsWorld* physicsWorld) : physicsWorld{physicsWorld}{
+ChessGame::ChessGame(){
   // Start communication with stockfish
   stockfishConnector = new StockfishConnector();
 
@@ -262,14 +262,6 @@ void ChessGame::perform(){
     // user wants to move a piece
     if(allowedNextPositions[selectedPiecePosition.x]
                            [selectedPiecePosition.y] == true){
-      // If the user took a AI piece, collapse it in the physicsWorld
-      int pieceAtPosition = boardAt(
-        selectedPiecePosition.x, selectedPiecePosition.y);
-      if(pieceAtPosition < 0){
-        physicsWorld->collapsePiece(pieceAtPosition, selectedPiecePosition);
-        board[selectedPiecePosition.x][selectedPiecePosition.y] = EMPTY;
-      }
-
       // Set the currently moving piece
       movingPiece = boardAt(
         oldSelectedPiecePosition.x, oldSelectedPiecePosition.y);
@@ -341,20 +333,11 @@ void ChessGame::perform(){
       throw GameException("A forbiden move has been performed!");
     }
 
-    // If the AI took a user's piece, collapse it in the physicsWorld
-    sf::Vector2i aiMoveEndPosition = uciFormatToPosition(
-      aiMove.substr(2, 2));
-    int pieceAtPosition = boardAt(
-      aiMoveEndPosition.x, aiMoveEndPosition.y);
-    if(pieceAtPosition > 0){
-      physicsWorld->collapsePiece(pieceAtPosition, aiMoveEndPosition);
-      board[aiMoveEndPosition.x][aiMoveEndPosition.y] = EMPTY;
-    }
-
     // Set the currently moving piece
     movingPiece = boardAt(aiMoveStartPosition.x, aiMoveStartPosition.y);
     movingPieceStartPosition = aiMoveStartPosition;
-    movingPieceEndPosition = aiMoveEndPosition;
+    movingPieceEndPosition = uciFormatToPosition(
+      aiMove.substr(2, 2));;
     movingPiecePosition = {
       (float)aiMoveStartPosition.x, (float)aiMoveStartPosition.y
     };

@@ -7,8 +7,9 @@
 
 #include "Fragment.hxx"
 
-Fragment::Fragment(Mesh* mesh, sf::Vector2i position, GLfloat rotation)
-    : mesh{mesh}{
+Fragment::Fragment(
+    Mesh* mesh, sf::Vector2i position, GLfloat rotation, GLfloat lifetime)
+    : mesh{mesh}, lifetime{lifetime}{
   // Create a simplified version of the original mesh for optimization purppose
   btConvexHullShape* originalConvexHullShape = new btConvexHullShape();
   for(unsigned int i = 0; i < mesh->vertices.size() / 3; i ++){
@@ -32,14 +33,24 @@ Fragment::Fragment(Mesh* mesh, sf::Vector2i position, GLfloat rotation)
   convexHullShape->calculateLocalInertia(1, inertia);
 
   // Create the motion state
-  motionState = new btDefaultMotionState(
-    btTransform(btQuaternion(btVector3(0, 0, 1), rotation * M_PI/180.),
+  btTransform initialPosition = btTransform(
+    btQuaternion(btVector3(0, 0, 1), rotation * M_PI/180.),
     btVector3(
-      position.x * 4 - 14 + origin.x,
-      position.y * 4 - 14 + origin.y,
-      origin.z
-    ))
+      position.x * 4 - 14,
+      position.y * 4 - 14,
+      0
+    )
   );
+  // Take into account origin of each fragment
+  initialPosition *= btTransform(
+    btQuaternion::getIdentity(),
+    btVector3(
+      origin.x,
+      origin.y,
+      origin.z
+    )
+  );
+  motionState = new btDefaultMotionState(initialPosition);
 
   // And the rigid body
   btRigidBody::btRigidBodyConstructionInfo fallRigidBodyCI(
