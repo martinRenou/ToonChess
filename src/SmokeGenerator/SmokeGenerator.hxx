@@ -50,9 +50,6 @@ private:
   /* Inner clock for updating particles */
   sf::Clock* innerClock;
 
-  /* Delete buffers from memory */
-  void deleteBuffers();
-
 public:
   /* Constructor */
   explicit SmokeGenerator();
