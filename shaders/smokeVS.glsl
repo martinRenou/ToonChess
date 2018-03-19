@@ -16,6 +16,7 @@ void main(void){
 
   // Compute UV coordinates
   UV = vertexPosition.xz + vec2(0.5, 0.5);
+  UV.y = abs(UV.y - 1.0);
 
   // The position of the vertex
   gl_Position = PMatrix * VMatrix * vec4(position, 1.0);
