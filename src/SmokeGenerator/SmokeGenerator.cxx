@@ -12,8 +12,8 @@
 
 #include "SmokeGenerator.hxx"
 
-bool compareByLifetime(SmokeParticle* p1, SmokeParticle* p2){
-  return (p1->lifetime > p2->lifetime);
+bool compareByRemainingLife(SmokeParticle* p1, SmokeParticle* p2){
+  return (p1->remainingLife > p2->remainingLife);
 }
 
 SmokeGenerator::SmokeGenerator(){
@@ -24,6 +24,7 @@ SmokeGenerator::SmokeGenerator(){
     particle->position = {0.0, 0.0, 0.0};
     particle->size = 0.0;
     particle->lifetime = 0.0;
+    particle->remainingLife = 0.0;
     particle->textureIndex = 0;
 
     smokeParticles.push_back(particle);
@@ -116,11 +117,13 @@ void SmokeGenerator::generate(sf::Vector3f position, int numberParticles){
     particle->speed = {0.1, 0.1, zSpeed};
 
     particle->lifetime = getLifetime(generator);
+    particle->remainingLife = particle->lifetime;
     particle->textureIndex = getTextureIndex(generator);
   }
 
   // Sort particles by lifetime
-  std::sort(smokeParticles.begin(), smokeParticles.end(), compareByLifetime);
+  std::sort(
+    smokeParticles.begin(), smokeParticles.end(), compareByRemainingLife);
 
   nbParticles += numberParticles;
 };
@@ -134,9 +137,9 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
       SmokeParticle* particle = smokeParticles.at(p);
 
       // Update particle lifetime
-      particle->lifetime -= timeSinceLastCall;
-      if(particle->lifetime <= 0.0){
-        particle->lifetime = 0.0;
+      particle->remainingLife -= timeSinceLastCall;
+      if(particle->remainingLife <= 0.0){
+        particle->remainingLife = 0.0;
         nbParticles -= 1;
 
         continue;
@@ -147,15 +150,18 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
       particle->position.y += particle->speed.y * timeSinceLastCall;
       particle->position.z += particle->speed.z * timeSinceLastCall;
 
-      // Shrink smoke when dying
-      if(particle->lifetime <= 1.1)
-        particle->size *= particle->lifetime;
+      // Enlarge smoke when generated and shrink it when dying
+      float size = particle->size;
+      if(particle->lifetime - particle->remainingLife <= 0.2)
+        size *= 5 * (particle->lifetime - particle->remainingLife);
+      if(particle->remainingLife <= 1.1)
+        size *= particle->remainingLife;
 
       // Update the buffer
       positionSizeBuffer[4 * p + 0] = particle->position.x;
       positionSizeBuffer[4 * p + 1] = particle->position.y;
       positionSizeBuffer[4 * p + 2] = particle->position.z;
-      positionSizeBuffer[4 * p + 3] = particle->size;
+      positionSizeBuffer[4 * p + 3] = size;
 
       textureIndexBuffer[p] = particle->textureIndex;
     }

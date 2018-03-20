@@ -14,7 +14,10 @@ struct SmokeParticle {
   sf::Vector3f speed;
   sf::Vector3f position;
   float size;
+
   float lifetime;
+  float remainingLife;
+
   float textureIndex;
 };
 
