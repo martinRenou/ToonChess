@@ -103,6 +103,18 @@
         I also wanted to display black borders for chess pieces. In order to explain how I did it I'll have to explain what Backface Culling is. Backface Culling is a step during rendering in which triangles of the mesh are sorted between displayed triangles (visible on the screen) and hidden triangles (not visible because of camera point of view). Hidden triangles are not rendered in order to save computation time. Now, in order to display black borders I chose to display those "hidden triangles" in black and to enlarge them. It results in a nice black border effect, without the need of a filtering step (I could have used a sobel filter for example).
       </p>
 
+      <h3 class="mt-3"> Physics and particle system </h3>
+      <p class="text-justify">
+        I wanted chess pieces to collapse when they are taken, in order to achieve that I used <a href="http://bulletphysics.org/wordpress/">Bullet Physics</a>
+        which is a well known C++ physics library. I used Blender for generating fragment meshes and Bullet Physics for real time collisions and physics simulation.
+        The result was interesting but I needed a nice way to remove fragments from the view. That's why I decided to display smoke when fragments disappear.
+        I used a simple particle system for smoke, each particle has its own size, position, speed and lifetime.
+        <div class="d-inline-block" style="text-align: center;">
+          <img src="images/queen_collapsing.gif" class="rounded" style="max-width: 30%;height: auto;">
+          <img src="images/bishop_collapsing.gif" class="rounded" style="max-width: 30%;height: auto;">
+        </div>
+      </p>
+
       <h3 class="mt-3"> Shadow Mapping </h3>
       <p class="text-justify">
         For the shadows I used the well-known Shadow Mapping technique. A separate render is performed using a Render To Texture technique (RTT), in which the distance from the light is saved for each mesh in a texture. (See picture below, the nearer the mesh is from the light, the darker it is in the shadowmap). And this distance from the light can be used in the main rendering process in order to know if the currently rendered part of the mesh is hidden from the light by another object. See
