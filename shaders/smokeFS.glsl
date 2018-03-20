@@ -1,5 +1,5 @@
 varying vec2 UV;
-
+varying vec3 _color;
 varying float _textureIndex;
 
 uniform sampler2D smokeTexture0;
@@ -15,6 +15,9 @@ void main(void){
   else color = texture2D(smokeTexture2, UV);
 
   if(color.a <= 0.01) discard;
+
+  // Multiply by sprite color
+  color *= vec4(_color, 1.0);
 
   gl_FragColor = color;
 }

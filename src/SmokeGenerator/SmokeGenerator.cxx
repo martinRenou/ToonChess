@@ -25,6 +25,7 @@ SmokeGenerator::SmokeGenerator(){
     particle->size = 0.0;
     particle->lifetime = 0.0;
     particle->remainingLife = 0.0;
+    particle->initialColor = {1.0, 1.0, 1.0};
     particle->textureIndex = 0;
 
     smokeParticles.push_back(particle);
@@ -80,16 +81,17 @@ void SmokeGenerator::initBuffers(){
     GL_STREAM_DRAW);
 
   // TextureIndex buffer
-  glGenBuffers(1, &textureIndexBufferId);
-  glBindBuffer(GL_ARRAY_BUFFER, textureIndexBufferId);
+  glGenBuffers(1, &colorTextureBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, colorTextureBufferId);
   glBufferData(
     GL_ARRAY_BUFFER,
-    maxNbParticles * 1 * sizeof(GLfloat),
+    maxNbParticles * 4 * sizeof(GLfloat),
     NULL,
     GL_STREAM_DRAW);
 };
 
-void SmokeGenerator::generate(sf::Vector3f position, int numberParticles){
+void SmokeGenerator::generate(
+    sf::Vector3f position, int numberParticles, sf::Vector3f color){
   if(nbParticles + numberParticles > maxNbParticles){
     std::cout << "Cannot create more particles..." << std::endl;
 
@@ -119,6 +121,8 @@ void SmokeGenerator::generate(sf::Vector3f position, int numberParticles){
     particle->lifetime = getLifetime(generator);
     particle->remainingLife = particle->lifetime;
     particle->textureIndex = getTextureIndex(generator);
+
+    particle->initialColor = {color.x, color.y, color.z};
   }
 
   // Sort particles by lifetime
@@ -163,7 +167,12 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
       positionSizeBuffer[4 * p + 2] = particle->position.z;
       positionSizeBuffer[4 * p + 3] = size;
 
-      textureIndexBuffer[p] = particle->textureIndex;
+      float a = \
+        (particle->lifetime - particle->remainingLife) / particle->lifetime;
+      colorTextureBuffer[4 * p + 0] = (1 - a) * particle->initialColor.x + a;
+      colorTextureBuffer[4 * p + 1] = (1 - a) * particle->initialColor.y + a;
+      colorTextureBuffer[4 * p + 2] = (1 - a) * particle->initialColor.z + a;
+      colorTextureBuffer[4 * p + 3] = particle->textureIndex;
     }
 
     // Bind smoke shader program
@@ -196,17 +205,17 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
       positionSizeBuffer);
 
     // Bind the new textureIndexBuffer
-    glBindBuffer(GL_ARRAY_BUFFER, textureIndexBufferId);
+    glBindBuffer(GL_ARRAY_BUFFER, colorTextureBufferId);
     glBufferData(
       GL_ARRAY_BUFFER,
-      maxNbParticles * 1 * sizeof(GLfloat),
+      maxNbParticles * 4 * sizeof(GLfloat),
       NULL,
       GL_STREAM_DRAW);
     glBufferSubData(
       GL_ARRAY_BUFFER,
       0,
-      maxNbParticles * 1 * sizeof(GLfloat),
-      textureIndexBuffer);
+      maxNbParticles * 4 * sizeof(GLfloat),
+      colorTextureBuffer);
 
     // Send vertices
     glEnableVertexAttribArray(0);
@@ -222,9 +231,9 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
 
     // Send texture indices
     glEnableVertexAttribArray(2);
-    glBindAttribLocation(smokeShaderProgram->id, 2, "textureIndex");
-    glBindBuffer(GL_ARRAY_BUFFER, textureIndexBufferId);
-    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glBindAttribLocation(smokeShaderProgram->id, 2, "colorTexture");
+    glBindBuffer(GL_ARRAY_BUFFER, colorTextureBufferId);
+    glVertexAttribPointer(2, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // Always use 4 vertices
     glVertexAttribDivisor(0, 0);

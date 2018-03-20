@@ -18,6 +18,8 @@ struct SmokeParticle {
   float lifetime;
   float remainingLife;
 
+  sf::Vector3f initialColor;
+
   float textureIndex;
 };
 
@@ -48,11 +50,11 @@ private:
   /* The buffer containing the positions and sizes of smoke particles */
   GLfloat positionSizeBuffer[4 * maxNbParticles];
 
-  /* ID of the textureIndex buffer */
-  GLuint textureIndexBufferId;
+  /* ID of the colorTexture buffer */
+  GLuint colorTextureBufferId;
 
-  /* The buffer containing the texture indices of smoke particles */
-  GLfloat textureIndexBuffer[maxNbParticles];
+  /* The buffer containing the color and texture indices of smoke particles */
+  GLfloat colorTextureBuffer[4 * maxNbParticles];
 
   /* The array of smoke particles */
   std::vector<SmokeParticle*> smokeParticles;
@@ -82,7 +84,7 @@ public:
     \param position: Position where to generate the smoke
     \param numberParticles: Number of smoke particles to create
   */
-  void generate(sf::Vector3f position, int numberParticles);
+  void generate(sf::Vector3f position, int numberParticles, sf::Vector3f color);
 
   /* Draw smoke in the currently bound framebuffer object */
   void draw(GameInfo* gameInfo);
