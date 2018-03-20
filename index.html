@@ -37,33 +37,33 @@
 
       <h2 class="mt-4" style="border-top-style: solid;border-top-color: #e7e7e7;border-top-width: thin;"><b> Installation (linux only) </b></h2>
 
-      <p> Install <a href="https://cmake.org/" class="alert-link">CMake</a>, <a href="https://www.sfml-dev.org/index.php" class="alert-link">SFML</a> and <a href="https://stockfishchess.org/" class="alert-link">Stockfish</a>:
+      <p> Install <a href="https://cmake.org/">CMake</a>, <a href="https://www.sfml-dev.org/index.php">SFML</a> and <a href="https://stockfishchess.org/">Stockfish</a>:
         <pre class="mr-4 ml-4" style="background: #e7e7e7;"><code>
-          sudo apt-get install cmake libsfml-dev stockfish
+          <span style="color:#800000;">sudo</span> apt-get install cmake libsfml-dev stockfish
         </code></pre>
       </p>
 
-      <p> Install <a href="http://bulletphysics.org/wordpress/" class="alert-link">Bullet Physics</a>:
+      <p> Install <a href="http://bulletphysics.org/wordpress/">Bullet Physics</a>:
         <pre class="mr-4 ml-4" style="background: #e7e7e7;"><code>
           wget https://github.com/bulletphysics/bullet3/archive/2.87.tar.gz
           tar -xzf 2.87.tar.gz
-          cd bullet3-2.87/
-          mkdir build && cd build && cmake .. -DBUILD_EXTRAS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_UNIT_TESTS=OFF -DBUILD_PYBULLET=OFF
-          sudo make install
-          cd ..
+          <span style="color:#0f5ccd;">cd</span> bullet3-2.87/
+          <span style="color:#0f5ccd;">mkdir</span> build <span style="color:#800000;">&&</span> cd build <span style="color:#800000;">&&</span> cmake .. -DBUILD_EXTRAS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_UNIT_TESTS=OFF -DBUILD_PYBULLET=OFF
+          <span style="color:#800000;">sudo</span> make install
+          <span style="color:#0f5ccd;">cd</span> ..
         </code></pre>
       </p>
 
       <p> Download source code:
         <pre class="mr-4 ml-4" style="background: #e7e7e7;"><code>
           git clone https://github.com/martinRenou/ToonChess.git
-          cd ToonChess
+          <span style="color:#0f5ccd;">cd</span> ToonChess
         </code></pre>
       </p>
 
       <p> Compile ToonChess:
         <pre class="mr-4 ml-4" style="background: #e7e7e7;"><code>
-          mkdir build && cd build && cmake ..
+          <span style="color:#0f5ccd;">mkdir</span> build <span style="color:#800000;">&&</span> cd build <span style="color:#800000;">&&</span> cmake ..
           make
         </code></pre>
       </p>
@@ -130,11 +130,11 @@
 
       <h3 class="mt-3"> Physics and particle system </h3>
       <p class="text-justify">
-        I wanted chess pieces to collapse when they are taken, in order to achieve that I used <a href="http://bulletphysics.org/wordpress/" class="alert-link">Bullet Physics</a>
+        I wanted chess pieces to collapse when they are taken, in order to achieve that I used <a href="http://bulletphysics.org/wordpress/">Bullet Physics</a>
         which is a well known C++ physics library. I used Blender for generating fragment meshes and Bullet Physics for real time collisions and physics simulation.
         The result was interesting but I needed a nice way to remove fragments from the view. That's why I decided to display smoke when fragments disappear.
         I used a simple particle system for smoke, each particle has its own size, position, speed and lifetime. I first draw smoke textures on paper and vectorized them
-        using <a href="https://inkscape.org/fr/" class="alert-link">Inkscape</a>.
+        using <a href="https://inkscape.org/fr/">Inkscape</a>.
         <div class="d-inline-block" style="text-align: center;">
           <img src="images/queen_collapsing.gif" class="rounded" style="max-width: 30%;height: auto;">
           <img src="images/bishop_collapsing.gif" class="rounded" style="max-width: 30%;height: auto;">
@@ -147,9 +147,9 @@
         in which the distance from the light is saved for each mesh in a texture. (See picture below, the nearer the mesh is from the light, the
         darker it is in the shadowmap). And this distance from the light can be used in the main rendering process in order to know if the currently
         rendered part of the mesh is hidden from the light by another object. See
-        <a href="http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/" class="alert-link">this</a> tutorial if you want
+        <a href="http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/">this</a> tutorial if you want
         to learn more about it. I then used the Percentage Close Filtering technique in order to make the shadows
-        smoother (See this <a href="http://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch11.html" class="alert-link">nvidia article</a> about PCF).
+        smoother (See this <a href="http://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch11.html">nvidia article</a> about PCF).
         <img src="images/ShadowMapping.png" class="rounded mx-auto d-block" style="max-width: 50%;height: auto;">
       </p>
 
@@ -165,12 +165,12 @@
       <h3 class="mt-3"> AI </h3>
       <p class="text-justify">
         Developing the AI would have been too much work, and it wasn't the purpose of this project. I chose to use Stockfish for that. Stockfish runs
-        in a subprocess, and communicates with the GUI using the <a href="http://wbec-ridderkerk.nl/html/UCIProtocol.html" class="alert-link">UCI protocol</a>.
+        in a subprocess, and communicates with the GUI using the <a href="http://wbec-ridderkerk.nl/html/UCIProtocol.html">UCI protocol</a>.
       </p>
 
       <h3 class="mt-3"> Meshes </h3>
       <p class="text-justify">
-        I created meshes on <a href="https://www.blender.org/" class="alert-link">Blender</a> and exported them under ".obj" file format.
+        I created meshes on <a href="https://www.blender.org/">Blender</a> and exported them under ".obj" file format.
       </p>
     </div>
 
