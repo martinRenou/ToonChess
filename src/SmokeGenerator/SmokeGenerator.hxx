@@ -43,7 +43,7 @@ private:
   GLuint positionSizeBufferId;
 
   /* The buffer containing the positions and sizes of smoke particles */
-  GLfloat positionSizeBuffer[maxNbParticles];
+  GLfloat positionSizeBuffer[4 * maxNbParticles];
 
   /* ID of the textureIndex buffer */
   GLuint textureIndexBufferId;
