@@ -1,4 +1,4 @@
-<p align="center"><a href="https://martinrenou.github.io/ToonChess/"><img width="700" src="images/logo.png"></a></p>
+<p align="center"><a href="https://martinrenou.github.io/ToonChess/"><img width="300" src="images/logo.png"></a></p>
 <h1 align="center"><a href="https://martinrenou.github.io/ToonChess/">ToonChess</a></h1>
 <h1 align="center"> 3D Chess game based on OpenGL and Stockfish </h1>
 
