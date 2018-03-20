@@ -1,5 +1,5 @@
 attribute vec3 vertexPosition;
-attribute vec4 center_size;
+attribute vec4 centerSize;
 attribute float textureIndex;
 
 varying float _textureIndex;
@@ -11,8 +11,8 @@ uniform mat4 VMatrix;
 uniform mat4 PMatrix;
 
 void main(void){
-  vec3 particleCenter = center_size.xyz;
-  float particleSize = center_size.w;
+  vec3 particleCenter = centerSize.xyz;
+  float particleSize = centerSize.w;
 
   vec3 camera_right = vec3(VMatrix[0][0], VMatrix[1][0], VMatrix[2][0]);
   vec3 camera_up = vec3(VMatrix[0][1], VMatrix[1][1], VMatrix[2][1]);

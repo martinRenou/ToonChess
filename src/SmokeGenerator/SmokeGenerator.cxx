@@ -206,7 +206,7 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
 
     // Send positions and sizes
     glEnableVertexAttribArray(1);
-    glBindAttribLocation(smokeShaderProgram->id, 1, "center_size");
+    glBindAttribLocation(smokeShaderProgram->id, 1, "centerSize");
     glBindBuffer(GL_ARRAY_BUFFER, positionSizeBufferId);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
