@@ -24,6 +24,7 @@ SmokeGenerator::SmokeGenerator(){
     particle->position = {0.0, 0.0, 0.0};
     particle->size = 0.0;
     particle->lifetime = 0.0;
+    particle->textureIndex = 0;
 
     smokeParticles.push_back(particle);
   }
@@ -44,8 +45,14 @@ SmokeGenerator::SmokeGenerator(){
   }
 
   // Load texture
-  smokeTexture = new sf::Texture();
-  if (!smokeTexture->loadFromFile("../assets/smoke_texture.png"))
+  smokeTexture0 = new sf::Texture();
+  if (!smokeTexture0->loadFromFile("../assets/smoke_texture0.png"))
+    std::cout << "Couldn't load smoke texture file..." << std::endl;
+  smokeTexture1 = new sf::Texture();
+  if (!smokeTexture1->loadFromFile("../assets/smoke_texture1.png"))
+    std::cout << "Couldn't load smoke texture file..." << std::endl;
+  smokeTexture2 = new sf::Texture();
+  if (!smokeTexture2->loadFromFile("../assets/smoke_texture2.png"))
     std::cout << "Couldn't load smoke texture file..." << std::endl;
 
   // Start clock
@@ -70,6 +77,15 @@ void SmokeGenerator::initBuffers(){
     maxNbParticles * 4 * sizeof(GLfloat),
     NULL,
     GL_STREAM_DRAW);
+
+  // TextureIndex buffer
+  glGenBuffers(1, &textureIndexBufferId);
+  glBindBuffer(GL_ARRAY_BUFFER, textureIndexBufferId);
+  glBufferData(
+    GL_ARRAY_BUFFER,
+    maxNbParticles * 1 * sizeof(GLfloat),
+    NULL,
+    GL_STREAM_DRAW);
 };
 
 void SmokeGenerator::generate(sf::Vector3f position, int numberParticles){
@@ -83,6 +99,7 @@ void SmokeGenerator::generate(sf::Vector3f position, int numberParticles){
   std::uniform_real_distribution<float> getPosition(-0.2, 1.5);
   std::uniform_real_distribution<float> getSize(1.0, 3.5);
   std::uniform_real_distribution<float> getLifetime(2.0, 3.0);
+  std::uniform_real_distribution<float> getTextureIndex(0.0, 3.0);
 
   // Create particles
   for(int p = nbParticles; p < nbParticles + numberParticles; p++){
@@ -95,6 +112,7 @@ void SmokeGenerator::generate(sf::Vector3f position, int numberParticles){
     };
     particle->size = getSize(generator);
     particle->lifetime = getLifetime(generator);
+    particle->textureIndex = getTextureIndex(generator);
   }
 
   // Sort particles by lifetime
@@ -134,6 +152,8 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
       positionSizeBuffer[4 * p + 1] = particle->position.y;
       positionSizeBuffer[4 * p + 2] = particle->position.z;
       positionSizeBuffer[4 * p + 3] = particle->size;
+
+      textureIndexBuffer[p] = particle->textureIndex;
     }
 
     // Bind smoke shader program
@@ -146,7 +166,11 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
     smokeShaderProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
 
     smokeShaderProgram->bindTexture(
-      0, GL_TEXTURE0, "smokeTexture", smokeTexture);
+      0, GL_TEXTURE0, "smokeTexture0", smokeTexture0);
+    smokeShaderProgram->bindTexture(
+      1, GL_TEXTURE1, "smokeTexture1", smokeTexture1);
+    smokeShaderProgram->bindTexture(
+      2, GL_TEXTURE2, "smokeTexture2", smokeTexture2);
 
     // Bind the new positionSizeBuffer
     glBindBuffer(GL_ARRAY_BUFFER, positionSizeBufferId);
@@ -161,6 +185,19 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
       maxNbParticles * 4 * sizeof(GLfloat),
       positionSizeBuffer);
 
+    // Bind the new textureIndexBuffer
+    glBindBuffer(GL_ARRAY_BUFFER, textureIndexBufferId);
+    glBufferData(
+      GL_ARRAY_BUFFER,
+      maxNbParticles * 1 * sizeof(GLfloat),
+      NULL,
+      GL_STREAM_DRAW);
+    glBufferSubData(
+      GL_ARRAY_BUFFER,
+      0,
+      maxNbParticles * 1 * sizeof(GLfloat),
+      textureIndexBuffer);
+
     // Send vertices
     glEnableVertexAttribArray(0);
     glBindAttribLocation(smokeShaderProgram->id, 0, "vertexPosition");
@@ -173,16 +210,25 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
     glBindBuffer(GL_ARRAY_BUFFER, positionSizeBufferId);
     glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
+    // Send texture indices
+    glEnableVertexAttribArray(2);
+    glBindAttribLocation(smokeShaderProgram->id, 2, "textureIndex");
+    glBindBuffer(GL_ARRAY_BUFFER, textureIndexBufferId);
+    glVertexAttribPointer(2, 1, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
     // Always use 4 vertices
     glVertexAttribDivisor(0, 0);
     // Always use one position/size per quad
     glVertexAttribDivisor(1, 1);
+    // Always use one textureIndex per quad
+    glVertexAttribDivisor(2, 1);
 
     // Draw triangles
     glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 4, nbParticles);
 
     glDisableVertexAttribArray(0);
     glDisableVertexAttribArray(1);
+    glDisableVertexAttribArray(2);
 
     // Enable face culling
     glEnable(GL_CULL_FACE);
@@ -200,6 +246,8 @@ SmokeGenerator::~SmokeGenerator(){
     delete smokeParticles.at(p);
 
   delete smokeShaderProgram;
-  delete smokeTexture;
+  delete smokeTexture0;
+  delete smokeTexture1;
+  delete smokeTexture2;
   delete innerClock;
 };

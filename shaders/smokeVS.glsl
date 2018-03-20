@@ -1,5 +1,8 @@
 attribute vec3 vertexPosition;
 attribute vec4 center_size;
+attribute float textureIndex;
+
+varying float _textureIndex;
 
 varying vec2 UV;
 
@@ -21,6 +24,9 @@ void main(void){
   // Compute UV coordinates
   UV = vertexPosition.xz + vec2(0.5, 0.5);
   UV.y = abs(UV.y - 1.0);
+
+  // Set texture index
+  _textureIndex = textureIndex;
 
   // The position of the vertex
   gl_Position = PMatrix * VMatrix * vec4(position, 1.0);

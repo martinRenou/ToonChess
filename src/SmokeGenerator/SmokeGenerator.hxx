@@ -15,6 +15,7 @@ struct SmokeParticle {
   sf::Vector3f position;
   float size;
   float lifetime;
+  float textureIndex;
 };
 
 
@@ -44,6 +45,12 @@ private:
   /* The buffer containing the positions and sizes of smoke particles */
   GLfloat positionSizeBuffer[maxNbParticles];
 
+  /* ID of the textureIndex buffer */
+  GLuint textureIndexBufferId;
+
+  /* The buffer containing the texture indices of smoke particles */
+  GLfloat textureIndexBuffer[maxNbParticles];
+
   /* The array of smoke particles */
   std::vector<SmokeParticle*> smokeParticles;
 
@@ -54,7 +61,9 @@ private:
   sf::Clock* innerClock;
 
   /* Smoke texture */
-  sf::Texture* smokeTexture;
+  sf::Texture* smokeTexture0;
+  sf::Texture* smokeTexture1;
+  sf::Texture* smokeTexture2;
 
   /* The shader program for displaying smoke */
   ShaderProgram* smokeShaderProgram;
