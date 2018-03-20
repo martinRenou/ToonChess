@@ -104,13 +104,17 @@ void SmokeGenerator::generate(sf::Vector3f position, int numberParticles){
   // Create particles
   for(int p = nbParticles; p < nbParticles + numberParticles; p++){
     SmokeParticle* particle = smokeParticles.at(p);
-    particle->speed = {0.1, 0.1, 0.2};
     particle->position = {
       position.x + getPosition(generator),
       position.y + getPosition(generator),
       position.z + getPosition(generator)
     };
     particle->size = getSize(generator);
+
+    // Compute speed depending on the size
+    float zSpeed = 3.0 * 1.0/particle->size;
+    particle->speed = {0.1, 0.1, zSpeed};
+
     particle->lifetime = getLifetime(generator);
     particle->textureIndex = getTextureIndex(generator);
   }
