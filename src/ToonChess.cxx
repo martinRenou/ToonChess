@@ -18,6 +18,8 @@
 #include "ColorPicking/ColorPicking.hxx"
 #include "ShadowMapping/ShadowMapping.hxx"
 
+#include "SmokeGenerator/SmokeGenerator.hxx"
+
 #include "PhysicsWorld/PhysicsWorld.hxx"
 
 #include "constants.hxx"
@@ -85,9 +87,24 @@ int main(){
     std::cerr << e.what() << std::endl;
 
     delete game;
+    deletePrograms(&programs);
 
     return 1;
   }
+
+  // Create SmokeGenerator
+  SmokeGenerator* smokeGenerator;
+  try{
+    smokeGenerator = new SmokeGenerator();
+  } catch(const std::exception& e){
+    std::cerr << e.what() << std::endl;
+
+    delete game;
+    deletePrograms(&programs);
+
+    return 1;
+  }
+  smokeGenerator->initBuffers();
 
   // Load pieces
   std::map<int, Mesh*> pieces = initPieces();
@@ -234,7 +251,7 @@ int main(){
     }
 
     // Simulate dynamics world
-    physicsWorld->simulate(game);
+    physicsWorld->simulate(game, smokeGenerator);
 
     // Create the shadowMap
     shadowMap = shadowMapping->getShadowMap(
@@ -252,6 +269,9 @@ int main(){
     celShadingRender(
       game, physicsWorld, &gameInfo, &pieces, &programs, shadowMap);
 
+    // Display smoke particles
+    smokeGenerator->draw(&gameInfo);
+
     // Perform the chess rules
     try{
       game->perform();
@@ -265,6 +285,7 @@ int main(){
       deletePrograms(&programs);
       delete colorPicking;
       delete shadowMapping;
+      delete smokeGenerator;
       delete game;
       delete physicsWorld;
 
@@ -283,6 +304,7 @@ int main(){
   deletePrograms(&programs);
   delete colorPicking;
   delete shadowMapping;
+  delete smokeGenerator;
   delete game;
   delete physicsWorld;
 

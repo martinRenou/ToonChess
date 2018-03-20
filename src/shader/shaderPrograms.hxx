@@ -5,6 +5,12 @@
 
 #include "ShaderProgram.hxx"
 
+/* Creates the shader program, given the shader names
+  \return The ShaderProgram instance
+*/
+ShaderProgram* createProgram(
+    std::string vertexShaderPath, std::string fragmentShaderPath);
+
 /* Initialize the shader programs
   \return A map with index of the mesh as key and ShaderProgram instances as
     value

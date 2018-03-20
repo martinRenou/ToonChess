@@ -3,6 +3,8 @@
 
 #include <GL/gl.h>
 
+#include <SFML/Graphics.hpp>
+
 #include <vector>
 
 #include "Shader.hxx"
@@ -100,6 +102,15 @@ class ShaderProgram {
       \param value The texture
     */
     void bindTexture(GLuint n, GLenum target, std::string name, GLuint texture);
+
+    /* Bind an SFML texture to sampler "n"
+      \param n The index of the sampler
+      \param target The target for the sampler, must be GL_TEXTUREn with n the
+        index of the sampler
+      \param name The name of the sampler in shaders
+      \param texture The SFML texture
+    */
+    void bindTexture(GLuint n, GLenum target, std::string name, sf::Texture* texture);
 
     /* Destructor, this will remove the shaders from memory */
     ~ShaderProgram();

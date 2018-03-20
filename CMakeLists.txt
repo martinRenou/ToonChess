@@ -25,6 +25,7 @@ set(
   ${CMAKE_SOURCE_DIR}/src/shader/shaderPrograms.cxx
   ${CMAKE_SOURCE_DIR}/src/ColorPicking/ColorPicking.cxx
   ${CMAKE_SOURCE_DIR}/src/ShadowMapping/ShadowMapping.cxx
+  ${CMAKE_SOURCE_DIR}/src/SmokeGenerator/SmokeGenerator.cxx
   ${CMAKE_SOURCE_DIR}/src/PhysicsWorld/Fragment.cxx
   ${CMAKE_SOURCE_DIR}/src/PhysicsWorld/PhysicsWorld.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/ConnectionException.cxx
