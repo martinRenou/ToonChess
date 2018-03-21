@@ -170,9 +170,9 @@ int main(){
   GLint dX = 0;
   GLint dY = 0;
   // Rotation angle around Z axis
-  GLfloat phi;
+  GLfloat phi = 0.0;
   // Rotation angle around X axis
-  GLfloat teta;
+  GLfloat theta = 0.0;
   bool cameraMoving = false;
   while(running){
     sf::Event event;
@@ -227,20 +227,20 @@ int main(){
         mousePosition.y = event.mouseMove.y;
 
         phi -= rotationSpeed * (double)width/height * dX;
-        teta += rotationSpeed * dY;
+        theta += rotationSpeed * dY;
 
         // Constraint phi between -PI/2 and PI/2
         if(phi > M_PI / 2.0) phi = M_PI / 2.0;
         else if (phi < - M_PI / 2.0) phi = - M_PI / 2.0;
 
-        // Constraint teta between 0.0 and PI/3
-        if(teta > M_PI / 3.0) teta = M_PI / 3.0;
-        else if (teta < 0.0) teta = 0.0;
+        // Constraint theta between 0.0 and PI/3
+        if(theta > M_PI / 3.0) theta = M_PI / 3.0;
+        else if (theta < 0.0) theta = 0.0;
 
         // Compute camera position according to the new rotation angle
         camera.position.x = 40 * sin(phi);
-        camera.position.y = - 40 * cos(phi) * cos(teta);
-        camera.position.z = 20 + 40 * sin(teta);
+        camera.position.y = - 40 * cos(phi) * cos(theta);
+        camera.position.z = 20 + 40 * sin(theta);
 
         camera.viewMatrix = getLookAtMatrix(camera.position, center, up);
       }
