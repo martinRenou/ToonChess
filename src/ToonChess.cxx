@@ -165,9 +165,9 @@ int main(){
   GLint dX = 0;
   GLint dY = 0;
   // Rotation angle around Z axis
-  GLfloat phi;
+  GLfloat phi = 0.0;
   // Rotation angle around X axis
-  GLfloat teta;
+  GLfloat teta = 0.0;
   bool cameraMoving = false;
   GLuint shadowMap;
   while(running){
