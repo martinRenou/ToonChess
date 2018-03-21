@@ -1,3 +1,5 @@
+#version 130
+
 varying vec2 UV;
 varying vec3 _color;
 varying float _textureIndex;

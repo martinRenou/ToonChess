@@ -1,3 +1,5 @@
+#version 130
+
 attribute vec3 vertexPosition;
 attribute vec4 centerSize;
 attribute vec4 colorTexture;
