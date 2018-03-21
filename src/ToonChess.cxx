@@ -23,7 +23,10 @@
 #include "PhysicsWorld/PhysicsWorld.hxx"
 
 #include "constants.hxx"
-#include "GameInfo.hxx"
+
+#include "Camera/Camera.hxx"
+#include "DirectionalLight.hxx"
+
 #include "utils/utils.hxx"
 #include "utils/math.hxx"
 
@@ -31,33 +34,35 @@
 
 /* Perform a cel-shading rendering in the current frameBuffer
   \param game The game instance
-  \param gameInfo The current game informations
+  \param physicsWorld The dynamics world
   \param pieces The map of meshes
   \param programs The map of shader programs
-  \param shadowMap The shadowMap texture
+  \param shadowMap The shadowMaping instance
+  \param camera The camera
 */
 void celShadingRender(
   ChessGame* game,
   PhysicsWorld* physicsWorld,
-  GameInfo* gameInfo,
   std::map<int, Mesh*>* pieces,
   std::map<int, ShaderProgram*>* programs,
-  GLuint shadowMap);
+  ShadowMapping* shadowMapping,
+  Camera* camera,
+  DirectionalLight* light);
 
 int main(){
-  // Initialize game informations
-  GameInfo gameInfo;
-
   // Create window
   sf::ContextSettings settings;
   settings.depthBits = 24;
   settings.stencilBits = 8;
-  settings.antialiasingLevel = gameInfo.antialiasingLevel;
+  settings.antialiasingLevel = ANTIALIASING_LOW;
   settings.majorVersion = 3;
   settings.minorVersion = 0;
 
+  GLint width = 1024;
+  GLint height = 576;
+
   sf::Window window(
-      sf::VideoMode(gameInfo.width, gameInfo.height),
+      sf::VideoMode(width, height),
       "ToonChess",
       sf::Style::Default,
       settings
@@ -119,41 +124,27 @@ int main(){
   PhysicsWorld* physicsWorld = new PhysicsWorld(&fragmentMeshes, game);
 
   // Initialize color picking
-  ColorPicking* colorPicking = new ColorPicking(
-    gameInfo.width, gameInfo.height);
+  ColorPicking* colorPicking = new ColorPicking(width, height);
   colorPicking->initBuffers();
 
   // Initialize shadow mapping
-  ShadowMapping* shadowMapping = new ShadowMapping(
-    gameInfo.shadowMapResolution);
+  ShadowMapping* shadowMapping = new ShadowMapping();
   shadowMapping->initBuffers();
 
-  // Compute cameraLookAtMatrix and cameraProjectionMatrix
-  sf::Vector3f center = {0.0, 0.0, 0.0};
-  sf::Vector3f up = {0.0, 0.0, 1.0};
-  gameInfo.cameraPosition.x = 0.0;
-  gameInfo.cameraPosition.y = - gameInfo.cameraRotationRadius;
-  gameInfo.cameraPosition.z = 20.0;
-  gameInfo.cameraViewMatrix = getLookAtMatrix(
-    gameInfo.cameraPosition, center, up
-  );
-  gameInfo.cameraProjectionMatrix = getPerspectiveProjMatrix(
-    gameInfo.fovy, (double)gameInfo.width/gameInfo.height, 1, 1000
-  );
+  // Create camera
+  Camera* camera = new Camera((double)width/height);
 
   // Create orthographic projection matrix for shadow mapping
-  gameInfo.lightProjectionMatrix = getOrthoProjMatrix(
-    -25, 25, -20, 20, 1, 50
-  );
+  DirectionalLight light;
+  light.projectionMatrix = getOrthoProjMatrix(-25, 25, -20, 20, 1, 50);
 
   // Get lookAt matrix from light position for shadow mapping
   sf::Vector3f lightPosition = {
-    (float)-20.0 * gameInfo.lightDirection.x,
-    (float)-20.0 * gameInfo.lightDirection.y,
-    (float)-20.0 * gameInfo.lightDirection.z
+    (float)-20.0 * light.direction.x,
+    (float)-20.0 * light.direction.y,
+    (float)-20.0 * light.direction.z
   };
-  gameInfo.lightViewMatrix = getLookAtMatrix(
-    lightPosition, center, up);
+  light.viewMatrix = getLookAtMatrix(lightPosition, {0, 0, 0}, {0, 0, 1});
 
   // Display OpenGL errors
   displayGLErrors();
@@ -163,16 +154,9 @@ int main(){
   sf::Vector2i selectedPixelPosition = {0, 0};
   // Mouse movement
   sf::Vector2i mousePosition;
-  // Rotation speed in radians per pixel
-  GLfloat rotationSpeed = 0.002;
   GLint dX = 0;
   GLint dY = 0;
-  // Rotation angle around Z axis
-  GLfloat phi = 0.0;
-  // Rotation angle around X axis
-  GLfloat theta = 0.0;
   bool cameraMoving = false;
-  GLuint shadowMap;
   while(running){
     sf::Event event;
     while(window.pollEvent(event)){
@@ -180,16 +164,14 @@ int main(){
         running = false;
       }
       else if(event.type == sf::Event::Resized){
-        gameInfo.width = event.size.width;
-        gameInfo.height = event.size.height;
+        width = event.size.width;
+        height = event.size.height;
 
         // Resize the buffers for color picking
-        colorPicking->resizeBuffers(gameInfo.width, gameInfo.height);
+        colorPicking->resizeBuffers(width, height);
 
-        // Recompute projectionMatrix
-        gameInfo.cameraProjectionMatrix = getPerspectiveProjMatrix(
-          gameInfo.fovy, (double)gameInfo.width/gameInfo.height, 1, 1000
-        );
+        // Recompute camera perspective matrix
+        camera->update((double)width/height);
       }
       else if(event.type == sf::Event::MouseButtonPressed){
         // If it's the right button, it's a camera movement
@@ -203,12 +185,12 @@ int main(){
         // If it's the left button, it must be a piece selection
         if(event.mouseButton.button == sf::Mouse::Left){
           selectedPixelPosition.x = event.mouseButton.x;
-          selectedPixelPosition.y = gameInfo.height - event.mouseButton.y;
+          selectedPixelPosition.y = height - event.mouseButton.y;
 
           // Get selected piece using color picking
           game->setNewSelectedPiecePosition(
             colorPicking->getClickedPiecePosition(
-                selectedPixelPosition, game, &gameInfo, &pieces, &programs
+                selectedPixelPosition, game, &pieces, &programs, camera
             )
           );
         }
@@ -225,24 +207,7 @@ int main(){
         mousePosition.x = event.mouseMove.x;
         mousePosition.y = event.mouseMove.y;
 
-        phi -= rotationSpeed * (double)gameInfo.width/gameInfo.height * dX;
-        theta += rotationSpeed * dY;
-
-        // Constraint phi between -PI/2 and PI/2
-        if(phi > M_PI / 2.0) phi = M_PI / 2.0;
-        else if (phi < - M_PI / 2.0) phi = - M_PI / 2.0;
-
-        // Constraint theta between 0.0 and PI/3
-        if(theta > M_PI / 3.0) theta = M_PI / 3.0;
-        else if (theta < 0.0) theta = 0.0;
-
-        // Compute camera position according to the new rotation angle
-        gameInfo.cameraPosition.x = 40 * sin(phi);
-        gameInfo.cameraPosition.y = - 40 * cos(phi) * cos(theta);
-        gameInfo.cameraPosition.z = 20 + 40 * sin(theta);
-
-        gameInfo.cameraViewMatrix = getLookAtMatrix(
-          gameInfo.cameraPosition, center, up);
+        camera->move(dX, dY, (double)width/height);
       }
       else if(event.type == sf::Event::KeyPressed){
         if(event.key.code == sf::Keyboard::Escape){
@@ -257,8 +222,8 @@ int main(){
     physicsWorld->simulate(game, smokeGenerator);
 
     // Create the shadowMap
-    shadowMap = shadowMapping->getShadowMap(
-      game, &gameInfo, &pieces, &programs);
+    shadowMapping->renderShadowMap(
+      game, &pieces, &programs, &light);
 
     // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -266,14 +231,14 @@ int main(){
     glClearColor(1, 1, 1, 1);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    glViewport(0, 0, gameInfo.width, gameInfo.height);
+    glViewport(0, 0, width, height);
 
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(
-      game, physicsWorld, &gameInfo, &pieces, &programs, shadowMap);
+      game, physicsWorld, &pieces, &programs, shadowMapping, camera, &light);
 
     // Display smoke particles
-    smokeGenerator->draw(&gameInfo);
+    smokeGenerator->draw(camera);
 
     // Perform the chess rules
     try{
@@ -291,6 +256,7 @@ int main(){
       delete smokeGenerator;
       delete game;
       delete physicsWorld;
+      delete camera;
 
       return 1;
     }
@@ -310,6 +276,7 @@ int main(){
   delete smokeGenerator;
   delete game;
   delete physicsWorld;
+  delete camera;
 
   return 0;
 }
@@ -317,10 +284,11 @@ int main(){
 void celShadingRender(
     ChessGame* game,
     PhysicsWorld* physicsWorld,
-    GameInfo* gameInfo,
     std::map<int, Mesh*>* pieces,
     std::map<int, ShaderProgram*>* programs,
-    GLuint shadowMap){
+    ShadowMapping* shadowMapping,
+    Camera* camera,
+    DirectionalLight* light){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
   sf::Vector3f translation;
@@ -335,8 +303,8 @@ void celShadingRender(
   glCullFace(GL_FRONT);
 
   // Bind uniform values
-  blackBorderProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
-  blackBorderProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
+  blackBorderProgram->setViewMatrix(&camera->viewMatrix);
+  blackBorderProgram->setProjectionMatrix(&camera->projectionMatrix);
 
   // Display fragments black borders
   for(unsigned int i = 0; i < physicsWorld->fragmentPool.size(); i++){
@@ -417,24 +385,25 @@ void celShadingRender(
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  celShadingProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
-  celShadingProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
+  celShadingProgram->setViewMatrix(&camera->viewMatrix);
+  celShadingProgram->setProjectionMatrix(&camera->projectionMatrix);
 
-  celShadingProgram->setMatrix4fv("LMatrix", &gameInfo->lightViewMatrix);
-  celShadingProgram->setMatrix4fv("PLMatrix", &gameInfo->lightProjectionMatrix);
+  celShadingProgram->setMatrix4fv("LMatrix", &light->viewMatrix);
+  celShadingProgram->setMatrix4fv("PLMatrix", &light->projectionMatrix);
 
   // Bind shadow map texture
-  celShadingProgram->bindTexture(0, GL_TEXTURE0, "shadowMap", shadowMap);
+  celShadingProgram->bindTexture(
+    0, GL_TEXTURE0, "shadowMap", shadowMapping->getShadowMap());
 
   // Set shadow map resolution
   celShadingProgram->setInt(
-    "shadowMapResolution", gameInfo->shadowMapResolution
+    "shadowMapResolution", shadowMapping->resolution
   );
 
   // Set lightDirection
   celShadingProgram->setVector3f(
-    "lightDirection", gameInfo->lightDirection.x,
-    gameInfo->lightDirection.y, gameInfo->lightDirection.z
+    "lightDirection",
+    light->direction.x, light->direction.y, light->direction.z
   );
 
   // Display fragments

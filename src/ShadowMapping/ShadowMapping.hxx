@@ -5,9 +5,10 @@
 
 #include <map>
 
+#include "../Camera/Camera.hxx"
+#include "../DirectionalLight.hxx"
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
-#include "../GameInfo.hxx"
 #include "../ChessGame/ChessGame.hxx"
 
 class ShadowMapping {
@@ -21,31 +22,33 @@ private:
   /* The identifier of the renderbuffer for depth */
   GLuint depthRenderBufferId;
 
-  /* The resolution of the shadow map */
-  GLuint resolution;
-
   /* Delete buffers from memory */
   void deleteBuffers();
 
 public:
-  /* Constructor
-    \param resolution The resolution of the shadow map
-  */
-  explicit ShadowMapping(GLuint resolution);
+  /* Constructor */
+  explicit ShadowMapping();
 
   /* Initialization of the buffer objects */
   void initBuffers();
 
-  /* Render and return the shadow map id
+  /* The resolution of the shadow map */
+  GLuint resolution = SHADOWMAPPING_LOW;
+
+  /* Render shadow map
     \param game The game instance
-    \param gameInfo The current game informations
     \param meshes The map of piece meshes
-    \param programs The map of shader programs
-    \return The id of the shadowMap
+    \param light The light
   */
-  GLuint getShadowMap(
-    ChessGame* game, GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs);
+  void renderShadowMap(
+    ChessGame* game, std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs,
+    DirectionalLight* light);
+
+  /* Get shadow map id
+    \return The shadow map id
+  */
+  GLuint getShadowMap();
 
   /* Destructor, this will remove the buffers from memory */
   ~ShadowMapping();

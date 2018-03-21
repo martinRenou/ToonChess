@@ -6,9 +6,10 @@
 
 #include <map>
 
+#include "../Camera/Camera.hxx"
+
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
-#include "../GameInfo.hxx"
 #include "../ChessGame/ChessGame.hxx"
 
 class ColorPicking {
@@ -51,16 +52,17 @@ public:
     This will perform a rendering in the framebuffer
     \param clickedPixelPosition The position of the clicked pixel on the screen
     \param game The game instance
-    \param gameInfo The current game informations
     \param meshes The map of piece meshes
     \param programs The map of shader programs
+    \param camera The camera
     \return The position of the clicked chess piece
   */
   sf::Vector2i getClickedPiecePosition(
     sf::Vector2i clickedPixelPosition,
     ChessGame* game,
-    GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs);
+    std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs,
+    Camera* camera);
 
   /* Destructor, this will remove the buffers from memory */
   ~ColorPicking();
