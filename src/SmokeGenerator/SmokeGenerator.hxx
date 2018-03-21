@@ -8,7 +8,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "../shader/ShaderProgram.hxx"
-#include "../Camera.hxx"
+#include "../Camera/Camera.hxx"
 
 struct SmokeParticle {
   sf::Vector3f speed;

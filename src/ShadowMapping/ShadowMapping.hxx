@@ -5,7 +5,7 @@
 
 #include <map>
 
-#include "../Camera.hxx"
+#include "../Camera/Camera.hxx"
 #include "../DirectionalLight.hxx"
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"

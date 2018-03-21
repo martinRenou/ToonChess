@@ -24,7 +24,7 @@
 
 #include "constants.hxx"
 
-#include "Camera.hxx"
+#include "Camera/Camera.hxx"
 #include "DirectionalLight.hxx"
 
 #include "utils/utils.hxx"
@@ -131,19 +131,8 @@ int main(){
   ShadowMapping* shadowMapping = new ShadowMapping();
   shadowMapping->initBuffers();
 
-  // Compute cameraLookAtMatrix and cameraProjectionMatrix
-  sf::Vector3f center = {0.0, 0.0, 0.0};
-  sf::Vector3f up = {0.0, 0.0, 1.0};
-  Camera camera;
-  camera.position.x = 0.0;
-  camera.position.y = - camera.radius;
-  camera.position.z = 20.0;
-  camera.viewMatrix = getLookAtMatrix(
-    camera.position, center, up
-  );
-  camera.projectionMatrix = getPerspectiveProjMatrix(
-    camera.fovy, (double)width/height, 1, 1000
-  );
+  // Create camera
+  Camera* camera = new Camera((double)width/height);
 
   // Create orthographic projection matrix for shadow mapping
   DirectionalLight light;
@@ -155,7 +144,7 @@ int main(){
     (float)-20.0 * light.direction.y,
     (float)-20.0 * light.direction.z
   };
-  light.viewMatrix = getLookAtMatrix(lightPosition, center, up);
+  light.viewMatrix = getLookAtMatrix(lightPosition, {0, 0, 0}, {0, 0, 1});
 
   // Display OpenGL errors
   displayGLErrors();
@@ -165,14 +154,8 @@ int main(){
   sf::Vector2i selectedPixelPosition = {0, 0};
   // Mouse movement
   sf::Vector2i mousePosition;
-  // Rotation speed in radians per pixel
-  GLfloat rotationSpeed = 0.002;
   GLint dX = 0;
   GLint dY = 0;
-  // Rotation angle around Z axis
-  GLfloat phi = 0.0;
-  // Rotation angle around X axis
-  GLfloat theta = 0.0;
   bool cameraMoving = false;
   while(running){
     sf::Event event;
@@ -187,10 +170,8 @@ int main(){
         // Resize the buffers for color picking
         colorPicking->resizeBuffers(width, height);
 
-        // Recompute projectionMatrix
-        camera.projectionMatrix = getPerspectiveProjMatrix(
-          camera.fovy, (double)width/height, 1, 1000
-        );
+        // Recompute camera perspective matrix
+        camera->update((double)width/height);
       }
       else if(event.type == sf::Event::MouseButtonPressed){
         // If it's the right button, it's a camera movement
@@ -209,7 +190,7 @@ int main(){
           // Get selected piece using color picking
           game->setNewSelectedPiecePosition(
             colorPicking->getClickedPiecePosition(
-                selectedPixelPosition, game, &pieces, &programs, &camera
+                selectedPixelPosition, game, &pieces, &programs, camera
             )
           );
         }
@@ -226,23 +207,7 @@ int main(){
         mousePosition.x = event.mouseMove.x;
         mousePosition.y = event.mouseMove.y;
 
-        phi -= rotationSpeed * (double)width/height * dX;
-        theta += rotationSpeed * dY;
-
-        // Constraint phi between -PI/2 and PI/2
-        if(phi > M_PI / 2.0) phi = M_PI / 2.0;
-        else if (phi < - M_PI / 2.0) phi = - M_PI / 2.0;
-
-        // Constraint theta between 0.0 and PI/3
-        if(theta > M_PI / 3.0) theta = M_PI / 3.0;
-        else if (theta < 0.0) theta = 0.0;
-
-        // Compute camera position according to the new rotation angle
-        camera.position.x = 40 * sin(phi);
-        camera.position.y = - 40 * cos(phi) * cos(theta);
-        camera.position.z = 20 + 40 * sin(theta);
-
-        camera.viewMatrix = getLookAtMatrix(camera.position, center, up);
+        camera->move(dX, dY, (double)width/height);
       }
       else if(event.type == sf::Event::KeyPressed){
         if(event.key.code == sf::Keyboard::Escape){
@@ -270,10 +235,10 @@ int main(){
 
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(
-      game, physicsWorld, &pieces, &programs, shadowMapping, &camera, &light);
+      game, physicsWorld, &pieces, &programs, shadowMapping, camera, &light);
 
     // Display smoke particles
-    smokeGenerator->draw(&camera);
+    smokeGenerator->draw(camera);
 
     // Perform the chess rules
     try{
@@ -291,6 +256,7 @@ int main(){
       delete smokeGenerator;
       delete game;
       delete physicsWorld;
+      delete camera;
 
       return 1;
     }
@@ -310,6 +276,7 @@ int main(){
   delete smokeGenerator;
   delete game;
   delete physicsWorld;
+  delete camera;
 
   return 0;
 }
