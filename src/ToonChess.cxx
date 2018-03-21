@@ -68,6 +68,9 @@ int main(){
   // Enable backface culling
   glEnable(GL_CULL_FACE);
 
+  // GLSL version
+  std::cout << "GLSL version: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
+
   // Load and compile shaders
   std::map<int, ShaderProgram*> programs;
   try{
