@@ -132,7 +132,7 @@ void SmokeGenerator::generate(
   nbParticles += numberParticles;
 };
 
-void SmokeGenerator::draw(GameInfo* gameInfo){
+void SmokeGenerator::draw(Camera* camera){
   float timeSinceLastCall = innerClock->getElapsedTime().asSeconds();
 
   if(nbParticles > 0){
@@ -181,8 +181,8 @@ void SmokeGenerator::draw(GameInfo* gameInfo){
     // Disable face culling
     glDisable(GL_CULL_FACE);
 
-    smokeShaderProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
-    smokeShaderProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
+    smokeShaderProgram->setViewMatrix(&camera->viewMatrix);
+    smokeShaderProgram->setProjectionMatrix(&camera->projectionMatrix);
 
     smokeShaderProgram->bindTexture(
       0, GL_TEXTURE0, "smokeTexture0", smokeTexture0);

@@ -7,7 +7,6 @@
 
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
-#include "../GameInfo.hxx"
 #include "../utils/math.hxx"
 #include "../ChessGame/ChessGame.hxx"
 
@@ -15,9 +14,9 @@
 
 void shadowMappingRender(
     ChessGame* game,
-    GameInfo* gameInfo,
     std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs){
+    std::map<int, ShaderProgram*>* programs,
+    DirectionalLight* light){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
   sf::Vector3f translation;
@@ -32,8 +31,8 @@ void shadowMappingRender(
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  shadowMappingProgram->setViewMatrix(&gameInfo->lightViewMatrix);
-  shadowMappingProgram->setProjectionMatrix(&gameInfo->lightProjectionMatrix);
+  shadowMappingProgram->setViewMatrix(&light->viewMatrix);
+  shadowMappingProgram->setProjectionMatrix(&light->projectionMatrix);
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
@@ -91,7 +90,7 @@ void shadowMappingRender(
   }
 };
 
-ShadowMapping::ShadowMapping(GLuint resolution) : resolution{resolution}{}
+ShadowMapping::ShadowMapping(){}
 
 void ShadowMapping::initBuffers(){
   // Create FBO for shadow mapping
@@ -151,9 +150,10 @@ void ShadowMapping::deleteBuffers(){
   glDeleteTextures(1, textures);
 }
 
-GLuint ShadowMapping::getShadowMap(
-    ChessGame* game, GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs){
+void ShadowMapping::renderShadowMap(
+    ChessGame* game, std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs,
+    DirectionalLight* light){
   // Bind the framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, fboId);
 
@@ -163,11 +163,13 @@ GLuint ShadowMapping::getShadowMap(
 
   glViewport(0, 0, resolution, resolution);
 
-  shadowMappingRender(game, gameInfo, meshes, programs);
+  shadowMappingRender(game, meshes, programs, light);
+};
 
-  // Return the shadowmap id
+GLuint ShadowMapping::getShadowMap(){
   return shadowMapId;
 };
+
 
 ShadowMapping::~ShadowMapping(){
   deleteBuffers();
