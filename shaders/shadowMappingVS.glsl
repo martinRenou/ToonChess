@@ -1,3 +1,5 @@
+#version 130
+
 varying float depth;
 
 uniform bool elevated;

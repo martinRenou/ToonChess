@@ -1,3 +1,5 @@
+#version 130
+
 varying float vLightIntensity;
 varying vec3 vLightPosition;
 

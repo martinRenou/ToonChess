@@ -10,7 +10,6 @@
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
 #include "../constants.hxx"
-#include "../GameInfo.hxx"
 #include "../ChessGame/ChessGame.hxx"
 #include "../utils/math.hxx"
 
@@ -24,14 +23,15 @@ struct Pixel {
 
 /* Makes a color-picking rendering in the current framebuffer
   \param game The game instance
-  \param gameInfo The game informations
   \param meshes The map of meshes
   \param programs The map of shader programs
+  \param camera The camera
 */
 void colorPickingRender(
     ChessGame* game,
-    GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs){
+    std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs,
+    Camera* camera){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
   sf::Vector3f translation;
@@ -45,8 +45,8 @@ void colorPickingRender(
   glCullFace(GL_BACK);
 
   // Bind uniform values
-  colorPickingProgram->setViewMatrix(&gameInfo->cameraViewMatrix);
-  colorPickingProgram->setProjectionMatrix(&gameInfo->cameraProjectionMatrix);
+  colorPickingProgram->setViewMatrix(&camera->viewMatrix);
+  colorPickingProgram->setProjectionMatrix(&camera->projectionMatrix);
 
   for(int x = 0; x < 8; x++){
     for(int y = 0; y < 8; y++){
@@ -152,8 +152,9 @@ void ColorPicking::deleteBuffers(){
 sf::Vector2i ColorPicking::getClickedPiecePosition(
     sf::Vector2i clickedPixelPosition,
     ChessGame* game,
-    GameInfo* gameInfo, std::map<int, Mesh*>* meshes,
-    std::map<int, ShaderProgram*>* programs){
+    std::map<int, Mesh*>* meshes,
+    std::map<int, ShaderProgram*>* programs,
+    Camera* camera){
   // Bind the framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, fboId);
 
@@ -163,7 +164,7 @@ sf::Vector2i ColorPicking::getClickedPiecePosition(
 
   glViewport(0, 0, width, height);
 
-  colorPickingRender(game, gameInfo, meshes, programs);
+  colorPickingRender(game, meshes, programs, camera);
 
   // Get pixel color at clicked position
   Pixel pixel;

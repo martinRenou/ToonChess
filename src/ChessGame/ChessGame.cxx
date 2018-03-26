@@ -34,6 +34,9 @@ sf::Vector2i ChessGame::uciFormatToPosition(std::string position){
 };
 
 std::string ChessGame::positionToUciFormat(sf::Vector2i position){
+  if(boardAt(position.x, position.y) == OUT_OF_BOUND)
+    throw GameException("Oups, something went wrong...");
+
   return uciGrid[position.x][position.y];
 };
 
@@ -260,8 +263,9 @@ void ChessGame::perform(){
   if(state == USER_TURN) {
     // If the selected position is an allowed move, it surely means that the
     // user wants to move a piece
-    if(allowedNextPositions[selectedPiecePosition.x]
-                           [selectedPiecePosition.y] == true){
+    if(selectedPiecePosition.x != -1 and selectedPiecePosition.y != -1 and
+        allowedNextPositions[selectedPiecePosition.x]
+                            [selectedPiecePosition.y] == true){
       // Set the currently moving piece
       movingPiece = boardAt(
         oldSelectedPiecePosition.x, oldSelectedPiecePosition.y);
