@@ -8,49 +8,68 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
 
+    <link rel="icon" type="image/png" href="images/logo.png" />
     <title>ToonChess</title>
   </head>
   <body>
     <a href="https://github.com/martinRenou/ToonChess"><img style="position: absolute; top: 0; left: 0; border: 0;" src="https://camo.githubusercontent.com/567c3a48d796e2fc06ea80409cc9dd82bf714434/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f6c6566745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_left_darkblue_121621.png"></a>
     <div class="container" style="border-color: #0003;border-style: solid;border-width: thin;padding-right: 45px;padding-left: 45px;">
-      <img src="images/ToonChess.png" class="rounded mx-auto d-block" style="max-width: 60%;height: auto;">
-      <h1 class="display-4 text-center"> 3D Chess game based on OpenGL and Stockfish </h1>
+      <img src="images/logo.svg" class="rounded mx-auto d-block" style="max-width: 300px;height: auto;">
+      <h1 class="display-3 text-center"> ToonChess </h1>
+      <h1 class="display-5 text-center"> 3D Chess game based on OpenGL and Stockfish </h1>
+
+      <div id="carousel" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img class="d-block w-100" src="images/screenshot_1.png" alt="First slide">
+          </div>
+          <div class="carousel-item">
+            <img class="d-block w-100" src="images/screenshot_2.png" alt="Second slide">
+          </div>
+          <div class="carousel-item">
+            <img class="d-block w-100" src="images/screenshot_3.png" alt="Third slide">
+          </div>
+          <div class="carousel-item">
+            <img class="d-block w-100" src="images/screenshot_4.png" alt="Third slide">
+          </div>
+        </div>
+      </div>
 
       <h2 class="mt-4" style="border-top-style: solid;border-top-color: #e7e7e7;border-top-width: thin;"><b> Installation (linux only) </b></h2>
 
       <p> Install <a href="https://cmake.org/">CMake</a>, <a href="https://www.sfml-dev.org/index.php">SFML</a> and <a href="https://stockfishchess.org/">Stockfish</a>:
-        <pre style="background: #e7e7e7;"><code>
-          sudo apt-get install cmake libsfml-dev stockfish
+        <pre class="mr-4 ml-4" style="background: #e7e7e7;"><code>
+          <span style="color:#800000;">sudo</span> apt-get install cmake libsfml-dev stockfish
         </code></pre>
       </p>
 
       <p> Install <a href="http://bulletphysics.org/wordpress/">Bullet Physics</a>:
-        <pre style="background: #e7e7e7;"><code>
+        <pre class="mr-4 ml-4" style="background: #e7e7e7;"><code>
           wget https://github.com/bulletphysics/bullet3/archive/2.87.tar.gz
           tar -xzf 2.87.tar.gz
-          cd bullet3-2.87/
-          mkdir build && cd build && cmake .. -DBUILD_EXTRAS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_UNIT_TESTS=OFF -DBUILD_PYBULLET=OFF
-          sudo make install
-          cd ..
+          <span style="color:#0f5ccd;">cd</span> bullet3-2.87/
+          <span style="color:#0f5ccd;">mkdir</span> build <span style="color:#800000;">&&</span> cd build <span style="color:#800000;">&&</span> cmake .. -DBUILD_EXTRAS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_UNIT_TESTS=OFF -DBUILD_PYBULLET=OFF
+          <span style="color:#800000;">sudo</span> make install
+          <span style="color:#0f5ccd;">cd</span> ..
         </code></pre>
       </p>
 
       <p> Download source code:
-        <pre style="background: #e7e7e7;"><code>
+        <pre class="mr-4 ml-4" style="background: #e7e7e7;"><code>
           git clone https://github.com/martinRenou/ToonChess.git
-          cd ToonChess
+          <span style="color:#0f5ccd;">cd</span> ToonChess
         </code></pre>
       </p>
 
       <p> Compile ToonChess:
-        <pre style="background: #e7e7e7;"><code>
-          mkdir build && cd build && cmake ..
+        <pre class="mr-4 ml-4" style="background: #e7e7e7;"><code>
+          <span style="color:#0f5ccd;">mkdir</span> build <span style="color:#800000;">&&</span> cd build <span style="color:#800000;">&&</span> cmake ..
           make
         </code></pre>
       </p>
 
       <p> Run it!
-        <pre style="background: #e7e7e7;"><code>
+        <pre class="mr-4 ml-4" style="background: #e7e7e7;"><code>
           ./ToonChess
         </code></pre>
       </p>
@@ -58,7 +77,9 @@
       <h2 class="mt-4" style="border-top-style: solid;border-top-color: #e7e7e7;border-top-width: thin;"><b> Why did I create this game? </b></h2>
       <p class="text-justify">
         There are already plenty of open-source chess games, so why would I develop my own?
-        I am not even a chess gamer, I am simply interested in real time 3D rendering. Working on this project made me improve on my OpenGL and C++ skills. I also wanted the opportunity to learn tools such as GoogleTest and Cppcheck. And here is the result! Feel free to copy parts of the code for your own OpenGL projects.
+        I am not even a chess gamer, I am simply interested in real time 3D rendering. Working on this project made me improve on my OpenGL
+        and C++ skills. I also wanted the opportunity to learn tools such as GoogleTest and Cppcheck. And here is the result! Feel free
+        to copy parts of the code for your own OpenGL projects.
       </p>
 
       <h2 class="mt-4" style="border-top-style: solid;border-top-color: #e7e7e7;border-top-width: thin;"><b> How did I create this game? </b></h2>
@@ -100,25 +121,51 @@
         3D view implemented with <a href="https://threejs.org/" class="alert-link">ThreeJS</a>.
       </div>
       <p class="text-justify">
-        I also wanted to display black borders for chess pieces. In order to explain how I did it I'll have to explain what Backface Culling is. Backface Culling is a step during rendering in which triangles of the mesh are sorted between displayed triangles (visible on the screen) and hidden triangles (not visible because of camera point of view). Hidden triangles are not rendered in order to save computation time. Now, in order to display black borders I chose to display those "hidden triangles" in black and to enlarge them. It results in a nice black border effect, without the need of a filtering step (I could have used a sobel filter for example).
+        I also wanted to display black borders for chess pieces. In order to explain how I did it I'll have to explain what Backface Culling is. Backface
+        Culling is a step during rendering in which triangles of the mesh are sorted between displayed triangles (visible on the screen) and hidden triangles
+         (not visible because of camera point of view). Hidden triangles are not rendered in order to save computation time. Now, in order to display black
+         borders I chose to display those "hidden triangles" in black and to enlarge them. It results in a nice black border effect, without the need of
+         a filtering step (I could have used a sobel filter for example).
+      </p>
+
+      <h3 class="mt-3"> Physics and particle system </h3>
+      <p class="text-justify">
+        I wanted chess pieces to collapse when they are taken, in order to achieve that I used <a href="http://bulletphysics.org/wordpress/">Bullet Physics</a>
+        which is a well known C++ physics library. I used Blender for generating fragment meshes and Bullet Physics for real time collisions and physics simulation.
+        The result was interesting but I needed a nice way to remove fragments from the view. That's why I decided to display smoke when fragments disappear.
+        I used a simple particle system for smoke, each particle has its own size, position, speed and lifetime. I created smoke textures
+        using <a href="https://inkscape.org/fr/">Inkscape</a>.
+        <div class="d-inline-block" style="text-align: center;">
+          <img src="images/queen_collapsing.gif" class="rounded" style="max-width: 30%;height: auto;">
+          <img src="images/bishop_collapsing.gif" class="rounded" style="max-width: 30%;height: auto;">
+        </div>
       </p>
 
       <h3 class="mt-3"> Shadow Mapping </h3>
       <p class="text-justify">
-        For the shadows I used the well-known Shadow Mapping technique. A separate render is performed using a Render To Texture technique (RTT), in which the distance from the light is saved for each mesh in a texture. (See picture below, the nearer the mesh is from the light, the darker it is in the shadowmap). And this distance from the light can be used in the main rendering process in order to know if the currently rendered part of the mesh is hidden from the light by another object. See
-        <a href="http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/">this</a> tutorial if you want to learn more about it. I then used the Percentage Close Filtering technique in order to make the shadows smoother (See this <a href="http://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch11.html">nvidia article</a> about PCF).
+        For the shadows I used the well-known Shadow Mapping technique. A separate render is performed using a Render To Texture technique (RTT),
+        in which the distance from the light is saved for each mesh in a texture. (See picture below, the nearer the mesh is from the light, the
+        darker it is in the shadowmap). And this distance from the light can be used in the main rendering process in order to know if the currently
+        rendered part of the mesh is hidden from the light by another object. See
+        <a href="http://www.opengl-tutorial.org/intermediate-tutorials/tutorial-16-shadow-mapping/">this</a> tutorial if you want
+        to learn more about it. I then used the Percentage Close Filtering technique in order to make the shadows
+        smoother (See this <a href="http://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch11.html">nvidia article</a> about PCF).
         <img src="images/ShadowMapping.png" class="rounded mx-auto d-block" style="max-width: 50%;height: auto;">
       </p>
 
       <h3 class="mt-3"> Color Picking </h3>
       <p class="text-justify">
-        Concerning mesh picking, I used a Color Picking technique. When a click event occurs, an other render is performed using a RTT technique, in which meshes are colored according to their positions on the grid (See picture below). The color of the clicked position on the screen is then extracted in order to know which piece on the grid has been selected. This technique is never used in video games, but it perfectly fits my needs for this project. Performances are ok because the RTT is performed only when a click event occurs.
+        Concerning mesh picking, I used a Color Picking technique. When a click event occurs, an other render is performed using a RTT technique,
+        in which meshes are colored according to their positions on the grid (See picture below). The color of the clicked position on the screen
+         is then extracted in order to know which piece on the grid has been selected. This technique is never used in video games, but it perfectly
+          fits my needs for this project. Performances are ok because the RTT is performed only when a click event occurs.
         <img src="images/ColorPicking.png" class="rounded mx-auto d-block" style="max-width: 50%;height: auto;">
       </p>
 
       <h3 class="mt-3"> AI </h3>
       <p class="text-justify">
-        Developing the AI would have been too much work, and it wasn't the purpose of this project. I chose to use Stockfish for that. Stockfish runs in a subprocess, and communicates with the GUI using the <a href="http://wbec-ridderkerk.nl/html/UCIProtocol.html">UCI protocol</a>.
+        Developing the AI would have been too much work, and it wasn't the purpose of this project. I chose to use Stockfish for that. Stockfish runs
+        in a subprocess, and communicates with the GUI using the <a href="http://wbec-ridderkerk.nl/html/UCIProtocol.html">UCI protocol</a>.
       </p>
 
       <h3 class="mt-3"> Meshes </h3>

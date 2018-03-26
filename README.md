@@ -1,6 +1,7 @@
-<p align="center"><img width="700" src="images/ToonChess.png"></p>
-<h1 align="center"><a href="https://martinrenou.github.io/ToonChess/">ToonChess</a></h1>
-<h1 align="center"> 3D Chess game based on OpenGL and Stockfish </h1>
+<p align="center"><a href="https://martinrenou.github.io/ToonChess/"><img width="300" src="images/logo.png"></a></p>
+<h1 align="center">ToonChess</h1>
+<h2 align="center"> 3D Chess game based on OpenGL and Stockfish </h1>
+<h2 align="center"><a href="https://martinrenou.github.io/ToonChess/">Website</a></h1>
 
 [![Build Status](https://travis-ci.org/martinRenou/ToonChess.svg?branch=master)](https://travis-ci.org/martinRenou/ToonChess)
 
