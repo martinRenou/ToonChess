@@ -33,15 +33,26 @@ private:
   /* Rotation speed in radians per pixel */
   GLfloat rotationSpeed = 0.002;
 
+  /* Camera damping */
+  GLfloat dPhi = 0.0;
+  GLfloat dTheta = 0.0;
+  GLfloat damping = 0.9;
+
+  void checkConstraints();
+  void computeViewMatrix();
+
 public:
   /* Constructor */
   explicit Camera(GLfloat screenRatio);
 
   /* Update the camera perspective matrix */
-  void update(GLfloat screenRatio);
+  void updatePerspective(GLfloat screenRatio);
 
   /* Move camera, given the mouse movement on the screen */
   void move(GLfloat dX, GLfloat dY, GLfloat screenRatio);
+
+  /* Update the camera position using damping */
+  void update();
 
   /* Camera view matrix */
   std::vector<GLfloat> viewMatrix;
