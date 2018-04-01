@@ -227,6 +227,30 @@ int main(){
       }
     }
 
+    // Perform the chess rules
+    try{
+      game->perform();
+    } catch(const std::exception& e){
+      std::cerr << e.what() << std::endl;
+
+      window.close();
+
+      deletePieces(&pieces);
+      deleteFragmentMeshes(&fragmentMeshes);
+      deletePrograms(&programs);
+      delete colorPicking;
+      delete shadowMapping;
+      delete smokeGenerator;
+      delete game;
+      delete physicsWorld;
+      delete camera;
+
+      return 1;
+    }
+
+    // Simulate dynamics world
+    physicsWorld->simulate(game);
+
     // Take care of game events
     Event gameEvent;
     while(EventStack::pollEvent(&gameEvent)){
@@ -248,10 +272,16 @@ int main(){
             sf::Vector3f(0.30, 0.12, 0.40)
         );
       }
+
+      if(gameEvent.type == Event::PieceTakenEvent){
+        physicsWorld->collapsePiece(
+          gameEvent.piece.piece,
+          gameEvent.piece.position
+        );
+      }
     }
 
-    // Simulate dynamics world
-    physicsWorld->simulate(game);
+    // Perform rendering
 
     // Create the shadowMap
     shadowMapping->renderShadowMap(
@@ -271,27 +301,6 @@ int main(){
 
     // Display smoke particles
     smokeGenerator->draw(camera);
-
-    // Perform the chess rules
-    try{
-      game->perform();
-    } catch(const std::exception& e){
-      std::cerr << e.what() << std::endl;
-
-      window.close();
-
-      deletePieces(&pieces);
-      deleteFragmentMeshes(&fragmentMeshes);
-      deletePrograms(&programs);
-      delete colorPicking;
-      delete shadowMapping;
-      delete smokeGenerator;
-      delete game;
-      delete physicsWorld;
-      delete camera;
-
-      return 1;
-    }
 
     glFlush();
 

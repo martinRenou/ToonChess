@@ -1,3 +1,6 @@
+#include "../Event/Event.hxx"
+#include "../Event/EventStack.hxx"
+
 #include "StockfishConnector.hxx"
 #include "GameException.hxx"
 
@@ -292,6 +295,18 @@ void ChessGame::perform(){
       // Reset allowedNextPositions matrix
       resetAllowedNextPositions();
 
+      // If a piece has been taken, remove it from the board and send event
+      if(boardAt(movingPieceEndPosition.x, movingPieceEndPosition.y) != EMPTY){
+        Event pieceTakenEvent;
+        pieceTakenEvent.type = Event::PieceTakenEvent;
+        pieceTakenEvent.piece.position = movingPieceEndPosition;
+        pieceTakenEvent.piece.piece = boardAt(
+          movingPieceEndPosition.x, movingPieceEndPosition.y);
+        EventStack::pushEvent(pieceTakenEvent);
+
+        board[movingPieceEndPosition.x][movingPieceEndPosition.y] = EMPTY;
+      }
+
       // Transition to the next state
       state = USER_MOVING;
       clock->restart();
@@ -361,6 +376,18 @@ void ChessGame::perform(){
     }else{
       suggestedUserMoveStartPosition = {-1, -1};
       suggestedUserMoveEndPosition = {-1, -1};
+    }
+
+    // If a piece has been taken, remove it from the board and send event
+    if(boardAt(movingPieceEndPosition.x, movingPieceEndPosition.y) != EMPTY){
+      Event pieceTakenEvent;
+      pieceTakenEvent.type = Event::PieceTakenEvent;
+      pieceTakenEvent.piece.position = movingPieceEndPosition;
+      pieceTakenEvent.piece.piece = boardAt(
+        movingPieceEndPosition.x, movingPieceEndPosition.y);
+      EventStack::pushEvent(pieceTakenEvent);
+
+      board[movingPieceEndPosition.x][movingPieceEndPosition.y] = EMPTY;
     }
 
     // Transition to AI_MOVING state

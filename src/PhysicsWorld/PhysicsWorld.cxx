@@ -80,6 +80,11 @@ PhysicsWorld::PhysicsWorld(
 };
 
 void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
+  // Remove it from the dynamics world
+  dynamicsWorld->removeRigidBody(pieceRigidBodies[position.x][position.y]);
+  delete pieceRigidBodies[position.x][position.y];
+  pieceRigidBodies[position.x][position.y] = NULL;
+
   // Create a fragment for each fragmentMesh of the piece
   int absPiece = abs(piece);
   for(unsigned int i = 0; i < fragmentMeshes->at(absPiece).size(); i++){
@@ -124,28 +129,6 @@ void PhysicsWorld::simulate(ChessGame* game){
       )
     );
     movingRigidBody->setWorldTransform(transform);
-
-    int pieceAtEndPosition = game->boardAt(
-      movingRigidBodyEndPosition.x, movingRigidBodyEndPosition.y);
-
-    // It the piece is taking another one, remove the last and collapse it
-    if(pieceAtEndPosition != EMPTY and pieceAtEndPosition != OUT_OF_BOUND){
-      // Remove it from the dynamics world
-      dynamicsWorld->removeRigidBody(
-        pieceRigidBodies[movingRigidBodyEndPosition.x]
-                        [movingRigidBodyEndPosition.y]
-      );
-      delete pieceRigidBodies[movingRigidBodyEndPosition.x]
-                             [movingRigidBodyEndPosition.y];
-      pieceRigidBodies[movingRigidBodyEndPosition.x]
-                      [movingRigidBodyEndPosition.y] = NULL;
-
-      // Remove it from the board
-      game->board[movingRigidBodyEndPosition.x][movingRigidBodyEndPosition.y] = EMPTY;
-
-      // Collapse it
-      collapsePiece(pieceAtEndPosition, game->movingPieceEndPosition);
-    }
   }
   else if(movingRigidBody){
     pieceRigidBodies[movingRigidBodyEndPosition.x][movingRigidBodyEndPosition.y] = movingRigidBody;

@@ -12,7 +12,8 @@ public:
   /* Event type */
   enum Type {
     SmokeEvent,
-    FragmentDisappearsEvent
+    FragmentDisappearsEvent,
+    PieceTakenEvent
   };
   Type type;
 
@@ -29,9 +30,15 @@ public:
     int piece;
   };
 
+  struct Piece {
+    sf::Vector2i position;
+    int piece;
+  };
+
   union {
     Smoke smoke;
     Fragment fragment;
+    Piece piece;
   };
 
   /* Destructor */
