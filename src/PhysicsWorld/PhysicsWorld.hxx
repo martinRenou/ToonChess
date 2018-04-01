@@ -13,7 +13,6 @@
 #include "Fragment.hxx"
 #include "../mesh/Mesh.hxx"
 #include "../ChessGame/ChessGame.hxx"
-#include "../SmokeGenerator/SmokeGenerator.hxx"
 
 
 // cppcheck-suppress noCopyConstructor
@@ -45,11 +44,6 @@ class PhysicsWorld{
     std::vector<btDefaultMotionState*> pieceMotionStates;
     btRigidBody* pieceRigidBodies[8][8];
 
-    /* Properties of the currently moving piece, useful for updating its
-    rigidbody */
-    btRigidBody* movingRigidBody;
-    sf::Vector2i movingRigidBodyEndPosition = {-1, -1};
-
     /* Inner clock for stepping simulation */
     sf::Clock* innerClock;
 
@@ -60,6 +54,20 @@ class PhysicsWorld{
     /* Constructor */
     explicit PhysicsWorld(
       std::map<int, std::vector<Mesh*>>* fragmentMeshes, ChessGame* game);
+
+    /* Update a piece position when it's moving
+      \param currentPosition The current position of the moving rigid body
+      \param startPosition The start position of the movement
+    */
+    void updatePiecePosition(
+      sf::Vector2i startPosition, sf::Vector2f currentPosition);
+
+    /* Move a piece directly to its end position
+      \param startPosition The start position of the movement
+      \param endPosition The end position of the movement
+    */
+    void movePiece(
+      sf::Vector2i startPosition, sf::Vector2i endPosition);
 
     /* Adds a piece to the dynamics world and collapse it
       \param piece Piece that you want to collapse: KING, QUEEN, BISHOP...
@@ -73,7 +81,7 @@ class PhysicsWorld{
 
     /* Simulate method, this will update the position of each fragment of the
       fragment pool and add new fragments when needed */
-    void simulate(ChessGame* game, SmokeGenerator* smokeGenerator);
+    void simulate();
 
     /* Destructor */
     ~PhysicsWorld();

@@ -1,3 +1,6 @@
+#include "../Event/Event.hxx"
+#include "../Event/EventStack.hxx"
+
 #include "StockfishConnector.hxx"
 #include "GameException.hxx"
 
@@ -292,6 +295,18 @@ void ChessGame::perform(){
       // Reset allowedNextPositions matrix
       resetAllowedNextPositions();
 
+      // If a piece has been taken, remove it from the board and send event
+      if(boardAt(movingPieceEndPosition.x, movingPieceEndPosition.y) != EMPTY){
+        Event event;
+        event.type = Event::PieceTakenEvent;
+        event.piece.position = movingPieceEndPosition;
+        event.piece.piece = boardAt(
+          movingPieceEndPosition.x, movingPieceEndPosition.y);
+        EventStack::pushEvent(event);
+
+        board[movingPieceEndPosition.x][movingPieceEndPosition.y] = EMPTY;
+      }
+
       // Transition to the next state
       state = USER_MOVING;
       clock->restart();
@@ -304,9 +319,25 @@ void ChessGame::perform(){
         elapsedTime * movingPieceEndPosition.x + (1 - elapsedTime) * movingPieceStartPosition.x,
         elapsedTime * movingPieceEndPosition.y + (1 - elapsedTime) * movingPieceStartPosition.y
       };
+
+      // Seng moving piece event
+      Event event;
+      event.type = Event::PieceMovingEvent;
+      event.movingPiece.currentPosition = movingPiecePosition;
+      event.movingPiece.startPosition = movingPieceStartPosition;
+      event.movingPiece.endPosition = movingPieceEndPosition;
+      EventStack::pushEvent(event);
     } else {
       // Add the moving piece to its end position
       board[movingPieceEndPosition.x][movingPieceEndPosition.y] = movingPiece;
+
+      // Seng piece stops event
+      Event event;
+      event.type = Event::PieceStopsEvent;
+      event.movingPiece.currentPosition = movingPiecePosition;
+      event.movingPiece.startPosition = movingPieceStartPosition;
+      event.movingPiece.endPosition = movingPieceEndPosition;
+      EventStack::pushEvent(event);
 
       // Reset attributes
       movingPiece = EMPTY;
@@ -361,6 +392,18 @@ void ChessGame::perform(){
     }else{
       suggestedUserMoveStartPosition = {-1, -1};
       suggestedUserMoveEndPosition = {-1, -1};
+    }
+
+    // If a piece has been taken, remove it from the board and send event
+    if(boardAt(movingPieceEndPosition.x, movingPieceEndPosition.y) != EMPTY){
+      Event event;
+      event.type = Event::PieceTakenEvent;
+      event.piece.position = movingPieceEndPosition;
+      event.piece.piece = boardAt(
+        movingPieceEndPosition.x, movingPieceEndPosition.y);
+      EventStack::pushEvent(event);
+
+      board[movingPieceEndPosition.x][movingPieceEndPosition.y] = EMPTY;
     }
 
     // Transition to AI_MOVING state

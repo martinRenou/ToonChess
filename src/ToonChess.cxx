@@ -22,6 +22,9 @@
 
 #include "PhysicsWorld/PhysicsWorld.hxx"
 
+#include "Event/EventStack.hxx"
+#include "Event/Event.hxx"
+
 #include "constants.hxx"
 
 #include "Camera/Camera.hxx"
@@ -158,12 +161,14 @@ int main(){
   GLint dY = 0;
   bool cameraMoving = false;
   while(running){
+    // Take care of SFML events
     sf::Event event;
     while(window.pollEvent(event)){
       if(event.type == sf::Event::Closed){
         running = false;
       }
-      else if(event.type == sf::Event::Resized){
+
+      if(event.type == sf::Event::Resized){
         width = event.size.width;
         height = event.size.height;
 
@@ -173,7 +178,8 @@ int main(){
         // Recompute camera perspective matrix
         camera->update((double)width/height);
       }
-      else if(event.type == sf::Event::MouseButtonPressed){
+
+      if(event.type == sf::Event::MouseButtonPressed){
         // If it's the right button, it's a camera movement
         if(event.mouseButton.button == sf::Mouse::Right){
           cameraMoving = true;
@@ -181,7 +187,8 @@ int main(){
           mousePosition = sf::Mouse::getPosition(window);
         }
       }
-      else if(event.type == sf::Event::MouseButtonReleased){
+
+      if(event.type == sf::Event::MouseButtonReleased){
         // If it's the left button, it must be a piece selection
         if(event.mouseButton.button == sf::Mouse::Left){
           selectedPixelPosition.x = event.mouseButton.x;
@@ -200,7 +207,8 @@ int main(){
           cameraMoving = false;
         }
       }
-      else if(event.type == sf::Event::MouseMoved and cameraMoving){
+
+      if(event.type == sf::Event::MouseMoved and cameraMoving){
         dX = event.mouseMove.x - mousePosition.x;
         dY = event.mouseMove.y - mousePosition.y;
 
@@ -209,7 +217,8 @@ int main(){
 
         camera->move(dX, dY, (double)width/height);
       }
-      else if(event.type == sf::Event::KeyPressed){
+
+      if(event.type == sf::Event::KeyPressed){
         if(event.key.code == sf::Keyboard::Escape){
           running = false;
 
@@ -217,28 +226,6 @@ int main(){
         }
       }
     }
-
-    // Simulate dynamics world
-    physicsWorld->simulate(game, smokeGenerator);
-
-    // Create the shadowMap
-    shadowMapping->renderShadowMap(
-      game, &pieces, &programs, &light);
-
-    // Do the cel-shading rendering
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-    glClearColor(1, 1, 1, 1);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    glViewport(0, 0, width, height);
-
-    // Display all pieces on the screen using the cel-shading effect
-    celShadingRender(
-      game, physicsWorld, &pieces, &programs, shadowMapping, camera, &light);
-
-    // Display smoke particles
-    smokeGenerator->draw(camera);
 
     // Perform the chess rules
     try{
@@ -260,6 +247,69 @@ int main(){
 
       return 1;
     }
+
+    // Simulate dynamics world
+    physicsWorld->simulate();
+
+    // Take care of game events
+    Event gameEvent;
+    while(EventStack::pollEvent(&gameEvent)){
+      if(gameEvent.type == Event::FragmentDisappearsEvent){
+        // Generate smoke depending on the fragment volume and the team
+        smokeGenerator->generate(
+          gameEvent.fragment.position,
+          (int)round(gameEvent.fragment.volume),
+          gameEvent.fragment.piece > 0 ?
+            sf::Vector3f(0.41, 0.37, 0.23) :
+            sf::Vector3f(0.30, 0.12, 0.40)
+        );
+      }
+
+      if(gameEvent.type == Event::PieceTakenEvent){
+        // Collapse piece in the dynamics world
+        physicsWorld->collapsePiece(
+          gameEvent.piece.piece,
+          gameEvent.piece.position
+        );
+      }
+
+      if(gameEvent.type == Event::PieceMovingEvent){
+        // Update the piece position in the dynamics world
+        physicsWorld->updatePiecePosition(
+          gameEvent.movingPiece.startPosition,
+          gameEvent.movingPiece.currentPosition
+        );
+      }
+
+      if(gameEvent.type == Event::PieceStopsEvent){
+        // Move the piece to its end position in the dynamics world
+        physicsWorld->movePiece(
+          gameEvent.movingPiece.startPosition,
+          gameEvent.movingPiece.endPosition
+        );
+      }
+    }
+
+    // Perform rendering
+
+    // Create the shadowMap
+    shadowMapping->renderShadowMap(
+      game, &pieces, &programs, &light);
+
+    // Do the cel-shading rendering
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    glClearColor(1, 1, 1, 1);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    glViewport(0, 0, width, height);
+
+    // Display all pieces on the screen using the cel-shading effect
+    celShadingRender(
+      game, physicsWorld, &pieces, &programs, shadowMapping, camera, &light);
+
+    // Display smoke particles
+    smokeGenerator->draw(camera);
 
     glFlush();
 

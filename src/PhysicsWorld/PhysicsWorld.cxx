@@ -10,6 +10,8 @@
 
 #include "../mesh/Mesh.hxx"
 #include "../mesh/meshes.hxx"
+#include "../Event/Event.hxx"
+#include "../Event/EventStack.hxx"
 #include "../constants.hxx"
 
 #include "PhysicsWorld.hxx"
@@ -71,13 +73,48 @@ PhysicsWorld::PhysicsWorld(
       }
     }
   }
-  movingRigidBody = NULL;
 
   // Start the innerClock
   innerClock = new sf::Clock();
 };
 
+void PhysicsWorld::updatePiecePosition(
+    sf::Vector2i startPosition, sf::Vector2f currentPosition){
+  // Get rigidBody
+  btRigidBody* movingRigidBody = pieceRigidBodies[
+    startPosition.x][startPosition.y];
+
+  // Move rigid body in the dynamics world
+  btTransform transform(
+    btQuaternion(0, 0, 0, 1),
+    btVector3(
+      currentPosition.x * 4 - 14,
+      currentPosition.y * 4 - 14,
+      3.75
+    )
+  );
+  movingRigidBody->setWorldTransform(transform);
+};
+
+void PhysicsWorld::movePiece(
+    sf::Vector2i startPosition, sf::Vector2i endPosition){
+  // Move the piece to its end position
+  updatePiecePosition(
+    startPosition, {float(endPosition.x), float(endPosition.y)});
+
+  // And update the rigid bodies grid
+  btRigidBody* movingRigidBody = pieceRigidBodies[
+    startPosition.x][startPosition.y];
+  pieceRigidBodies[startPosition.x][startPosition.y] = NULL;
+  pieceRigidBodies[endPosition.x][endPosition.y] = movingRigidBody;
+};
+
 void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
+  // Remove it from the dynamics world
+  dynamicsWorld->removeRigidBody(pieceRigidBodies[position.x][position.y]);
+  delete pieceRigidBodies[position.x][position.y];
+  pieceRigidBodies[position.x][position.y] = NULL;
+
   // Create a fragment for each fragmentMesh of the piece
   int absPiece = abs(piece);
   for(unsigned int i = 0; i < fragmentMeshes->at(absPiece).size(); i++){
@@ -99,70 +136,7 @@ void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
   }
 };
 
-void PhysicsWorld::simulate(ChessGame* game, SmokeGenerator* smokeGenerator){
-  // If a piece is moving on the board, move its rigid body in the dynamics world
-  if(game->movingPiece != EMPTY){
-    sf::Vector2i startPosition = game->movingPieceStartPosition;
-    movingRigidBodyEndPosition = {
-      game->movingPieceEndPosition.x, game->movingPieceEndPosition.y};
-
-    // Get the rigid body of the moving piece
-    if(!movingRigidBody){
-      movingRigidBody = pieceRigidBodies[startPosition.x][startPosition.y];
-      pieceRigidBodies[startPosition.x][startPosition.y] = NULL;
-    }
-
-    // Move rigid body in the dynamics world
-    btTransform transform(
-      btQuaternion(0, 0, 0, 1),
-      btVector3(
-        game->movingPiecePosition.x * 4 - 14,
-        game->movingPiecePosition.y * 4 - 14,
-        3.75
-      )
-    );
-    movingRigidBody->setWorldTransform(transform);
-
-    int pieceAtEndPosition = game->boardAt(
-      movingRigidBodyEndPosition.x, movingRigidBodyEndPosition.y);
-
-    // It the piece is taking another one, remove the last and collapse it
-    if(pieceAtEndPosition != EMPTY and pieceAtEndPosition != OUT_OF_BOUND){
-      // Remove it from the dynamics world
-      dynamicsWorld->removeRigidBody(
-        pieceRigidBodies[movingRigidBodyEndPosition.x]
-                        [movingRigidBodyEndPosition.y]
-      );
-      delete pieceRigidBodies[movingRigidBodyEndPosition.x]
-                             [movingRigidBodyEndPosition.y];
-      pieceRigidBodies[movingRigidBodyEndPosition.x]
-                      [movingRigidBodyEndPosition.y] = NULL;
-
-      // Remove it from the board
-      game->board[movingRigidBodyEndPosition.x][movingRigidBodyEndPosition.y] = EMPTY;
-
-      // Collapse it
-      collapsePiece(pieceAtEndPosition, game->movingPieceEndPosition);
-    }
-  }
-  else if(movingRigidBody){
-    pieceRigidBodies[movingRigidBodyEndPosition.x][movingRigidBodyEndPosition.y] = movingRigidBody;
-
-    // Move the rigid body to its final position
-    btTransform transform(
-      btQuaternion(0, 0, 0, 1),
-      btVector3(
-        movingRigidBodyEndPosition.x * 4 - 14,
-        movingRigidBodyEndPosition.y * 4 - 14,
-        3.75
-      )
-    );
-    movingRigidBody->setWorldTransform(transform);
-
-    // And stop moving
-    movingRigidBody = NULL;
-  }
-
+void PhysicsWorld::simulate(){
   float timeSinceLastCall = innerClock->getElapsedTime().asSeconds();
 
   // Take into account fragments lifetime
@@ -174,22 +148,25 @@ void PhysicsWorld::simulate(ChessGame* game, SmokeGenerator* smokeGenerator){
       // Generate smoke particles where the fragment disapeared
       btTransform trans;
       fragment->rigidBody->getMotionState()->getWorldTransform(trans);
-      smokeGenerator->generate(
-        {
-          trans.getOrigin().getX(),
-          trans.getOrigin().getY(),
-          trans.getOrigin().getZ()
-        },
-        (int)round(fragment->mass) + 1,
-        fragmentPool.at(i).first > 0 ?
-          sf::Vector3f(0.41, 0.37, 0.23) : sf::Vector3f(0.30, 0.12, 0.40)
-      );
+
+      // Trigger fragment disappears event
+      Event event;
+      event.type = Event::FragmentDisappearsEvent;
+      event.fragment.position = {
+        trans.getOrigin().getX(),
+        trans.getOrigin().getY(),
+        trans.getOrigin().getZ()
+      };
+      event.fragment.volume = fragment->mass;
+      event.fragment.piece = fragmentPool.at(i).first;
+      EventStack::pushEvent(event);
 
       dynamicsWorld->removeRigidBody(fragment->rigidBody);
       delete fragment;
       fragmentPool.at(i).second = NULL;
     }
   }
+
   // Remove fragments which lifetime is over from the fragment pool
   fragmentPool.erase(
     std::remove_if(
