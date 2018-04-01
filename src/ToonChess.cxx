@@ -176,7 +176,7 @@ int main(){
         colorPicking->resizeBuffers(width, height);
 
         // Recompute camera perspective matrix
-        camera->update((double)width/height);
+        camera->updatePerspective((double)width/height);
       }
 
       if(event.type == sf::Event::MouseButtonPressed){
@@ -304,6 +304,7 @@ int main(){
     }
 
     // Perform rendering
+    camera->update();
 
     // Create the shadowMap
     shadowMapping->renderShadowMap(
