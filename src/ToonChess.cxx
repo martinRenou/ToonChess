@@ -254,14 +254,6 @@ int main(){
     // Take care of game events
     Event gameEvent;
     while(EventStack::pollEvent(&gameEvent)){
-      if(gameEvent.type == Event::SmokeEvent){
-        smokeGenerator->generate(
-          gameEvent.smoke.position,
-          gameEvent.smoke.numberParticles,
-          gameEvent.smoke.color
-        );
-      }
-
       if(gameEvent.type == Event::FragmentDisappearsEvent){
         // Generate smoke depending on the fragment volume and the team
         smokeGenerator->generate(

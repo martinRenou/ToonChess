@@ -11,7 +11,6 @@ public:
 
   /* Event type */
   enum Type {
-    SmokeEvent,
     FragmentDisappearsEvent,
     PieceTakenEvent,
     PieceMovingEvent,
@@ -20,12 +19,6 @@ public:
   Type type;
 
   /* Event data */
-  struct Smoke {
-    sf::Vector3f position;
-    int numberParticles;
-    sf::Vector3f color;
-  };
-
   struct Fragment {
     sf::Vector3f position;
     float volume;
@@ -44,7 +37,6 @@ public:
   };
 
   union {
-    Smoke smoke;
     Fragment fragment;
     Piece piece;
     MovingPiece movingPiece;
