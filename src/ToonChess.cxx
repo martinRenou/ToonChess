@@ -261,7 +261,8 @@ int main(){
           (int)round(gameEvent.fragment.volume),
           gameEvent.fragment.piece > 0 ?
             sf::Vector3f(0.41, 0.37, 0.23) :
-            sf::Vector3f(0.30, 0.12, 0.40)
+            sf::Vector3f(0.30, 0.12, 0.40),
+          0.7
         );
       }
 
@@ -278,6 +279,18 @@ int main(){
         physicsWorld->updatePiecePosition(
           gameEvent.movingPiece.startPosition,
           gameEvent.movingPiece.currentPosition
+        );
+
+        // Generate smoke
+        smokeGenerator->generate(
+          {
+            gameEvent.movingPiece.currentPosition.x * 4 -14,
+            gameEvent.movingPiece.currentPosition.y * 4 -14,
+            0.0
+          },
+          1,
+          sf::Vector3f(1.0, 1.0, 1.0),
+          0.2
         );
       }
 

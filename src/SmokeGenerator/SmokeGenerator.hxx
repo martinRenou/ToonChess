@@ -83,8 +83,14 @@ public:
   /* Generate smoke at the given position
     \param position: Position where to generate the smoke
     \param numberParticles: Number of smoke particles to create
+    \param color: Color of particles
+    \param sizeFactor: Size factor of particles
   */
-  void generate(sf::Vector3f position, int numberParticles, sf::Vector3f color);
+  void generate(
+    sf::Vector3f position,
+    int numberParticles,
+    sf::Vector3f color,
+    float sizeFactor);
 
   /* Draw smoke in the currently bound framebuffer object */
   void draw(Camera* camera);

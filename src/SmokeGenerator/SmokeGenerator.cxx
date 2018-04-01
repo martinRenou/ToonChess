@@ -91,7 +91,10 @@ void SmokeGenerator::initBuffers(){
 };
 
 void SmokeGenerator::generate(
-    sf::Vector3f position, int numberParticles, sf::Vector3f color){
+    sf::Vector3f position,
+    int numberParticles,
+    sf::Vector3f color,
+    float sizeFactor){
   if(nbParticles + numberParticles > maxNbParticles){
     std::cout << "Cannot create more particles..." << std::endl;
 
@@ -99,7 +102,7 @@ void SmokeGenerator::generate(
   }
 
   // Random generators
-  std::uniform_real_distribution<float> getPosition(-0.2, 1.5);
+  std::uniform_real_distribution<float> getPosition(-1.0, 1.0);
   std::uniform_real_distribution<float> getSize(1.0, 3.5);
   std::uniform_real_distribution<float> getLifetime(2.0, 3.0);
   std::uniform_real_distribution<float> getTextureIndex(0.0, 3.0);
@@ -110,13 +113,15 @@ void SmokeGenerator::generate(
     particle->position = {
       position.x + getPosition(generator),
       position.y + getPosition(generator),
-      position.z + getPosition(generator)
+      position.z
     };
     particle->size = getSize(generator);
 
     // Compute speed depending on the size
     float zSpeed = 3.0 * 1.0/particle->size;
     particle->speed = {0.1, 0.1, zSpeed};
+
+    particle->size *= sizeFactor;
 
     particle->lifetime = getLifetime(generator);
     particle->remainingLife = particle->lifetime;
