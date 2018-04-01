@@ -22,6 +22,9 @@
 
 #include "PhysicsWorld/PhysicsWorld.hxx"
 
+#include "Event/EventStack.hxx"
+#include "Event/Event.hxx"
+
 #include "constants.hxx"
 
 #include "Camera/Camera.hxx"
@@ -158,6 +161,7 @@ int main(){
   GLint dY = 0;
   bool cameraMoving = false;
   while(running){
+    // Take care of SFML events
     sf::Event event;
     while(window.pollEvent(event)){
       if(event.type == sf::Event::Closed){
@@ -199,6 +203,20 @@ int main(){
         if(event.mouseButton.button == sf::Mouse::Right){
           cameraMoving = false;
         }
+
+        Event smokeEvent;
+        smokeEvent.type = Event::SmokeEvent;
+        smokeEvent.smoke.position = {0.2, 0.3, 0.4};
+        smokeEvent.smoke.numberParticles = 10;
+        smokeEvent.smoke.color = {1.0, 1.0, 1.0};
+        EventStack::pushEvent(smokeEvent);
+
+        Event smokeEvent2;
+        smokeEvent.type = Event::SmokeEvent;
+        smokeEvent.smoke.position = {0.36, 1.2, 1.4};
+        smokeEvent.smoke.numberParticles = 10;
+        smokeEvent.smoke.color = {1.0, 1.0, 1.0};
+        EventStack::pushEvent(smokeEvent);
       }
       else if(event.type == sf::Event::MouseMoved and cameraMoving){
         dX = event.mouseMove.x - mousePosition.x;
@@ -215,6 +233,18 @@ int main(){
 
           continue;
         }
+      }
+    }
+
+    // Take care of game events
+    Event gameEvent;
+    while(EventStack::pollEvent(&gameEvent)){
+      if(gameEvent.type == Event::SmokeEvent){
+        smokeGenerator->generate(
+          gameEvent.smoke.position,
+          gameEvent.smoke.numberParticles,
+          gameEvent.smoke.color
+        );
       }
     }
 

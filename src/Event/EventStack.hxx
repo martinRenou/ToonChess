@@ -6,19 +6,18 @@
 #include "Event.hxx"
 
 class EventStack {
-private:
-  /* Array of events */
-  std::vector<Event> waitingQueue;
-
 public:
   /* Constructor */
-  explicit EventStack();
+  explicit EventStack(){};
+
+  /* Array of events */
+  static std::vector<Event> waitingQueue;
 
   /* Push an Event in the waiting queue */
-  void pushEvent(Event event);
+  static void pushEvent(Event event);
 
   /* Poll an event, returns true if an event was there, false otherwise */
-  bool pollEvent(Event* event);
+  static bool pollEvent(Event* event);
 
   /* Destructor */
   ~EventStack(){};

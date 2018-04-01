@@ -41,6 +41,8 @@ set(
 
   ${CMAKE_SOURCE_DIR}/src/Camera/Camera.cxx
 
+  ${CMAKE_SOURCE_DIR}/src/Event/EventStack.cxx
+
   ${CMAKE_SOURCE_DIR}/src/utils/utils.cxx
   ${CMAKE_SOURCE_DIR}/src/utils/math.cxx
 )
