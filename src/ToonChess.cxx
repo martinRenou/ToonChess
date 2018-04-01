@@ -167,7 +167,8 @@ int main(){
       if(event.type == sf::Event::Closed){
         running = false;
       }
-      else if(event.type == sf::Event::Resized){
+
+      if(event.type == sf::Event::Resized){
         width = event.size.width;
         height = event.size.height;
 
@@ -177,7 +178,8 @@ int main(){
         // Recompute camera perspective matrix
         camera->update((double)width/height);
       }
-      else if(event.type == sf::Event::MouseButtonPressed){
+
+      if(event.type == sf::Event::MouseButtonPressed){
         // If it's the right button, it's a camera movement
         if(event.mouseButton.button == sf::Mouse::Right){
           cameraMoving = true;
@@ -185,7 +187,8 @@ int main(){
           mousePosition = sf::Mouse::getPosition(window);
         }
       }
-      else if(event.type == sf::Event::MouseButtonReleased){
+
+      if(event.type == sf::Event::MouseButtonReleased){
         // If it's the left button, it must be a piece selection
         if(event.mouseButton.button == sf::Mouse::Left){
           selectedPixelPosition.x = event.mouseButton.x;
@@ -204,7 +207,8 @@ int main(){
           cameraMoving = false;
         }
       }
-      else if(event.type == sf::Event::MouseMoved and cameraMoving){
+
+      if(event.type == sf::Event::MouseMoved and cameraMoving){
         dX = event.mouseMove.x - mousePosition.x;
         dY = event.mouseMove.y - mousePosition.y;
 
@@ -213,7 +217,8 @@ int main(){
 
         camera->move(dX, dY, (double)width/height);
       }
-      else if(event.type == sf::Event::KeyPressed){
+
+      if(event.type == sf::Event::KeyPressed){
         if(event.key.code == sf::Keyboard::Escape){
           running = false;
 
