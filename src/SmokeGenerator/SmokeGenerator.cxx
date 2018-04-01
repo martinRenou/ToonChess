@@ -102,8 +102,7 @@ void SmokeGenerator::generate(
   }
 
   // Random generators
-  std::uniform_real_distribution<float> getPosition(-1.5, 1.5);
-  std::uniform_real_distribution<float> getPositionZ(0.0, 0.2);
+  std::uniform_real_distribution<float> getPosition(-1.0, 1.0);
   std::uniform_real_distribution<float> getSize(1.0, 3.5);
   std::uniform_real_distribution<float> getLifetime(2.0, 3.0);
   std::uniform_real_distribution<float> getTextureIndex(0.0, 3.0);
@@ -114,7 +113,7 @@ void SmokeGenerator::generate(
     particle->position = {
       position.x + getPosition(generator),
       position.y + getPosition(generator),
-      position.z + getPositionZ(generator)
+      position.z
     };
     particle->size = getSize(generator);
 
