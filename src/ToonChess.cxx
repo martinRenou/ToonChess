@@ -203,20 +203,6 @@ int main(){
         if(event.mouseButton.button == sf::Mouse::Right){
           cameraMoving = false;
         }
-
-        Event smokeEvent;
-        smokeEvent.type = Event::SmokeEvent;
-        smokeEvent.smoke.position = {0.2, 0.3, 0.4};
-        smokeEvent.smoke.numberParticles = 10;
-        smokeEvent.smoke.color = {1.0, 1.0, 1.0};
-        EventStack::pushEvent(smokeEvent);
-
-        Event smokeEvent2;
-        smokeEvent.type = Event::SmokeEvent;
-        smokeEvent.smoke.position = {0.36, 1.2, 1.4};
-        smokeEvent.smoke.numberParticles = 10;
-        smokeEvent.smoke.color = {1.0, 1.0, 1.0};
-        EventStack::pushEvent(smokeEvent);
       }
       else if(event.type == sf::Event::MouseMoved and cameraMoving){
         dX = event.mouseMove.x - mousePosition.x;
@@ -246,10 +232,21 @@ int main(){
           gameEvent.smoke.color
         );
       }
+
+      if(gameEvent.type == Event::FragmentDisappearsEvent){
+        // Generate smoke depending on the fragment volume and the team
+        smokeGenerator->generate(
+          gameEvent.fragment.position,
+          (int)round(gameEvent.fragment.volume),
+          gameEvent.fragment.piece > 0 ?
+            sf::Vector3f(0.41, 0.37, 0.23) :
+            sf::Vector3f(0.30, 0.12, 0.40)
+        );
+      }
     }
 
     // Simulate dynamics world
-    physicsWorld->simulate(game, smokeGenerator);
+    physicsWorld->simulate(game);
 
     // Create the shadowMap
     shadowMapping->renderShadowMap(

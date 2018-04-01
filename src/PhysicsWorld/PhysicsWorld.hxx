@@ -13,7 +13,6 @@
 #include "Fragment.hxx"
 #include "../mesh/Mesh.hxx"
 #include "../ChessGame/ChessGame.hxx"
-#include "../SmokeGenerator/SmokeGenerator.hxx"
 
 
 // cppcheck-suppress noCopyConstructor
@@ -73,7 +72,7 @@ class PhysicsWorld{
 
     /* Simulate method, this will update the position of each fragment of the
       fragment pool and add new fragments when needed */
-    void simulate(ChessGame* game, SmokeGenerator* smokeGenerator);
+    void simulate(ChessGame* game);
 
     /* Destructor */
     ~PhysicsWorld();

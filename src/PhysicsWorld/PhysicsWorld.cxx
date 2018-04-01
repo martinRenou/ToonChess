@@ -10,6 +10,8 @@
 
 #include "../mesh/Mesh.hxx"
 #include "../mesh/meshes.hxx"
+#include "../Event/Event.hxx"
+#include "../Event/EventStack.hxx"
 #include "../constants.hxx"
 
 #include "PhysicsWorld.hxx"
@@ -99,7 +101,7 @@ void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
   }
 };
 
-void PhysicsWorld::simulate(ChessGame* game, SmokeGenerator* smokeGenerator){
+void PhysicsWorld::simulate(ChessGame* game){
   // If a piece is moving on the board, move its rigid body in the dynamics world
   if(game->movingPiece != EMPTY){
     sf::Vector2i startPosition = game->movingPieceStartPosition;
@@ -174,22 +176,25 @@ void PhysicsWorld::simulate(ChessGame* game, SmokeGenerator* smokeGenerator){
       // Generate smoke particles where the fragment disapeared
       btTransform trans;
       fragment->rigidBody->getMotionState()->getWorldTransform(trans);
-      smokeGenerator->generate(
-        {
-          trans.getOrigin().getX(),
-          trans.getOrigin().getY(),
-          trans.getOrigin().getZ()
-        },
-        (int)round(fragment->mass) + 1,
-        fragmentPool.at(i).first > 0 ?
-          sf::Vector3f(0.41, 0.37, 0.23) : sf::Vector3f(0.30, 0.12, 0.40)
-      );
+
+      // Trigger fragment disappears event
+      Event event;
+      event.type = Event::FragmentDisappearsEvent;
+      event.fragment.position = {
+        trans.getOrigin().getX(),
+        trans.getOrigin().getY(),
+        trans.getOrigin().getZ()
+      };
+      event.fragment.volume = fragment->mass;
+      event.fragment.piece = fragmentPool.at(i).first;
+      EventStack::pushEvent(event);
 
       dynamicsWorld->removeRigidBody(fragment->rigidBody);
       delete fragment;
       fragmentPool.at(i).second = NULL;
     }
   }
+
   // Remove fragments which lifetime is over from the fragment pool
   fragmentPool.erase(
     std::remove_if(
