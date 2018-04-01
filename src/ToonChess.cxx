@@ -249,7 +249,7 @@ int main(){
     }
 
     // Simulate dynamics world
-    physicsWorld->simulate(game);
+    physicsWorld->simulate();
 
     // Take care of game events
     Event gameEvent;
@@ -274,9 +274,26 @@ int main(){
       }
 
       if(gameEvent.type == Event::PieceTakenEvent){
+        // Collapse piece in the dynamics world
         physicsWorld->collapsePiece(
           gameEvent.piece.piece,
           gameEvent.piece.position
+        );
+      }
+
+      if(gameEvent.type == Event::PieceMovingEvent){
+        // Update the piece position in the dynamics world
+        physicsWorld->updatePiecePosition(
+          gameEvent.movingPiece.startPosition,
+          gameEvent.movingPiece.currentPosition
+        );
+      }
+
+      if(gameEvent.type == Event::PieceStopsEvent){
+        // Move the piece to its end position in the dynamics world
+        physicsWorld->movePiece(
+          gameEvent.movingPiece.startPosition,
+          gameEvent.movingPiece.endPosition
         );
       }
     }

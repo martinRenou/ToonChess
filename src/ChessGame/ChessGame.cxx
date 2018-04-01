@@ -297,12 +297,12 @@ void ChessGame::perform(){
 
       // If a piece has been taken, remove it from the board and send event
       if(boardAt(movingPieceEndPosition.x, movingPieceEndPosition.y) != EMPTY){
-        Event pieceTakenEvent;
-        pieceTakenEvent.type = Event::PieceTakenEvent;
-        pieceTakenEvent.piece.position = movingPieceEndPosition;
-        pieceTakenEvent.piece.piece = boardAt(
+        Event event;
+        event.type = Event::PieceTakenEvent;
+        event.piece.position = movingPieceEndPosition;
+        event.piece.piece = boardAt(
           movingPieceEndPosition.x, movingPieceEndPosition.y);
-        EventStack::pushEvent(pieceTakenEvent);
+        EventStack::pushEvent(event);
 
         board[movingPieceEndPosition.x][movingPieceEndPosition.y] = EMPTY;
       }
@@ -319,9 +319,25 @@ void ChessGame::perform(){
         elapsedTime * movingPieceEndPosition.x + (1 - elapsedTime) * movingPieceStartPosition.x,
         elapsedTime * movingPieceEndPosition.y + (1 - elapsedTime) * movingPieceStartPosition.y
       };
+
+      // Seng moving piece event
+      Event event;
+      event.type = Event::PieceMovingEvent;
+      event.movingPiece.currentPosition = movingPiecePosition;
+      event.movingPiece.startPosition = movingPieceStartPosition;
+      event.movingPiece.endPosition = movingPieceEndPosition;
+      EventStack::pushEvent(event);
     } else {
       // Add the moving piece to its end position
       board[movingPieceEndPosition.x][movingPieceEndPosition.y] = movingPiece;
+
+      // Seng piece stops event
+      Event event;
+      event.type = Event::PieceStopsEvent;
+      event.movingPiece.currentPosition = movingPiecePosition;
+      event.movingPiece.startPosition = movingPieceStartPosition;
+      event.movingPiece.endPosition = movingPieceEndPosition;
+      EventStack::pushEvent(event);
 
       // Reset attributes
       movingPiece = EMPTY;
@@ -380,12 +396,12 @@ void ChessGame::perform(){
 
     // If a piece has been taken, remove it from the board and send event
     if(boardAt(movingPieceEndPosition.x, movingPieceEndPosition.y) != EMPTY){
-      Event pieceTakenEvent;
-      pieceTakenEvent.type = Event::PieceTakenEvent;
-      pieceTakenEvent.piece.position = movingPieceEndPosition;
-      pieceTakenEvent.piece.piece = boardAt(
+      Event event;
+      event.type = Event::PieceTakenEvent;
+      event.piece.position = movingPieceEndPosition;
+      event.piece.piece = boardAt(
         movingPieceEndPosition.x, movingPieceEndPosition.y);
-      EventStack::pushEvent(pieceTakenEvent);
+      EventStack::pushEvent(event);
 
       board[movingPieceEndPosition.x][movingPieceEndPosition.y] = EMPTY;
     }

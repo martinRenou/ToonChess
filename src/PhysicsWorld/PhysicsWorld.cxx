@@ -73,10 +73,40 @@ PhysicsWorld::PhysicsWorld(
       }
     }
   }
-  movingRigidBody = NULL;
 
   // Start the innerClock
   innerClock = new sf::Clock();
+};
+
+void PhysicsWorld::updatePiecePosition(
+    sf::Vector2i startPosition, sf::Vector2f currentPosition){
+  // Get rigidBody
+  btRigidBody* movingRigidBody = pieceRigidBodies[
+    startPosition.x][startPosition.y];
+
+  // Move rigid body in the dynamics world
+  btTransform transform(
+    btQuaternion(0, 0, 0, 1),
+    btVector3(
+      currentPosition.x * 4 - 14,
+      currentPosition.y * 4 - 14,
+      3.75
+    )
+  );
+  movingRigidBody->setWorldTransform(transform);
+};
+
+void PhysicsWorld::movePiece(
+    sf::Vector2i startPosition, sf::Vector2i endPosition){
+  // Move the piece to its end position
+  updatePiecePosition(
+    startPosition, {float(endPosition.x), float(endPosition.y)});
+
+  // And update the rigid bodies grid
+  btRigidBody* movingRigidBody = pieceRigidBodies[
+    startPosition.x][startPosition.y];
+  pieceRigidBodies[startPosition.x][startPosition.y] = NULL;
+  pieceRigidBodies[endPosition.x][endPosition.y] = movingRigidBody;
 };
 
 void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
@@ -106,48 +136,7 @@ void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
   }
 };
 
-void PhysicsWorld::simulate(ChessGame* game){
-  // If a piece is moving on the board, move its rigid body in the dynamics world
-  if(game->movingPiece != EMPTY){
-    sf::Vector2i startPosition = game->movingPieceStartPosition;
-    movingRigidBodyEndPosition = {
-      game->movingPieceEndPosition.x, game->movingPieceEndPosition.y};
-
-    // Get the rigid body of the moving piece
-    if(!movingRigidBody){
-      movingRigidBody = pieceRigidBodies[startPosition.x][startPosition.y];
-      pieceRigidBodies[startPosition.x][startPosition.y] = NULL;
-    }
-
-    // Move rigid body in the dynamics world
-    btTransform transform(
-      btQuaternion(0, 0, 0, 1),
-      btVector3(
-        game->movingPiecePosition.x * 4 - 14,
-        game->movingPiecePosition.y * 4 - 14,
-        3.75
-      )
-    );
-    movingRigidBody->setWorldTransform(transform);
-  }
-  else if(movingRigidBody){
-    pieceRigidBodies[movingRigidBodyEndPosition.x][movingRigidBodyEndPosition.y] = movingRigidBody;
-
-    // Move the rigid body to its final position
-    btTransform transform(
-      btQuaternion(0, 0, 0, 1),
-      btVector3(
-        movingRigidBodyEndPosition.x * 4 - 14,
-        movingRigidBodyEndPosition.y * 4 - 14,
-        3.75
-      )
-    );
-    movingRigidBody->setWorldTransform(transform);
-
-    // And stop moving
-    movingRigidBody = NULL;
-  }
-
+void PhysicsWorld::simulate(){
   float timeSinceLastCall = innerClock->getElapsedTime().asSeconds();
 
   // Take into account fragments lifetime
