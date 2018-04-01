@@ -16,7 +16,7 @@ void shadowMappingRender(
     ChessGame* game,
     std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
-    DirectionalLight* light){
+    DirectionalLight* light, float elapsedTime){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
   sf::Vector3f translation;
@@ -48,6 +48,13 @@ void shadowMappingRender(
 
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
+      // If it's part of the suggested user move
+      if((game->suggestedUserMoveStartPosition.x == x and
+          game->suggestedUserMoveStartPosition.y == y) or (
+          game->suggestedUserMoveEndPosition.x == x and
+          game->suggestedUserMoveEndPosition.y == y)){
+        translation.z = 0.3 * (1 + cos(elapsedTime));
+      }
       movementMatrix = translate(&movementMatrix, translation);
       shadowMappingProgram->setMoveMatrix(&movementMatrix);
 
@@ -153,7 +160,7 @@ void ShadowMapping::deleteBuffers(){
 void ShadowMapping::renderShadowMap(
     ChessGame* game, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
-    DirectionalLight* light){
+    DirectionalLight* light, float elapsedTime){
   // Bind the framebuffer
   glBindFramebuffer(GL_FRAMEBUFFER, fboId);
 
@@ -163,7 +170,7 @@ void ShadowMapping::renderShadowMap(
 
   glViewport(0, 0, resolution, resolution);
 
-  shadowMappingRender(game, meshes, programs, light);
+  shadowMappingRender(game, meshes, programs, light, elapsedTime);
 };
 
 GLuint ShadowMapping::getShadowMap(){

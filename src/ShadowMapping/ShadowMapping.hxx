@@ -43,7 +43,7 @@ public:
   void renderShadowMap(
     ChessGame* game, std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
-    DirectionalLight* light);
+    DirectionalLight* light, float elapsedTime);
 
   /* Get shadow map id
     \return The shadow map id

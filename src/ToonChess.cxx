@@ -50,7 +50,8 @@ void celShadingRender(
   std::map<int, ShaderProgram*>* programs,
   ShadowMapping* shadowMapping,
   Camera* camera,
-  DirectionalLight* light);
+  DirectionalLight* light,
+  float elapsedTime);
 
 int main(){
   // Create window
@@ -133,6 +134,9 @@ int main(){
   // Initialize shadow mapping
   ShadowMapping* shadowMapping = new ShadowMapping();
   shadowMapping->initBuffers();
+
+  // Main clock
+  sf::Clock mainClock;
 
   // Create camera
   Camera* camera = new Camera((double)width/height);
@@ -303,12 +307,15 @@ int main(){
       }
     }
 
+    // Get elapsed time since game started
+    float elapsedTime = mainClock.getElapsedTime().asSeconds();
+
     // Perform rendering
     camera->update();
 
     // Create the shadowMap
     shadowMapping->renderShadowMap(
-      game, &pieces, &programs, &light);
+      game, &pieces, &programs, &light, elapsedTime);
 
     // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -320,7 +327,8 @@ int main(){
 
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(
-      game, physicsWorld, &pieces, &programs, shadowMapping, camera, &light);
+      game, physicsWorld, &pieces, &programs, shadowMapping, camera, &light,
+      elapsedTime);
 
     // Display smoke particles
     smokeGenerator->draw(camera);
@@ -352,7 +360,8 @@ void celShadingRender(
     std::map<int, ShaderProgram*>* programs,
     ShadowMapping* shadowMapping,
     Camera* camera,
-    DirectionalLight* light){
+    DirectionalLight* light,
+    float elapsedTime){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
   sf::Vector3f translation;
@@ -404,6 +413,13 @@ void celShadingRender(
 
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
+      // If it's part of the suggested user move
+      if((game->suggestedUserMoveStartPosition.x == x and
+          game->suggestedUserMoveStartPosition.y == y) or (
+          game->suggestedUserMoveEndPosition.x == x and
+          game->suggestedUserMoveEndPosition.y == y)){
+        translation.z = 0.3 * (1 + cos(elapsedTime));
+      }
       movementMatrix = translate(&movementMatrix, translation);
       blackBorderProgram->setMoveMatrix(&movementMatrix);
 
@@ -506,8 +522,20 @@ void celShadingRender(
         rotate(&movementMatrix, -90.0, rotation) :
         rotate(&movementMatrix, 90.0, rotation);
 
+      // Draw the checkerboard
+      (x + y) % 2 == 0 ?
+        celShadingProgram->setVector4f("color", 0.70, 0.60, 0.41, 1.0) :
+        celShadingProgram->setVector4f("color", 1.0, 1.0, 1.0, 1.0);
+
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
+      // If it's part of the suggested user move
+      if((game->suggestedUserMoveStartPosition.x == x and
+          game->suggestedUserMoveStartPosition.y == y) or (
+          game->suggestedUserMoveEndPosition.x == x and
+          game->suggestedUserMoveEndPosition.y == y)){
+        translation.z = 0.3 * (1 + cos(elapsedTime));
+      }
       movementMatrix = translate(&movementMatrix, translation);
       celShadingProgram->setMoveMatrix(&movementMatrix);
 
@@ -515,19 +543,6 @@ void celShadingRender(
       std::vector<GLfloat> normalMatrix = inverse(&movementMatrix);
       normalMatrix = transpose(&normalMatrix);
       celShadingProgram->setNormalMatrix(&normalMatrix);
-
-      // Draw the checkerboard
-      (x + y) % 2 == 0 ?
-        celShadingProgram->setVector4f("color", 0.70, 0.60, 0.41, 1.0) :
-        celShadingProgram->setVector4f("color", 1.0, 1.0, 1.0, 1.0);
-
-      // If it's part of the suggested user move, change its color
-      if((game->suggestedUserMoveStartPosition.x == x and
-          game->suggestedUserMoveStartPosition.y == y) or (
-          game->suggestedUserMoveEndPosition.x == x and
-          game->suggestedUserMoveEndPosition.y == y)){
-        celShadingProgram->setVector4f("color", 0.40, 0.45, 0.70, 1.0);
-      }
 
       // If it's the selected piece, or if it's an allowed next move, move up
       // the piece
