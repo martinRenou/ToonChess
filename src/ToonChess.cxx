@@ -50,7 +50,8 @@ void celShadingRender(
   std::map<int, ShaderProgram*>* programs,
   ShadowMapping* shadowMapping,
   Camera* camera,
-  DirectionalLight* light);
+  DirectionalLight* light,
+  float elapsedTime);
 
 int main(){
   // Create window
@@ -134,6 +135,9 @@ int main(){
   ShadowMapping* shadowMapping = new ShadowMapping();
   shadowMapping->initBuffers();
 
+  // Main clock
+  sf::Clock mainClock;
+
   // Create camera
   Camera* camera = new Camera((double)width/height);
 
@@ -161,6 +165,9 @@ int main(){
   GLint dY = 0;
   bool cameraMoving = false;
   while(running){
+    // Get elapsed time since game started
+    float elapsedTime = mainClock.getElapsedTime().asSeconds();
+
     // Take care of SFML events
     sf::Event event;
     while(window.pollEvent(event)){
@@ -197,7 +204,8 @@ int main(){
           // Get selected piece using color picking
           game->setNewSelectedPiecePosition(
             colorPicking->getClickedPiecePosition(
-                selectedPixelPosition, game, &pieces, &programs, camera
+                selectedPixelPosition, game, &pieces, &programs, camera,
+                elapsedTime
             )
           );
         }
@@ -308,7 +316,7 @@ int main(){
 
     // Create the shadowMap
     shadowMapping->renderShadowMap(
-      game, &pieces, &programs, &light);
+      game, &pieces, &programs, &light, elapsedTime);
 
     // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -320,7 +328,8 @@ int main(){
 
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(
-      game, physicsWorld, &pieces, &programs, shadowMapping, camera, &light);
+      game, physicsWorld, &pieces, &programs, shadowMapping, camera, &light,
+      elapsedTime);
 
     // Display smoke particles
     smokeGenerator->draw(camera);
@@ -352,7 +361,8 @@ void celShadingRender(
     std::map<int, ShaderProgram*>* programs,
     ShadowMapping* shadowMapping,
     Camera* camera,
-    DirectionalLight* light){
+    DirectionalLight* light,
+    float elapsedTime){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
   sf::Vector3f translation;
@@ -383,8 +393,6 @@ void celShadingRender(
     normalMatrix = transpose(&normalMatrix);
     blackBorderProgram->setNormalMatrix(&normalMatrix);
 
-    blackBorderProgram->setBoolean("elevated", false);
-
     // Draw fragment
     fragment->mesh->draw();
   }
@@ -404,16 +412,15 @@ void celShadingRender(
 
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
+      // If it's part of the suggested move
+      if((game->suggestedUserMoveStartPosition.x == x and
+          game->suggestedUserMoveStartPosition.y == y) or
+          (game->suggestedUserMoveEndPosition.x == x and
+          game->suggestedUserMoveEndPosition.y == y)){
+        translation.z = 0.5 + 0.5 * sin(2*elapsedTime - M_PI/2.0);
+      }
       movementMatrix = translate(&movementMatrix, translation);
       blackBorderProgram->setMoveMatrix(&movementMatrix);
-
-      // If it's the selected piece, or if it's an allowed next move, move up
-      // the piece
-      (game->selectedPiecePosition.x == x and
-          game->selectedPiecePosition.y == y) or
-          game->allowedNextPositions[x][y] ?
-        blackBorderProgram->setBoolean("elevated", true) :
-        blackBorderProgram->setBoolean("elevated", false);
 
       // Draw board cell
       pieces->at(BOARDCELL)->draw();
@@ -487,7 +494,6 @@ void celShadingRender(
     physicsWorld->fragmentPool.at(i).first > 0 ?
       celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
       celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
-    celShadingProgram->setBoolean("elevated", false);
 
     // Draw fragment
     fragment->mesh->draw();
@@ -506,8 +512,25 @@ void celShadingRender(
         rotate(&movementMatrix, -90.0, rotation) :
         rotate(&movementMatrix, 90.0, rotation);
 
+      // Draw the checkerboard
+      (x + y) % 2 == 0 ?
+        celShadingProgram->setVector4f("color", 0.70, 0.60, 0.41, 1.0) :
+        celShadingProgram->setVector4f("color", 1.0, 1.0, 1.0, 1.0);
+      if((game->selectedPiecePosition.x == x and
+          game->selectedPiecePosition.y == y) or
+          game->allowedNextPositions[x][y]){
+        celShadingProgram->setVector4f("color", 0.94, 0.81, 0.34, 1.0);
+      }
+
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
+      // If it's part of the suggested move
+      if((game->suggestedUserMoveStartPosition.x == x and
+          game->suggestedUserMoveStartPosition.y == y) or
+          (game->suggestedUserMoveEndPosition.x == x and
+          game->suggestedUserMoveEndPosition.y == y)){
+        translation.z = 0.5 + 0.5 * sin(2*elapsedTime - M_PI/2.0);
+      }
       movementMatrix = translate(&movementMatrix, translation);
       celShadingProgram->setMoveMatrix(&movementMatrix);
 
@@ -515,27 +538,6 @@ void celShadingRender(
       std::vector<GLfloat> normalMatrix = inverse(&movementMatrix);
       normalMatrix = transpose(&normalMatrix);
       celShadingProgram->setNormalMatrix(&normalMatrix);
-
-      // Draw the checkerboard
-      (x + y) % 2 == 0 ?
-        celShadingProgram->setVector4f("color", 0.70, 0.60, 0.41, 1.0) :
-        celShadingProgram->setVector4f("color", 1.0, 1.0, 1.0, 1.0);
-
-      // If it's part of the suggested user move, change its color
-      if((game->suggestedUserMoveStartPosition.x == x and
-          game->suggestedUserMoveStartPosition.y == y) or (
-          game->suggestedUserMoveEndPosition.x == x and
-          game->suggestedUserMoveEndPosition.y == y)){
-        celShadingProgram->setVector4f("color", 0.40, 0.45, 0.70, 1.0);
-      }
-
-      // If it's the selected piece, or if it's an allowed next move, move up
-      // the piece
-      (game->selectedPiecePosition.x == x and
-          game->selectedPiecePosition.y == y) or
-          game->allowedNextPositions[x][y] ?
-        celShadingProgram->setBoolean("elevated", true) :
-        celShadingProgram->setBoolean("elevated", false);
 
       pieces->at(BOARDCELL)->draw();
 
@@ -576,8 +578,6 @@ void celShadingRender(
     game->movingPiece > 0 ?
       celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
       celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
-
-    celShadingProgram->setBoolean("elevated", false);
 
     pieces->at(abs(game->movingPiece))->draw();
   }
