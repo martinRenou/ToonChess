@@ -165,6 +165,9 @@ int main(){
   GLint dY = 0;
   bool cameraMoving = false;
   while(running){
+    // Get elapsed time since game started
+    float elapsedTime = mainClock.getElapsedTime().asSeconds();
+
     // Take care of SFML events
     sf::Event event;
     while(window.pollEvent(event)){
@@ -198,10 +201,14 @@ int main(){
           selectedPixelPosition.x = event.mouseButton.x;
           selectedPixelPosition.y = height - event.mouseButton.y;
 
+          mainClock.restart();
+          elapsedTime = mainClock.getElapsedTime().asSeconds();
+
           // Get selected piece using color picking
           game->setNewSelectedPiecePosition(
             colorPicking->getClickedPiecePosition(
-                selectedPixelPosition, game, &pieces, &programs, camera
+                selectedPixelPosition, game, &pieces, &programs, camera,
+                elapsedTime
             )
           );
         }
@@ -307,9 +314,6 @@ int main(){
       }
     }
 
-    // Get elapsed time since game started
-    float elapsedTime = mainClock.getElapsedTime().asSeconds();
-
     // Perform rendering
     camera->update();
 
@@ -392,8 +396,6 @@ void celShadingRender(
     normalMatrix = transpose(&normalMatrix);
     blackBorderProgram->setNormalMatrix(&normalMatrix);
 
-    blackBorderProgram->setBoolean("elevated", false);
-
     // Draw fragment
     fragment->mesh->draw();
   }
@@ -413,23 +415,15 @@ void celShadingRender(
 
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
-      // If it's part of the suggested user move
-      if((game->suggestedUserMoveStartPosition.x == x and
-          game->suggestedUserMoveStartPosition.y == y) or (
-          game->suggestedUserMoveEndPosition.x == x and
-          game->suggestedUserMoveEndPosition.y == y)){
-        translation.z = 0.3 * (1 + cos(elapsedTime));
+      // If it's the selected piece, or if it's an allowed next move, move up
+      // the piece
+      if((game->selectedPiecePosition.x == x and
+          game->selectedPiecePosition.y == y) or
+          game->allowedNextPositions[x][y]){
+        translation.z = 0.5 + 0.5 * sin(2*elapsedTime - M_PI/2.0);
       }
       movementMatrix = translate(&movementMatrix, translation);
       blackBorderProgram->setMoveMatrix(&movementMatrix);
-
-      // If it's the selected piece, or if it's an allowed next move, move up
-      // the piece
-      (game->selectedPiecePosition.x == x and
-          game->selectedPiecePosition.y == y) or
-          game->allowedNextPositions[x][y] ?
-        blackBorderProgram->setBoolean("elevated", true) :
-        blackBorderProgram->setBoolean("elevated", false);
 
       // Draw board cell
       pieces->at(BOARDCELL)->draw();
@@ -503,7 +497,6 @@ void celShadingRender(
     physicsWorld->fragmentPool.at(i).first > 0 ?
       celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
       celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
-    celShadingProgram->setBoolean("elevated", false);
 
     // Draw fragment
     fragment->mesh->draw();
@@ -529,12 +522,12 @@ void celShadingRender(
 
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
-      // If it's part of the suggested user move
-      if((game->suggestedUserMoveStartPosition.x == x and
-          game->suggestedUserMoveStartPosition.y == y) or (
-          game->suggestedUserMoveEndPosition.x == x and
-          game->suggestedUserMoveEndPosition.y == y)){
-        translation.z = 0.3 * (1 + cos(elapsedTime));
+      // If it's the selected piece, or if it's an allowed next move, move up
+      // the piece
+      if((game->selectedPiecePosition.x == x and
+          game->selectedPiecePosition.y == y) or
+          game->allowedNextPositions[x][y]){
+        translation.z = 0.5 + 0.5 * sin(2*elapsedTime - M_PI/2.0);
       }
       movementMatrix = translate(&movementMatrix, translation);
       celShadingProgram->setMoveMatrix(&movementMatrix);
@@ -543,14 +536,6 @@ void celShadingRender(
       std::vector<GLfloat> normalMatrix = inverse(&movementMatrix);
       normalMatrix = transpose(&normalMatrix);
       celShadingProgram->setNormalMatrix(&normalMatrix);
-
-      // If it's the selected piece, or if it's an allowed next move, move up
-      // the piece
-      (game->selectedPiecePosition.x == x and
-          game->selectedPiecePosition.y == y) or
-          game->allowedNextPositions[x][y] ?
-        celShadingProgram->setBoolean("elevated", true) :
-        celShadingProgram->setBoolean("elevated", false);
 
       pieces->at(BOARDCELL)->draw();
 
@@ -591,8 +576,6 @@ void celShadingRender(
     game->movingPiece > 0 ?
       celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
       celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
-
-    celShadingProgram->setBoolean("elevated", false);
 
     pieces->at(abs(game->movingPiece))->draw();
   }
