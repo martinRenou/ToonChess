@@ -3,8 +3,6 @@
 varying float vLightIntensity;
 varying vec3 vLightPosition;
 
-uniform bool elevated;
-
 uniform vec3 lightDirection;
 
 // View/Movement/Projection matrices
@@ -19,7 +17,6 @@ uniform mat4 NMatrix;
 uniform mat4 LMatrix;
 uniform mat4 PLMatrix;
 
-vec4 position;
 vec4 lightPosition;
 vec3 normal;
 vec3 lightDir = normalize(lightDirection);
@@ -31,19 +28,11 @@ void main(void){
 
   vLightIntensity = - dot(lightDir, normalize(normal));
 
-  // If the mesh should be elevated
-  if(elevated){
-    position = gl_Vertex + vec4(0, 0, 0.6, 0);
-  } else {
-    position = gl_Vertex;
-  }
-
   // Compute position in the light coordinates system
-  lightPosition = PLMatrix * LMatrix * MMatrix * position;
+  lightPosition = PLMatrix * LMatrix * MMatrix * gl_Vertex;
   vLightPosition = vec3(0.5, 0.5, 0.5) +
     lightPosition.xyz/lightPosition.w * 0.5;
 
   // The position of the vertex
-  //gl_Position = PMatrix * VMatrix * MMatrix * position;
-  gl_Position = PMatrix * VMatrix * MMatrix * position;
+  gl_Position = PMatrix * VMatrix * MMatrix * gl_Vertex;
 }
