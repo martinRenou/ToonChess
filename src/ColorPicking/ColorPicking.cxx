@@ -62,11 +62,11 @@ void colorPickingRender(
 
       // Translate the piece
       translation = {(float)(x * 4.0 - 14.0), (float)(y * 4.0 - 14.0), 0.0};
-      // If it's the selected piece, or if it's an allowed next move, move up
-      // the piece
-      if((game->selectedPiecePosition.x == x and
-          game->selectedPiecePosition.y == y) or
-          game->allowedNextPositions[x][y]){
+      // If it's part of the suggested move
+      if((game->suggestedUserMoveStartPosition.x == x and
+          game->suggestedUserMoveStartPosition.y == y) or
+          (game->suggestedUserMoveEndPosition.x == x and
+          game->suggestedUserMoveEndPosition.y == y)){
         translation.z = 0.5 + 0.5 * sin(2*elapsedTime - M_PI/2.0);
       }
       movementMatrix = translate(&movementMatrix, translation);
