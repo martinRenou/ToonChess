@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <map>
+#include <cmath>
 
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"

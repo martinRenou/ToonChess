@@ -2,6 +2,7 @@
 #define SMOKEGENERATOR_HXX_
 
 #include <vector>
+#include <random>
 
 #include <GL/gl.h>
 
