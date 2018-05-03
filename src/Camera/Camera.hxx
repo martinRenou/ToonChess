@@ -2,6 +2,7 @@
 #define CAMERA_HXX_
 
 #include <vector>
+#include <cmath>
 
 #include <GL/gl.h>
 

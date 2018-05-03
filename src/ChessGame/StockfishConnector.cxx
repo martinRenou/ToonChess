@@ -96,7 +96,7 @@ void StockfishConnector::startCommunication(){
     close(childReadPipe);
 
     // Run stockfish
-    execlp("/usr/games/stockfish", "/usr/games/stockfish", (char *)NULL);
+    execlp("stockfish", "stockfish", (char *)NULL);
 
     // If everything went fine, this code shouldn't be reached
     writeLine(fdopen(childWritePipe, writeMode), "stop\n", true);

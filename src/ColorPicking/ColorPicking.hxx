@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 #include <map>
+#include <cmath>
 
 #include "../Camera/Camera.hxx"
 
@@ -62,7 +63,7 @@ public:
     ChessGame* game,
     std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
-    Camera* camera);
+    Camera* camera, float elapsedTime);
 
   /* Destructor, this will remove the buffers from memory */
   ~ColorPicking();
