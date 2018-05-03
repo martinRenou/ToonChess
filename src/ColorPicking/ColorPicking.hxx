@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 
 #include <map>
+#include <cmath>
 
 #include "../Camera/Camera.hxx"
 
