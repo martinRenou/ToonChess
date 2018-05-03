@@ -12,7 +12,7 @@ before_install:
   - wget github.com/danmar/cppcheck/releases/download/1.81/cppcheck-1.81.tar.gz
   - tar -xvf cppcheck-1.81.tar.gz
   - pushd cppcheck-1.81/
-  - make SRCDIR=build CFGDIR=/usr/share/cppcheck/ HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
+  - make -j6 SRCDIR=build CFGDIR=/usr/share/cppcheck/ HAVE_RULES=yes CXXFLAGS="-O2 -DNDEBUG -Wall -Wno-sign-compare -Wno-unused-function"
   - sudo make install CFGDIR=/usr/share/cppcheck/
   - popd
 
@@ -23,15 +23,17 @@ before_install:
   - mkdir build
   - pushd build
   - cmake .. -DBUILD_EXTRAS=OFF -DBUILD_BULLET2_DEMOS=OFF -DBUILD_CPU_DEMOS=OFF -DBUILD_OPENGL3_DEMOS=OFF -DBUILD_UNIT_TESTS=OFF -DBUILD_PYBULLET=OFF
-  - sudo make install
+  - sudo make -j6 install
   - popd
   - popd
+
+  - export PATH=/usr/games:$PATH
 
 script:
   - cppcheck --quiet --error-exitcode=1 --enable=all --inline-suppr src/
   - mkdir build
   - cd build
   - cmake ..
-  - make
+  - make -j6
   - ./tests
   - valgrind --leak-check=full --track-origins=yes --error-exitcode=1 ./tests
