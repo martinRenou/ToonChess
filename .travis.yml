@@ -27,6 +27,8 @@ before_install:
   - popd
   - popd
 
+  - export PATH=/usr/games:$PATH
+
 script:
   - cppcheck --quiet --error-exitcode=1 --enable=all --inline-suppr src/
   - mkdir build
