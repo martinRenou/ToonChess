@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <map>
+#include <math.h>
 
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
