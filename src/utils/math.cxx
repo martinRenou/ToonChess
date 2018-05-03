@@ -1,4 +1,5 @@
 #include <vector>
+#include <cmath>
 #include <iostream>
 
 #include <GL/gl.h>

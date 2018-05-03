@@ -2,6 +2,7 @@
 #define CHESSGAME_HXX_
 
 #include <string>
+#include <cmath>
 
 #include <SFML/Graphics.hpp>
 

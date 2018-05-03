@@ -292,6 +292,10 @@ void ChessGame::perform(){
       oldSelectedPiecePosition = {-1, -1};
       selectedPiecePosition = {-1, -1};
 
+      // Reset suggested user move
+      suggestedUserMoveStartPosition = {-1, -1};
+      suggestedUserMoveEndPosition = {-1, -1};
+
       // Reset allowedNextPositions matrix
       resetAllowedNextPositions();
 
