@@ -1,7 +1,9 @@
 #include <iostream>
+#include <string>
 
 #include "ShaderProgram.hxx"
 #include "../constants.hxx"
+#include "../get_share_path.hxx"
 
 #include "shaderPrograms.hxx"
 
@@ -23,28 +25,30 @@ ShaderProgram* createProgram(
 }
 
 std::map<int, ShaderProgram*> initPrograms(){
+  std::string share_path = get_share_path();
+
   // Load cel-shading program
   ShaderProgram* celShadingShaderProgram = createProgram(
-    "../shaders/celShadingVS.glsl",
-    "../shaders/celShadingFS.glsl"
+    share_path + "shaders/celShadingVS.glsl",
+    share_path + "shaders/celShadingFS.glsl"
   );
 
   // Load black border shader program
   ShaderProgram* blackBorderShaderProgram = createProgram(
-    "../shaders/blackBorderVS.glsl",
-    "../shaders/blackBorderFS.glsl"
+    share_path + "shaders/blackBorderVS.glsl",
+    share_path + "shaders/blackBorderFS.glsl"
   );
 
   // Load color-picking shader program
   ShaderProgram* colorPickingShaderProgram = createProgram(
-    "../shaders/colorPickingVS.glsl",
-    "../shaders/colorPickingFS.glsl"
+    share_path + "shaders/colorPickingVS.glsl",
+    share_path + "shaders/colorPickingFS.glsl"
   );
 
   // Load shadow-mapping shader program
   ShaderProgram* shadowMappingShaderProgram = createProgram(
-    "../shaders/shadowMappingVS.glsl",
-    "../shaders/shadowMappingFS.glsl"
+    share_path + "shaders/shadowMappingVS.glsl",
+    share_path + "shaders/shadowMappingFS.glsl"
   );
 
   // Try to compile shaders

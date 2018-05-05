@@ -12,6 +12,14 @@ project(ToonChess)
 set(ToonChess_VERSION_MAJOR 0)
 set(ToonChess_VERSION_MINOR 1)
 
+set(TOONCHESS_SHARE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/share)
+
+set(TOONCHESS_SHARE_PATH "\"${CMAKE_INSTALL_PREFIX}/share/toonchess/\"")
+configure_file (
+    "${CMAKE_SOURCE_DIR}/src/get_share_path.cxx.in"
+    "${CMAKE_SOURCE_DIR}/src/get_share_path.cxx"
+)
+
 # Add headers
 set(
   CXX_FILES
@@ -45,7 +53,13 @@ set(
 
   ${CMAKE_SOURCE_DIR}/src/utils/utils.cxx
   ${CMAKE_SOURCE_DIR}/src/utils/math.cxx
+
+  ${CMAKE_SOURCE_DIR}/src/get_share_path.cxx
 )
+
+# Install assets
+install(DIRECTORY "${TOONCHESS_SHARE_DIR}/toonchess"
+        DESTINATION "share")
 
 # Define sources and executable
 set(EXECUTABLE_NAME "ToonChess")
@@ -103,3 +117,6 @@ if(BULLET_FOUND)
   target_link_libraries(${EXECUTABLE_NAME} ${BULLET_LIBRARIES})
   target_link_libraries(${TEST_NAME} ${BULLET_LIBRARIES})
 endif()
+
+install(TARGETS ToonChess
+        RUNTIME DESTINATION bin)

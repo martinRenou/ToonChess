@@ -1,0 +1,9 @@
+#include <string>
+
+#include "get_share_path.hxx"
+
+std::string get_share_path()
+{
+    static std::string share_path = @TOONCHESS_SHARE_PATH@;
+    return share_path;
+};
