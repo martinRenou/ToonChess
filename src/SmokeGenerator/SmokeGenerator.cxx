@@ -1,6 +1,7 @@
 #define GL_GLEXT_PROTOTYPES
 
 #include <vector>
+#include <string>
 #include <algorithm>
 #include <iostream>
 
@@ -9,6 +10,7 @@
 #include <SFML/Graphics.hpp>
 
 #include "../shader/shaderPrograms.hxx"
+#include "../get_share_path.hxx"
 
 #include "SmokeGenerator.hxx"
 
@@ -31,10 +33,12 @@ SmokeGenerator::SmokeGenerator(){
     smokeParticles.push_back(particle);
   }
 
+  std::string share_path = get_share_path();
+
   // Create the smoke shader program
   smokeShaderProgram = createProgram(
-    "../shaders/smokeVS.glsl",
-    "../shaders/smokeFS.glsl"
+    share_path + "shaders/smokeVS.glsl",
+    share_path + "shaders/smokeFS.glsl"
   );
 
   try{
@@ -48,13 +52,13 @@ SmokeGenerator::SmokeGenerator(){
 
   // Load texture
   smokeTexture0 = new sf::Texture();
-  if (!smokeTexture0->loadFromFile("../assets/smoke_texture0.png"))
+  if (!smokeTexture0->loadFromFile(share_path + "assets/smoke_texture0.png"))
     std::cout << "Couldn't load smoke texture file..." << std::endl;
   smokeTexture1 = new sf::Texture();
-  if (!smokeTexture1->loadFromFile("../assets/smoke_texture1.png"))
+  if (!smokeTexture1->loadFromFile(share_path + "assets/smoke_texture1.png"))
     std::cout << "Couldn't load smoke texture file..." << std::endl;
   smokeTexture2 = new sf::Texture();
-  if (!smokeTexture2->loadFromFile("../assets/smoke_texture2.png"))
+  if (!smokeTexture2->loadFromFile(share_path + "assets/smoke_texture2.png"))
     std::cout << "Couldn't load smoke texture file..." << std::endl;
 
   // Start clock
