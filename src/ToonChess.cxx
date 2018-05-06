@@ -1,9 +1,6 @@
 #define GL_GLEXT_PROTOTYPES
 
-#include <GL/gl.h>
-
-#include <SFML/Window.hpp>
-#include <SFML/Graphics.hpp>
+#include <GLFW/glfw3.h>
 
 #include <exception>
 #include <map>
@@ -27,6 +24,7 @@
 
 #include "constants.hxx"
 
+#include "Clock/Clock.hxx"
 #include "Camera/Camera.hxx"
 #include "DirectionalLight.hxx"
 
@@ -34,6 +32,16 @@
 #include "utils/math.hxx"
 
 #include "ChessGame/ChessGame.hxx"
+
+// Globals
+bool resizing = false;
+int width = 1024;
+int height = 576;
+bool cameraMoving = false;
+int dX = 0;
+int dY = 0;
+Vector2i mousePosition;
+bool selecting;
 
 /* Perform a cel-shading rendering in the current frameBuffer
   \param game The game instance
@@ -53,25 +61,69 @@ void celShadingRender(
   DirectionalLight* light,
   float elapsedTime);
 
-int main(){
-  // Create window
-  sf::ContextSettings settings;
-  settings.depthBits = 24;
-  settings.stencilBits = 8;
-  settings.antialiasingLevel = ANTIALIASING_LOW;
-  settings.majorVersion = 3;
-  settings.minorVersion = 0;
+void resize_callback(GLFWwindow* window, int new_width, int new_height)
+{
+  width = new_width;
+  height = new_height;
+  resizing = true;
+};
 
-  GLint width = 1024;
-  GLint height = 576;
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+  if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
+  {
+    dX = 0;
+    dY = 0;
 
-  sf::Window window(
-      sf::VideoMode(width, height),
-      "ToonChess",
-      sf::Style::Default,
-      settings
-  );
-  window.setFramerateLimit(30);
+    cameraMoving = true;
+  }
+
+  if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
+  {
+    cameraMoving = false;
+  }
+
+  if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE)
+  {
+    selecting = true;
+  }
+};
+
+void cursor_move_callback(GLFWwindow* window, double xpos, double ypos)
+{
+  int xposi = (int)xpos;
+  int yposi = (int)ypos;
+
+  dX = xposi - mousePosition.x;
+  dY = yposi - mousePosition.y;
+
+  mousePosition.x = xposi;
+  mousePosition.y = yposi;
+}
+
+int main()
+{
+  // Initialize glfw
+  if (!glfwInit())
+    return 1;
+
+  // Antialiasing level
+  glfwWindowHint(GLFW_SAMPLES, ANTIALIASING_LOW);
+
+  GLFWwindow* window;
+  // Create a windowed mode window and its OpenGL context
+  window = glfwCreateWindow(width, height, "ToonChess", NULL, NULL);
+  if (!window)
+  {
+    glfwTerminate();
+    return 1;
+  }
+
+  // Make the window's context current
+  glfwMakeContextCurrent(window);
+
+  glEnable(GL_MULTISAMPLE);
+
   // Enable depth test
   glEnable(GL_DEPTH_TEST);
   // Enable backface culling
@@ -136,7 +188,7 @@ int main(){
   shadowMapping->initBuffers();
 
   // Main clock
-  sf::Clock mainClock;
+  Clock mainClock;
 
   // Create camera
   Camera* camera = new Camera((double)width/height);
@@ -146,7 +198,7 @@ int main(){
   light.projectionMatrix = getOrthoProjMatrix(-25, 25, -20, 20, 1, 50);
 
   // Get lookAt matrix from light position for shadow mapping
-  sf::Vector3f lightPosition = {
+  Vector3f lightPosition = {
     (float)-20.0 * light.direction.x,
     (float)-20.0 * light.direction.y,
     (float)-20.0 * light.direction.z
@@ -156,83 +208,45 @@ int main(){
   // Display OpenGL errors
   displayGLErrors();
 
+  // Set events callbacks
+  glfwSetFramebufferSizeCallback(window, resize_callback);
+  glfwSetMouseButtonCallback(window, mouse_button_callback);
+  glfwSetCursorPosCallback(window, cursor_move_callback);
+
   // Render loop
   bool running = true;
-  sf::Vector2i selectedPixelPosition = {0, 0};
-  // Mouse movement
-  sf::Vector2i mousePosition;
-  GLint dX = 0;
-  GLint dY = 0;
-  bool cameraMoving = false;
-  while(running){
+  while(running and !glfwWindowShouldClose(window))
+  {
     // Get elapsed time since game started
-    float elapsedTime = mainClock.getElapsedTime().asSeconds();
+    float elapsedTime = mainClock.getElapsedTime();
 
-    // Take care of SFML events
-    sf::Event event;
-    while(window.pollEvent(event)){
-      if(event.type == sf::Event::Closed){
-        running = false;
-      }
+    // Take care of glfw events
+    glfwPollEvents();
+    if (resizing)
+    {
+      // Resize the buffers for color picking
+      colorPicking->resizeBuffers(width, height);
 
-      if(event.type == sf::Event::Resized){
-        width = event.size.width;
-        height = event.size.height;
+      // Recompute camera perspective matrix
+      camera->updatePerspective((double)width/height);
 
-        // Resize the buffers for color picking
-        colorPicking->resizeBuffers(width, height);
+      resizing = false;
+    }
+    if (cameraMoving)
+    {
+      camera->move(dX, dY, (double)width/height);
+    }
+    if (selecting)
+    {
+      // Get selected piece using color picking
+      game->setNewSelectedPiecePosition(
+        colorPicking->getClickedPiecePosition(
+            {mousePosition.x, height - mousePosition.y},
+            game, &pieces, &programs, camera, elapsedTime
+        )
+      );
 
-        // Recompute camera perspective matrix
-        camera->updatePerspective((double)width/height);
-      }
-
-      if(event.type == sf::Event::MouseButtonPressed){
-        // If it's the right button, it's a camera movement
-        if(event.mouseButton.button == sf::Mouse::Right){
-          cameraMoving = true;
-
-          mousePosition = sf::Mouse::getPosition(window);
-        }
-      }
-
-      if(event.type == sf::Event::MouseButtonReleased){
-        // If it's the left button, it must be a piece selection
-        if(event.mouseButton.button == sf::Mouse::Left){
-          selectedPixelPosition.x = event.mouseButton.x;
-          selectedPixelPosition.y = height - event.mouseButton.y;
-
-          // Get selected piece using color picking
-          game->setNewSelectedPiecePosition(
-            colorPicking->getClickedPiecePosition(
-                selectedPixelPosition, game, &pieces, &programs, camera,
-                elapsedTime
-            )
-          );
-        }
-
-        // If it's the right button, it's the end of a camera movement
-        if(event.mouseButton.button == sf::Mouse::Right){
-          cameraMoving = false;
-        }
-      }
-
-      if(event.type == sf::Event::MouseMoved and cameraMoving){
-        dX = event.mouseMove.x - mousePosition.x;
-        dY = event.mouseMove.y - mousePosition.y;
-
-        mousePosition.x = event.mouseMove.x;
-        mousePosition.y = event.mouseMove.y;
-
-        camera->move(dX, dY, (double)width/height);
-      }
-
-      if(event.type == sf::Event::KeyPressed){
-        if(event.key.code == sf::Keyboard::Escape){
-          running = false;
-
-          continue;
-        }
-      }
+      selecting = false;
     }
 
     // Perform the chess rules
@@ -241,19 +255,7 @@ int main(){
     } catch(const std::exception& e){
       std::cerr << e.what() << std::endl;
 
-      window.close();
-
-      deletePieces(&pieces);
-      deleteFragmentMeshes(&fragmentMeshes);
-      deletePrograms(&programs);
-      delete colorPicking;
-      delete shadowMapping;
-      delete smokeGenerator;
-      delete game;
-      delete physicsWorld;
-      delete camera;
-
-      return 1;
+      running = false;
     }
 
     // Simulate dynamics world
@@ -268,8 +270,8 @@ int main(){
           gameEvent.fragment.position,
           (int)round(gameEvent.fragment.volume),
           gameEvent.fragment.piece > 0 ?
-            sf::Vector3f(0.41, 0.37, 0.23) :
-            sf::Vector3f(0.30, 0.12, 0.40),
+            Vector3f(0.41, 0.37, 0.23) :
+            Vector3f(0.30, 0.12, 0.40),
           0.7
         );
       }
@@ -297,7 +299,7 @@ int main(){
             0.0
           },
           1,
-          sf::Vector3f(1.0, 1.0, 1.0),
+          Vector3f(1.0, 1.0, 1.0),
           0.2
         );
       }
@@ -334,12 +336,11 @@ int main(){
     // Display smoke particles
     smokeGenerator->draw(camera);
 
-    glFlush();
-
-    window.display();
+    // Swap front and back buffers
+    glfwSwapBuffers(window);
   }
 
-  window.close();
+  glfwTerminate();
 
   deletePieces(&pieces);
   deleteFragmentMeshes(&fragmentMeshes);
@@ -365,8 +366,8 @@ void celShadingRender(
     float elapsedTime){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
-  sf::Vector3f translation;
-  sf::Vector3f rotation = {0, 0, 1};
+  Vector3f translation;
+  Vector3f rotation = {0, 0, 1};
 
   // Get shader programs
   ShaderProgram* blackBorderProgram = programs->at(BLACK_BORDER);

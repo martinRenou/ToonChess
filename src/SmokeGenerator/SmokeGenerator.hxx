@@ -4,22 +4,21 @@
 #include <vector>
 #include <random>
 
-#include <GL/gl.h>
-
-#include <SFML/Graphics.hpp>
+#include <GLFW/glfw3.h>
 
 #include "../shader/ShaderProgram.hxx"
 #include "../Camera/Camera.hxx"
+#include "../Clock/Clock.hxx"
 
 struct SmokeParticle {
-  sf::Vector3f speed;
-  sf::Vector3f position;
+  Vector3f speed;
+  Vector3f position;
   float size;
 
   float lifetime;
   float remainingLife;
 
-  sf::Vector3f initialColor;
+  Vector3f initialColor;
 
   float textureIndex;
 };
@@ -64,12 +63,12 @@ private:
   std::default_random_engine generator;
 
   /* Inner clock for updating particles */
-  sf::Clock* innerClock;
+  Clock* innerClock;
 
-  /* Smoke texture */
-  sf::Texture* smokeTexture0;
-  sf::Texture* smokeTexture1;
-  sf::Texture* smokeTexture2;
+  /* Smoke textures */
+  GLuint smokeTexture0;
+  GLuint smokeTexture1;
+  GLuint smokeTexture2;
 
   /* The shader program for displaying smoke */
   ShaderProgram* smokeShaderProgram;
@@ -88,9 +87,9 @@ public:
     \param sizeFactor: Size factor of particles
   */
   void generate(
-    sf::Vector3f position,
+    Vector3f position,
     int numberParticles,
-    sf::Vector3f color,
+    Vector3f color,
     float sizeFactor);
 
   /* Draw smoke in the currently bound framebuffer object */

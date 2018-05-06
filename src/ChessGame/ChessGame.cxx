@@ -12,14 +12,14 @@ ChessGame::ChessGame(){
   stockfishConnector = new StockfishConnector();
 
   lastUserMove = "";
-  clock = new sf::Clock();
+  clock = new Clock();
 };
 
 void ChessGame::start(){
   stockfishConnector->startCommunication();
 }
 
-sf::Vector2i ChessGame::uciFormatToPosition(std::string position){
+Vector2i ChessGame::uciFormatToPosition(std::string position){
   int x(0), y(0);
   bool found(false);
   for(x = 0; x < 8 and not found; x++){
@@ -32,11 +32,11 @@ sf::Vector2i ChessGame::uciFormatToPosition(std::string position){
 
   if(not found) throw GameException("Oups, something went wrong...");
 
-  sf::Vector2i outPosition = {x - 1, y - 1};
+  Vector2i outPosition = {x - 1, y - 1};
   return outPosition;
 };
 
-std::string ChessGame::positionToUciFormat(sf::Vector2i position){
+std::string ChessGame::positionToUciFormat(Vector2i position){
   if(boardAt(position.x, position.y) == OUT_OF_BOUND)
     throw GameException("Oups, something went wrong...");
 
@@ -51,7 +51,7 @@ const int ChessGame::boardAt(int x, int y){
   }
 };
 
-void ChessGame::computePAWNNextPositions(sf::Vector2i position){
+void ChessGame::computePAWNNextPositions(Vector2i position){
   // Moving one tile
   if(boardAt(position.x, position.y + 1) == EMPTY)
     allowedNextPositions[position.x][position.y + 1] = true;
@@ -69,7 +69,7 @@ void ChessGame::computePAWNNextPositions(sf::Vector2i position){
     allowedNextPositions[position.x + 1][position.y + 1] = true;
 };
 
-void ChessGame::computeROOKNextPositions(sf::Vector2i position){
+void ChessGame::computeROOKNextPositions(Vector2i position){
   int dx, dy;
   // Moving forward
   for(dy = 1; position.y + dy < 8; dy++){
@@ -104,7 +104,7 @@ void ChessGame::computeROOKNextPositions(sf::Vector2i position){
   }
 };
 
-void ChessGame::computeKNIGHTNextPositions(sf::Vector2i position){
+void ChessGame::computeKNIGHTNextPositions(Vector2i position){
   // Moving forward/right
   if(boardAt(position.x + 1, position.y + 2) <= 0)
     allowedNextPositions[position.x + 1][position.y + 2] = true;
@@ -130,7 +130,7 @@ void ChessGame::computeKNIGHTNextPositions(sf::Vector2i position){
     allowedNextPositions[position.x - 2][position.y - 1] = true;
 };
 
-void ChessGame::computeBISHOPNextPositions(sf::Vector2i position){
+void ChessGame::computeBISHOPNextPositions(Vector2i position){
   int dd;
   // Moving forward/right
   for(dd = 1; position.x + dd < 8 and position.y + dd < 8; dd++){
@@ -165,7 +165,7 @@ void ChessGame::computeBISHOPNextPositions(sf::Vector2i position){
   }
 };
 
-void ChessGame::computeKINGNextPositions(sf::Vector2i position){
+void ChessGame::computeKINGNextPositions(Vector2i position){
   // Move forward forward/right forward/left
   if(boardAt(position.x, position.y + 1) <= 0)
     allowedNextPositions[position.x][position.y + 1] = true;
@@ -194,7 +194,7 @@ void ChessGame::computeAllowedNextPositions(){
   resetAllowedNextPositions();
 
   // Get the selected piece
-  sf::Vector2i piecePosition = selectedPiecePosition;
+  Vector2i piecePosition = selectedPiecePosition;
   const int piece = boardAt(piecePosition.x, piecePosition.y);
 
   // If the new selected piece position is {-1, -1} which means that nothing is
@@ -241,7 +241,7 @@ void ChessGame::resetAllowedNextPositions(){
 };
 
 void ChessGame::setNewSelectedPiecePosition(
-    sf::Vector2i newSelectedPiecePosition){
+    Vector2i newSelectedPiecePosition){
   if(state == USER_TURN){
     // Register last user clicked position
     oldSelectedPiecePosition = selectedPiecePosition;
@@ -319,7 +319,7 @@ void ChessGame::perform(){
       board[movingPieceEndPosition.x][movingPieceEndPosition.y] = EMPTY;
     }
 
-    float elapsedTime = clock->getElapsedTime().asSeconds();
+    float elapsedTime = clock->getElapsedTime();
     if(elapsedTime < 1.0){
       movingPiecePosition = {
         elapsedTime * movingPieceEndPosition.x + (1 - elapsedTime) * movingPieceStartPosition.x,
@@ -357,7 +357,7 @@ void ChessGame::perform(){
     }
   }
   else if(state == WAITING) {
-    if(clock->getElapsedTime().asSeconds() >= 1.0){
+    if(clock->getElapsedTime() >= 1.0){
       state = AI_TURN;
       clock->restart();
     }
@@ -368,7 +368,7 @@ void ChessGame::perform(){
       lastUserMove);
 
     // If the AI tried to move one user's pawn, stop the game
-    sf::Vector2i aiMoveStartPosition = uciFormatToPosition(
+    Vector2i aiMoveStartPosition = uciFormatToPosition(
       aiMove.substr(0, 2));
     if(boardAt(aiMoveStartPosition.x, aiMoveStartPosition.y) >= 0){
       throw GameException("A forbiden move has been performed!");

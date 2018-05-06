@@ -5,11 +5,10 @@
 #include <algorithm>
 #include <iostream>
 
-#include <GL/gl.h>
-
-#include <SFML/Graphics.hpp>
+#include <GLFW/glfw3.h>
 
 #include "../shader/shaderPrograms.hxx"
+#include "../utils/utils.hxx"
 #include "../get_share_path.hxx"
 
 #include "SmokeGenerator.hxx"
@@ -51,18 +50,12 @@ SmokeGenerator::SmokeGenerator(){
   }
 
   // Load texture
-  smokeTexture0 = new sf::Texture();
-  if (!smokeTexture0->loadFromFile(share_path + "assets/smoke_texture0.png"))
-    std::cout << "Couldn't load smoke texture file..." << std::endl;
-  smokeTexture1 = new sf::Texture();
-  if (!smokeTexture1->loadFromFile(share_path + "assets/smoke_texture1.png"))
-    std::cout << "Couldn't load smoke texture file..." << std::endl;
-  smokeTexture2 = new sf::Texture();
-  if (!smokeTexture2->loadFromFile(share_path + "assets/smoke_texture2.png"))
-    std::cout << "Couldn't load smoke texture file..." << std::endl;
+  smokeTexture0 = loadPNGTexture(share_path + "assets/smoke_texture0.png");
+  smokeTexture1 = loadPNGTexture(share_path + "assets/smoke_texture1.png");
+  smokeTexture2 = loadPNGTexture(share_path + "assets/smoke_texture2.png");
 
   // Start clock
-  innerClock = new sf::Clock();
+  innerClock = new Clock();
 };
 
 void SmokeGenerator::initBuffers(){
@@ -95,9 +88,9 @@ void SmokeGenerator::initBuffers(){
 };
 
 void SmokeGenerator::generate(
-    sf::Vector3f position,
+    Vector3f position,
     int numberParticles,
-    sf::Vector3f color,
+    Vector3f color,
     float sizeFactor){
   if(nbParticles + numberParticles > maxNbParticles){
     std::cout << "Cannot create more particles..." << std::endl;
@@ -142,7 +135,7 @@ void SmokeGenerator::generate(
 };
 
 void SmokeGenerator::draw(Camera* camera){
-  float timeSinceLastCall = innerClock->getElapsedTime().asSeconds();
+  float timeSinceLastCall = innerClock->getElapsedTime();
 
   if(nbParticles > 0){
     // Update positionSizeBuffer
@@ -269,13 +262,13 @@ void SmokeGenerator::draw(Camera* camera){
 SmokeGenerator::~SmokeGenerator(){
   glDeleteBuffers(1, &vertexBufferId);
   glDeleteBuffers(1, &positionSizeBufferId);
+  glDeleteTextures(1, &smokeTexture0);
+  glDeleteTextures(1, &smokeTexture1);
+  glDeleteTextures(1, &smokeTexture2);
 
   for(unsigned int p = 0; p < smokeParticles.size(); p++)
     delete smokeParticles.at(p);
 
   delete smokeShaderProgram;
-  delete smokeTexture0;
-  delete smokeTexture1;
-  delete smokeTexture2;
   delete innerClock;
 };

@@ -2,8 +2,7 @@
 #include <cmath>
 #include <iostream>
 
-#include <GL/gl.h>
-#include <SFML/Graphics.hpp>
+#include <GLFW/glfw3.h>
 
 #include "math.hxx"
 
@@ -36,7 +35,7 @@ std::vector<GLfloat> getOrthoProjMatrix(
   return matrix;
 };
 
-void normalize(sf::Vector3f* vector){
+void normalize(Vector3f* vector){
   GLfloat norm = sqrt(
     pow(vector->x, 2) + pow(vector->y, 2) + pow(vector->z, 2)
   );
@@ -46,16 +45,16 @@ void normalize(sf::Vector3f* vector){
   vector->z /= norm;
 };
 
-void cross(sf::Vector3f vector1, sf::Vector3f vector2, sf::Vector3f* result){
+void cross(Vector3f vector1, Vector3f vector2, Vector3f* result){
   result->x = vector1.y * vector2.z - vector2.y * vector1.z;
   result->y = vector1.z * vector2.x - vector2.z * vector1.x;
   result->z = vector1.x * vector2.y - vector2.x * vector1.y;
 };
 
 std::vector<GLfloat> getLookAtMatrix(
-    sf::Vector3f eye, sf::Vector3f center, sf::Vector3f up){
+    Vector3f eye, Vector3f center, Vector3f up){
   // Get forward vector (center - eye)
-  sf::Vector3f forward = {
+  Vector3f forward = {
     center.x - eye.x,
     center.y - eye.y,
     center.z - eye.z
@@ -64,7 +63,7 @@ std::vector<GLfloat> getLookAtMatrix(
   normalize(&forward);
 
   // Get side vector (forward x up)
-  sf::Vector3f side;
+  Vector3f side;
   cross(forward, up, &side);
   normalize(&side);
 
@@ -123,7 +122,7 @@ std::vector<GLfloat> matrixProduct(
 std::vector<GLfloat> rotate(
     std::vector<GLfloat>* matrix,
     GLfloat angle,
-    sf::Vector3f r){
+    Vector3f r){
   GLfloat co = cos(angle * M_PI/180.);
   GLfloat si = sin(angle * M_PI/180.);
   normalize(&r);
@@ -153,7 +152,7 @@ std::vector<GLfloat> rotate(
 };
 
 std::vector<GLfloat> translate(
-    std::vector<GLfloat>* matrix, sf::Vector3f translation){
+    std::vector<GLfloat>* matrix, Vector3f translation){
   std::vector<GLfloat> translationMatrix = {
     1, 0, 0, 0,
     0, 1, 0, 0,

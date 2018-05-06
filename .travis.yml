@@ -1,9 +1,13 @@
 language: c++
 
 before_install:
+  # Start display (Needed for tests with glfw)
+  - export DISPLAY=:99.0
+  - sh -e /etc/init.d/xvfb start
+
   # Install dependencies
   - sudo apt-get update -qq
-  - sudo apt-get install -qq libsfml-dev cmake stockfish
+  - sudo apt-get install -qq cmake stockfish xorg-dev freeglut3-dev
 
   # Install valgrind for checking memory leaks on tests
   - sudo apt-get install -qq valgrind

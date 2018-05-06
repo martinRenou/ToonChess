@@ -3,9 +3,7 @@
 #include <algorithm>
 #include <random>
 
-#include <GL/gl.h>
-
-#include <SFML/Graphics.hpp>
+#include <GLFW/glfw3.h>
 
 #include <btBulletDynamicsCommon.h>
 
@@ -76,11 +74,11 @@ PhysicsWorld::PhysicsWorld(
   }
 
   // Start the innerClock
-  innerClock = new sf::Clock();
+  innerClock = new Clock();
 };
 
 void PhysicsWorld::updatePiecePosition(
-    sf::Vector2i startPosition, sf::Vector2f currentPosition){
+    Vector2i startPosition, Vector2f currentPosition){
   // Get rigidBody
   btRigidBody* movingRigidBody = pieceRigidBodies[
     startPosition.x][startPosition.y];
@@ -98,7 +96,7 @@ void PhysicsWorld::updatePiecePosition(
 };
 
 void PhysicsWorld::movePiece(
-    sf::Vector2i startPosition, sf::Vector2i endPosition){
+    Vector2i startPosition, Vector2i endPosition){
   // Move the piece to its end position
   updatePiecePosition(
     startPosition, {float(endPosition.x), float(endPosition.y)});
@@ -110,7 +108,7 @@ void PhysicsWorld::movePiece(
   pieceRigidBodies[endPosition.x][endPosition.y] = movingRigidBody;
 };
 
-void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
+void PhysicsWorld::collapsePiece(int piece, Vector2i position){
   // Remove it from the dynamics world
   dynamicsWorld->removeRigidBody(pieceRigidBodies[position.x][position.y]);
   delete pieceRigidBodies[position.x][position.y];
@@ -138,7 +136,7 @@ void PhysicsWorld::collapsePiece(int piece, sf::Vector2i position){
 };
 
 void PhysicsWorld::simulate(){
-  float timeSinceLastCall = innerClock->getElapsedTime().asSeconds();
+  float timeSinceLastCall = innerClock->getElapsedTime();
 
   // Take into account fragments lifetime
   for(unsigned int i = 0; i < fragmentPool.size(); i++){

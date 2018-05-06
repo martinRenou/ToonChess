@@ -4,9 +4,9 @@
 #include <string>
 #include <cmath>
 
-#include <SFML/Graphics.hpp>
-
 #include "../constants.hxx"
+#include "../Clock/Clock.hxx"
+#include "../utils/math.hxx"
 #include "StockfishConnector.hxx"
 
 
@@ -24,7 +24,7 @@ private:
 
   /* Clock used for measuring time during piece movement and
   waiting between the USER_TURN and the AI_TURN */
-  sf::Clock* clock;
+  Clock* clock;
 
   /* Grid used for conversions between position and UCI format */
   const std::string uciGrid[8][8] = {
@@ -41,23 +41,23 @@ private:
   /* Conversion function: converts a position in UCI format (e.g. "h3") into a
   vector
     \param position The position in the UCI format
-    \return the SFML vector representing the position on the board
+    \return the vector representing the position on the board
   */
-  sf::Vector2i uciFormatToPosition(std::string position);
+  Vector2i uciFormatToPosition(std::string position);
 
   /* Conversion function: converts a position specified with x and y into a UCI
   format (e.g. "a5")
-    \param position The position as an sf::Vector2i
+    \param position The position as an Vector2i
     \return the position in the UCI format
   */
-  std::string positionToUciFormat(sf::Vector2i position);
+  std::string positionToUciFormat(Vector2i position);
 
   /* Compute the allowedNextPositions matrix for a specific piece */
-  void computePAWNNextPositions(sf::Vector2i position);
-  void computeROOKNextPositions(sf::Vector2i position);
-  void computeKNIGHTNextPositions(sf::Vector2i position);
-  void computeBISHOPNextPositions(sf::Vector2i position);
-  void computeKINGNextPositions(sf::Vector2i position);
+  void computePAWNNextPositions(Vector2i position);
+  void computeROOKNextPositions(Vector2i position);
+  void computeKNIGHTNextPositions(Vector2i position);
+  void computeBISHOPNextPositions(Vector2i position);
+  void computeKINGNextPositions(Vector2i position);
 
   /* Compute the allowedNextPositions matrix according to the selected piece */
   void computeAllowedNextPositions();
@@ -100,19 +100,19 @@ public:
 
   /* Position of the currently selected chess piece {-1, -1} if nothing is
   selected */
-  sf::Vector2i selectedPiecePosition = {-1, -1};
+  Vector2i selectedPiecePosition = {-1, -1};
 
   /* Position of the selected chess piece just before the currently selected
   one was selected */
-  sf::Vector2i oldSelectedPiecePosition = {-1, -1};
+  Vector2i oldSelectedPiecePosition = {-1, -1};
 
   /* Start position of the suggested user move, {-1, -1} if nothing is suggested
   */
-  sf::Vector2i suggestedUserMoveStartPosition = {-1, -1};
+  Vector2i suggestedUserMoveStartPosition = {-1, -1};
 
   /* End position of the suggested user move, {-1, -1} if nothing is suggested
   */
-  sf::Vector2i suggestedUserMoveEndPosition = {-1, -1};
+  Vector2i suggestedUserMoveEndPosition = {-1, -1};
 
   /* Start the game engine
     \throw ConnectionException if communication with Stockfish didn't start
@@ -121,7 +121,7 @@ public:
   void start();
 
   /* Set the new clicked position on the board */
-  void setNewSelectedPiecePosition(sf::Vector2i newSelectedPiecePosition);
+  void setNewSelectedPiecePosition(Vector2i newSelectedPiecePosition);
 
   /* Perform the chess rules depending on the game state, if it's the USER_TURN
     it will move one chess piece according to the currently clicked piece, if
@@ -136,11 +136,11 @@ public:
   int movingPiece = EMPTY;
 
   /* Currently moving piece position */
-  sf::Vector2f movingPiecePosition = {-1, -1};
+  Vector2f movingPiecePosition = {-1, -1};
 
   /* The start and end position of the currently moving piece */
-  sf::Vector2i movingPieceStartPosition = {-1, -1};
-  sf::Vector2i movingPieceEndPosition = {-1, -1};
+  Vector2i movingPieceStartPosition = {-1, -1};
+  Vector2i movingPieceEndPosition = {-1, -1};
 
   /* Destructor */
   ~ChessGame();

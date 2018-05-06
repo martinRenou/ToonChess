@@ -1,6 +1,6 @@
 #define GL_GLEXT_PROTOTYPES
 
-#include <GL/gl.h>
+#include <GLFW/glfw3.h>
 
 #include <iostream>
 #include <map>
@@ -20,8 +20,8 @@ void shadowMappingRender(
     DirectionalLight* light, float elapsedTime){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
-  sf::Vector3f translation;
-  sf::Vector3f rotation = {0, 0, 1};
+  Vector3f translation;
+  Vector3f rotation = {0, 0, 1};
 
   // Get shader program
   ShaderProgram* shadowMappingProgram = programs->at(SHADOW_MAPPING);

@@ -1,8 +1,6 @@
 #define GL_GLEXT_PROTOTYPES
 
-#include <GL/gl.h>
-
-#include <SFML/Graphics.hpp>
+#include <GLFW/glfw3.h>
 
 #include <iostream>
 #include <map>
@@ -34,8 +32,8 @@ void colorPickingRender(
     Camera* camera, float elapsedTime){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
-  sf::Vector3f translation;
-  sf::Vector3f rotation = {0, 0, 1};
+  Vector3f translation;
+  Vector3f rotation = {0, 0, 1};
 
   // Get shader program
   ShaderProgram* colorPickingProgram = programs->at(COLOR_PICKING);
@@ -148,8 +146,8 @@ void ColorPicking::deleteBuffers(){
   glDeleteRenderbuffers(2, buffers);
 }
 
-sf::Vector2i ColorPicking::getClickedPiecePosition(
-    sf::Vector2i clickedPixelPosition,
+Vector2i ColorPicking::getClickedPiecePosition(
+    Vector2i clickedPixelPosition,
     ChessGame* game,
     std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
@@ -175,7 +173,7 @@ sf::Vector2i ColorPicking::getClickedPiecePosition(
   );
 
   // Get piece position according to picked color
-  sf::Vector2i clickedPiecePosition;
+  Vector2i clickedPiecePosition;
   int selectedX = (int)round(pixel.r*8);
   int selectedY = (int)round(pixel.g*8);
   clickedPiecePosition.x = (selectedX == 8) ? -1 : selectedX;

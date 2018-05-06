@@ -1,12 +1,11 @@
 #ifndef MESH_HXX_
 #define MESH_HXX_
 
-#include <GL/gl.h>
-
-#include <SFML/Graphics.hpp>
+#include <GLFW/glfw3.h>
 
 #include <vector>
 
+#include "../utils/math.hxx"
 
 class Mesh {
   public:
@@ -28,7 +27,7 @@ class Mesh {
     GLfloat mass = 1;
 
     /* Origin of the mesh */
-    sf::Vector3f origin = {0.0, 0.0, 0.0};
+    Vector3f origin = {0.0, 0.0, 0.0};
 
     /* Constructor */
     explicit Mesh();

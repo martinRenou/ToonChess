@@ -7,9 +7,9 @@
 
 ## Installation (linux only)
 
-Install [CMake](https://cmake.org/), [SFML](https://www.sfml-dev.org/index.php) and [Stockfish](https://stockfishchess.org/):
+Install [CMake](https://cmake.org/), [Stockfish](https://stockfishchess.org/) and [OpenGL](https://www.opengl.org/):
 ```bash
-sudo apt-get install cmake libsfml-dev stockfish
+sudo apt-get install cmake stockfish xorg-dev freeglut3-dev
 ```
 
 Install [Bullet Physics](http://bulletphysics.org/wordpress/):

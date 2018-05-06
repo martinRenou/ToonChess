@@ -4,7 +4,7 @@
 #include <btBulletDynamicsCommon.h>
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 
-#include <SFML/Graphics.hpp>
+#include "../utils/math.hxx"
 
 #include "../mesh/Mesh.hxx"
 
@@ -14,7 +14,7 @@ class Fragment {
   public:
     /* Constructor */
     explicit Fragment(
-      Mesh* mesh, sf::Vector2i position, GLfloat rotation, GLfloat lifetime);
+      Mesh* mesh, Vector2i position, GLfloat rotation, GLfloat lifetime);
 
     /* Shape */
     btShapeHull* hull;
@@ -36,7 +36,7 @@ class Fragment {
     float mass;
 
     /* Origin of the fragment */
-    sf::Vector3f origin;
+    Vector3f origin;
 
     /* Returns the movement matrix of the Fragment
       \return movement matrix as a vector of GLfloat

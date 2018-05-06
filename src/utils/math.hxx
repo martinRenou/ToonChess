@@ -3,8 +3,41 @@
 
 #include <vector>
 
-#include <GL/gl.h>
-#include <SFML/Graphics.hpp>
+#include <GLFW/glfw3.h>
+
+class Vector2i
+{
+  public:
+
+    int x;
+    int y;
+
+    Vector2i(int x_init = 0, int y_init = 0)
+      : x{x_init}, y{y_init} {};
+};
+
+class Vector2f
+{
+  public:
+
+    float x;
+    float y;
+
+    Vector2f(float x_init = 0.0, float y_init = 0.0)
+      : x{x_init}, y{y_init} {};
+};
+
+class Vector3f
+{
+  public:
+
+    float x;
+    float y;
+    float z;
+
+    Vector3f(float x_init = 0.0, float y_init = 0.0, float z_init = 0.0)
+      : x{x_init}, y{y_init}, z{z_init} {};
+};
 
 /* Generate and return a perspective matrix. Inspired from the gluPerspective
   function, but it only creates the matrix and returns it, it doesn't call
@@ -47,7 +80,7 @@ std::vector<GLfloat> getOrthoProjMatrix(
   \return The lookAt matrix
 */
 std::vector<GLfloat> getLookAtMatrix(
-  sf::Vector3f eye, sf::Vector3f center, sf::Vector3f up
+  Vector3f eye, Vector3f center, Vector3f up
 );
 
 /* Function which returns the 4x4 identity matrix
@@ -73,7 +106,7 @@ std::vector<GLfloat> matrixProduct(
 std::vector<GLfloat> rotate(
   std::vector<GLfloat>* matrix,
   GLfloat angle,
-  sf::Vector3f r
+  Vector3f r
 );
 
 /* Function which translates a matrix and return the result
@@ -83,7 +116,7 @@ std::vector<GLfloat> rotate(
 */
 std::vector<GLfloat> translate(
   std::vector<GLfloat>* matrix,
-  sf::Vector3f translation
+  Vector3f translation
 );
 
 /* Function which computes the inverse of a matrix and returns the result
