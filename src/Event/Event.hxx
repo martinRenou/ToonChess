@@ -1,7 +1,7 @@
 #ifndef EVENT_HXX_
 #define EVENT_HXX_
 
-#include <SFML/Graphics.hpp>
+#include "../utils/math.hxx"
 
 /* Class event, inspired from the SFML Event class */
 class Event {
@@ -20,20 +20,20 @@ public:
 
   /* Event data */
   struct Fragment {
-    sf::Vector3f position;
+    Vector3f position;
     float volume;
     int piece;
   };
 
   struct Piece {
-    sf::Vector2i position;
+    Vector2i position;
     int piece;
   };
 
   struct MovingPiece {
-    sf::Vector2f currentPosition;
-    sf::Vector2i startPosition;
-    sf::Vector2i endPosition;
+    Vector2f currentPosition;
+    Vector2i startPosition;
+    Vector2i endPosition;
   };
 
   union {

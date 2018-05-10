@@ -4,11 +4,19 @@
 #include <vector>
 #include <string>
 
+#include <GLFW/glfw3.h>
+
 /* Function used to load files like shader source code
   \param path The path to the file that you want to load
   \return the string containing the content of the file
 */
-std::string loadFile(std::string path);
+std::string loadFile(const std::string& path);
+
+/* Function used to load png images
+  \param path The path to the file that you want to load
+  \return the texture as a Gluint
+*/
+GLuint loadPNGTexture(const std::string& path);
 
 template<typename Out>
 void split(const std::string &s, char delim, Out result);

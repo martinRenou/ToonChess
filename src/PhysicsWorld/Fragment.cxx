@@ -3,12 +3,12 @@
 #include <BulletCollision/CollisionShapes/btShapeHull.h>
 #include <BulletCollision/CollisionShapes/btConvexHullShape.h>
 
-#include <SFML/Graphics.hpp>
+#include "../utils/math.hxx"
 
 #include "Fragment.hxx"
 
 Fragment::Fragment(
-    Mesh* mesh, sf::Vector2i position, GLfloat rotation, GLfloat lifetime)
+    Mesh* mesh, Vector2i position, GLfloat rotation, GLfloat lifetime)
     : mesh{mesh}, lifetime{lifetime}{
   // Create a simplified version of the original mesh for optimization purppose
   btConvexHullShape* originalConvexHullShape = new btConvexHullShape();

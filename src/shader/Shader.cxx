@@ -1,9 +1,10 @@
 #define GL_GLEXT_PROTOTYPES
 
-#include <GL/gl.h>
+#include <GLFW/glfw3.h>
 
 #include <string>
 #include <vector>
+#include <iostream>
 
 #include "../utils/utils.hxx"
 #include "CompilationException.hxx"
@@ -28,7 +29,7 @@ void Shader::compile(){
   GLint isCompiled(0);
   glGetShaderiv(id, GL_COMPILE_STATUS, &isCompiled);
   if(isCompiled == GL_FALSE){
-    GLint maxLength(0);
+    GLint maxLength(50);
     glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
 
     // Display compilation error

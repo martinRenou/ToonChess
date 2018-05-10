@@ -3,15 +3,15 @@
 
 #include <vector>
 
-#include <GL/gl.h>
+#include <GLFW/glfw3.h>
 
-#include <SFML/Graphics.hpp>
+#include "utils/math.hxx"
 
 struct DirectionalLight {
   // Light direction should NOT be collinear to (0, 0, 1) to prevent
   // lightLookAtMatrix computation issues, and should NOT be collinear to
   // (1, 1, 0) to prevent shadows artefacts
-  sf::Vector3f direction = {-1.0, 1.0, -1.0};
+  Vector3f direction = {-1.0, 1.0, -1.0};
   std::vector<GLfloat> viewMatrix;
   std::vector<GLfloat> projectionMatrix;
 };

@@ -4,15 +4,14 @@
 #include <vector>
 #include <map>
 
-#include <GL/gl.h>
-
-#include <SFML/Graphics.hpp>
+#include <GLFW/glfw3.h>
 
 #include <btBulletDynamicsCommon.h>
 
 #include "Fragment.hxx"
 #include "../mesh/Mesh.hxx"
 #include "../ChessGame/ChessGame.hxx"
+#include "../utils/math.hxx"
 
 
 // cppcheck-suppress noCopyConstructor
@@ -45,7 +44,7 @@ class PhysicsWorld{
     btRigidBody* pieceRigidBodies[8][8];
 
     /* Inner clock for stepping simulation */
-    sf::Clock* innerClock;
+    Clock* innerClock;
 
     /* Random generator for the fragments lifetime */
     std::default_random_engine generator;
@@ -60,20 +59,20 @@ class PhysicsWorld{
       \param startPosition The start position of the movement
     */
     void updatePiecePosition(
-      sf::Vector2i startPosition, sf::Vector2f currentPosition);
+      Vector2i startPosition, Vector2f currentPosition);
 
     /* Move a piece directly to its end position
       \param startPosition The start position of the movement
       \param endPosition The end position of the movement
     */
     void movePiece(
-      sf::Vector2i startPosition, sf::Vector2i endPosition);
+      Vector2i startPosition, Vector2i endPosition);
 
     /* Adds a piece to the dynamics world and collapse it
       \param piece Piece that you want to collapse: KING, QUEEN, BISHOP...
       \param position The position of the piece on the grid
     */
-    void collapsePiece(int piece, sf::Vector2i position);
+    void collapsePiece(int piece, Vector2i position);
 
     /* Fragment pool, it contains each fragment actually in the dynamics world
       as a a pair of int (PAWN, KING...) and Fragment* */

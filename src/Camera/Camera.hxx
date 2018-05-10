@@ -4,9 +4,9 @@
 #include <vector>
 #include <cmath>
 
-#include <GL/gl.h>
+#include <GLFW/glfw3.h>
 
-#include <SFML/Graphics.hpp>
+#include "../utils/math.hxx"
 
 class Camera {
 private:
@@ -14,13 +14,13 @@ private:
   GLint fovy = 50;
 
   /* Position of the camera in the space coordinates */
-  sf::Vector3f position;
+  Vector3f position;
 
   /* Look at position */
-  sf::Vector3f center = {0.0, 0.0, 0.0};
+  Vector3f center = {0.0, 0.0, 0.0};
 
   /* Camera up vector */
-  sf::Vector3f up = {0.0, 0.0, 1.0};
+  Vector3f up = {0.0, 0.0, 1.0};
 
   /* Rotation radius of the camera */
   GLfloat radius = 40.0;

@@ -1,9 +1,7 @@
 #ifndef SHADERPROGRAM_HXX_
 #define SHADERPROGRAM_HXX_
 
-#include <GL/gl.h>
-
-#include <SFML/Graphics.hpp>
+#include <GLFW/glfw3.h>
 
 #include <vector>
 
@@ -58,14 +56,6 @@ class ShaderProgram {
     void setVector4f(
       std::string name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
 
-    /* Set a bool uniform value, given its name. The program must be bound with
-      glUseProgram before using this method, otherwise there will be undefined
-      behavior depending on the context
-      \param name The uniform name
-      \param value The boolean value
-    */
-    void setBoolean(std::string name, bool value);
-
     /* Set a matrix uniform value, given its name. The program must be bound with
       glUseProgram before using this method, otherwise there will be undefined
       behavior depending on the context
@@ -102,15 +92,6 @@ class ShaderProgram {
       \param value The texture
     */
     void bindTexture(GLuint n, GLenum target, std::string name, GLuint texture);
-
-    /* Bind an SFML texture to sampler "n"
-      \param n The index of the sampler
-      \param target The target for the sampler, must be GL_TEXTUREn with n the
-        index of the sampler
-      \param name The name of the sampler in shaders
-      \param texture The SFML texture
-    */
-    void bindTexture(GLuint n, GLenum target, std::string name, sf::Texture* texture);
 
     /* Destructor, this will remove the shaders from memory */
     ~ShaderProgram();

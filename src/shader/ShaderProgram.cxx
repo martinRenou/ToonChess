@@ -1,6 +1,6 @@
 #define GL_GLEXT_PROTOTYPES
 
-#include <GL/gl.h>
+#include <GLFW/glfw3.h>
 
 #include <vector>
 #include <string>
@@ -85,12 +85,6 @@ void ShaderProgram::setVector4f(
   glUniform4f(location, x, y, z, w);
 };
 
-void ShaderProgram::setBoolean(std::string name, bool value){
-  GLuint location = glGetUniformLocation(id, name.c_str());
-
-  glUniform1i(location, value);
-};
-
 void ShaderProgram::setMatrix4fv(
     std::string name, std::vector<GLfloat>* matrix){
   GLuint location = glGetUniformLocation(id, name.c_str());
@@ -123,18 +117,6 @@ void ShaderProgram::bindTexture(
   glActiveTexture(target);
   glBindTexture(GL_TEXTURE_2D, texture);
 };
-
-void ShaderProgram::bindTexture(
-    GLuint n, GLenum target, std::string name, sf::Texture* texture){
-  GLuint location = glGetUniformLocation(id, name.c_str());
-
-  glUniform1i(location, n);
-
-  glActiveTexture(target);
-
-  sf::Texture::bind(texture);
-};
-
 
 ShaderProgram::~ShaderProgram(){
   deleteShaders(&shaders);

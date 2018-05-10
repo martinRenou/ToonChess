@@ -1,14 +1,13 @@
 #ifndef COLORPICKING_HXX_
 #define COLORPICKING_HXX_
 
-#include <GL/gl.h>
-#include <SFML/Graphics.hpp>
+#include <GLFW/glfw3.h>
 
 #include <map>
 #include <cmath>
 
 #include "../Camera/Camera.hxx"
-
+#include "../utils/math.hxx"
 #include "../mesh/Mesh.hxx"
 #include "../shader/ShaderProgram.hxx"
 #include "../ChessGame/ChessGame.hxx"
@@ -58,8 +57,8 @@ public:
     \param camera The camera
     \return The position of the clicked chess piece
   */
-  sf::Vector2i getClickedPiecePosition(
-    sf::Vector2i clickedPixelPosition,
+  Vector2i getClickedPiecePosition(
+    Vector2i clickedPixelPosition,
     ChessGame* game,
     std::map<int, Mesh*>* meshes,
     std::map<int, ShaderProgram*>* programs,
