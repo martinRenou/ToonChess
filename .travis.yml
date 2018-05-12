@@ -37,7 +37,7 @@ script:
   - cppcheck --quiet --error-exitcode=1 --enable=all --inline-suppr src/
   - mkdir build
   - cd build
-  - cmake ..
+  - cmake -DTOONCHESS_BUILD_TESTS=ON ..
   - sudo make -j6 install
-  - ./tests
-  - valgrind --leak-check=full --track-origins=yes --error-exitcode=1 ./tests
+  - ./toonchess_tests
+  - valgrind --leak-check=full --track-origins=yes --error-exitcode=1 ./toonchess_tests

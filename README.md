@@ -28,20 +28,23 @@ git clone https://github.com/martinRenou/ToonChess.git
 cd ToonChess
 ```
 
-Compile ToonChess:
+Install ToonChess:
 ```bash
 mkdir build && cd build && cmake ..
-make
+sudo make install
 ```
 
 Run it!
 ```bash
-./ToonChess
+ToonChess
 ```
 
 ## Tests
 
-Tests are written using [GoogleTest](https://github.com/google/googletest), you can run them after installation with:
+Tests are written using [GoogleTest](https://github.com/google/googletest),
+you can compile and run them using:
 ```bash
-./tests
+cmake -DTOONCHESS_BUILD_TESTS=ON ..
+make
+./toonchess_tests
 ```
