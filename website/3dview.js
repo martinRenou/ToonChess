@@ -58,7 +58,7 @@ let objLoader = new THREE.OBJLoader();
 // Callback function for the mesh selecting element
 function loadMesh(name) {
   objLoader.load(
-    'assets/' + name + '.obj',
+    'share/toonchess/assets/' + name + '.obj',
     function (object) {
       object.traverse(function (child) {
         if (child instanceof THREE.Mesh) {
