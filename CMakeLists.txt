@@ -8,11 +8,21 @@ set(ToonChess_VERSION_MAJOR 0)
 set(ToonChess_VERSION_MINOR 1)
 
 set(TOONCHESS_SHARE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/share)
+set(TOONCHESS_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/config)
 
 set(TOONCHESS_SHARE_PATH "\"${CMAKE_INSTALL_PREFIX}/share/toonchess/\"")
+set(TOONCHESS_CONFIG_PATH "\"$ENV{HOME}/.config/toonchess/\"")
 configure_file (
     "${CMAKE_SOURCE_DIR}/src/get_share_path.cxx.in"
     "${CMAKE_SOURCE_DIR}/src/get_share_path.cxx"
+)
+configure_file (
+    "${CMAKE_SOURCE_DIR}/gui/toonchess/get_config_path.py.in"
+    "${CMAKE_SOURCE_DIR}/gui/toonchess/get_config_path.py"
+)
+configure_file (
+    "${CMAKE_SOURCE_DIR}/gui/toonchess/get_share_path.py.in"
+    "${CMAKE_SOURCE_DIR}/gui/toonchess/get_share_path.py"
 )
 
 # Add CXX files
@@ -57,6 +67,10 @@ set(
 # Install assets
 install(DIRECTORY "${TOONCHESS_SHARE_DIR}/toonchess"
         DESTINATION "share")
+install(DIRECTORY "${TOONCHESS_CONFIG_DIR}/toonchess"
+        DESTINATION "$ENV{HOME}/.config"
+        PATTERN "toonchess/config.txt"
+        PERMISSIONS WORLD_READ WORLD_WRITE)
 
 # Define sources and executable
 set(EXECUTABLE_NAME "ToonChess")

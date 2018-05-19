@@ -1,0 +1,2 @@
+def get_config_path():
+    return @TOONCHESS_CONFIG_PATH@

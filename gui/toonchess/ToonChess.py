@@ -8,7 +8,7 @@ from traitsui.api import Item, UItem, VGroup, HGroup, View
 from pyface.image_resource import ImageResource
 
 from get_share_path import get_share_path
-from utils import get_config
+from utils import get_config, set_config
 
 default = {
     'resolution': 'fullscreen',
@@ -28,7 +28,7 @@ default = {
 
 
 class ToonChess(HasStrictTraits):
-    resolution = Enum('fullscreen', '1024/576', '1920/1600')
+    resolution = Enum('fullscreen', '1920/1600', '1024/576')
     shadows = Enum('high', 'low', 'very low')
     antialiasing = Enum('high', 'low', 'none')
 
@@ -47,7 +47,7 @@ class ToonChess(HasStrictTraits):
     play_button = Button("Play")
     reset_button = Button("Reset default")
 
-    game_running = Bool(False)
+    _game_running = Bool(False)
     _executor = Instance(futures.ThreadPoolExecutor)
 
     traits_view = View(
@@ -90,7 +90,7 @@ class ToonChess(HasStrictTraits):
                 show_border=True
             ),
             HGroup(
-                UItem('play_button', enabled_when=("not game_running")),
+                UItem('play_button', enabled_when=("not _game_running")),
                 UItem('reset_button'),
                 show_border=True
             ),
@@ -114,7 +114,9 @@ class ToonChess(HasStrictTraits):
 
     @on_trait_change('play_button')
     def _on_play_click(self):
-        self.game_running = True
+        set_config(self.trait_get())
+
+        self._game_running = True
         future = self._executor.submit(self._play)
         future.add_done_callback(self._game_done)
 
@@ -123,7 +125,7 @@ class ToonChess(HasStrictTraits):
         out, err = process.communicate()
 
     def _game_done(self, future):
-        self.game_running = False
+        self._game_running = False
 
     def __executor_default(self):
         return futures.ThreadPoolExecutor(max_workers=1)
