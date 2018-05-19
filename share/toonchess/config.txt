@@ -1,0 +1,13 @@
+resolution fullscreen
+shadows high
+antialiasing high
+difficulty easy
+ai stockfish
+user_pieces_color 255,237,178
+user_smoke_color 105,94,59
+ai_pieces_color 130,20,20
+ai_smoke_color 77,31,102
+background_color 255,255,255
+board_color_1 179,153,105
+board_color_2 255,255,255
+allowed_move_color 240,207,87

@@ -2,3 +2,4 @@ build/*
 *.gch
 src/get_share_path.cxx
 gui/toonchess/get_share_path.py
+gui/toonchess/__pycache__/*
