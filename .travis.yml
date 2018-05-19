@@ -9,6 +9,8 @@ before_install:
   - sudo apt-get update -qq
   - sudo apt-get install -qq cmake stockfish xorg-dev freeglut3-dev
 
+  - pip install traitsui pyqt5
+
   # Install valgrind for checking memory leaks on tests
   - sudo apt-get install -qq valgrind
 

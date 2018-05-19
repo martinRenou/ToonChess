@@ -1,0 +1,2 @@
+def get_share_path():
+    return @TOONCHESS_SHARE_PATH@
