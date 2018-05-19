@@ -1,4 +1,4 @@
-resolution fullscreen
+mode fullscreen
 shadows high
 antialiasing high
 difficulty easy

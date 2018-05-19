@@ -7,11 +7,11 @@ from traits.api import (
 from traitsui.api import Item, UItem, VGroup, HGroup, View
 from pyface.image_resource import ImageResource
 
-from get_share_path import get_share_path
-from utils import get_config, set_config
+from toonchess.get_share_path import get_share_path
+from toonchess.utils import get_config, set_config
 
 default = {
-    'resolution': 'fullscreen',
+    'mode': 'fullscreen',
     'shadows': 'high',
     'antialiasing': 'high',
     'difficulty': 'easy',
@@ -28,7 +28,7 @@ default = {
 
 
 class ToonChess(HasStrictTraits):
-    resolution = Enum('fullscreen', '1920/1600', '1024/576')
+    mode = Enum('fullscreen', 'window')
     shadows = Enum('high', 'low', 'very low')
     antialiasing = Enum('high', 'low', 'none')
 
@@ -53,7 +53,7 @@ class ToonChess(HasStrictTraits):
     traits_view = View(
         VGroup(
             HGroup(
-                Item('resolution'),
+                Item('mode'),
                 Item('shadows'),
                 Item('antialiasing'),
                 label='Graphical settings',
@@ -98,7 +98,7 @@ class ToonChess(HasStrictTraits):
         ),
         resizable=False,
         title='ToonChess',
-        icon=ImageResource(get_share_path() + 'logo.png')
+        icon=ImageResource('ToonChess.png', search_path=get_share_path())
     )
 
     def __init__(self, **traits):
@@ -115,13 +115,14 @@ class ToonChess(HasStrictTraits):
     @on_trait_change('play_button')
     def _on_play_click(self):
         set_config(self.trait_get())
+        self._changed = False
 
         self._game_running = True
         future = self._executor.submit(self._play)
         future.add_done_callback(self._game_done)
 
     def _play(self):
-        process = subprocess.Popen("ToonChess")
+        process = subprocess.Popen("toonchess3d")
         out, err = process.communicate()
 
     def _game_done(self, future):
@@ -134,5 +135,8 @@ class ToonChess(HasStrictTraits):
     def _on_reset_click(self):
         self.set(**default)
 
-if __name__ == '__main__':
-    ToonChess().configure_traits()
+    @on_trait_change('mode,shadows,antialiasing,difficulty,ai,\
+        user_pieces_color,user_smoke_color,ai_pieces_color,ai_smoke_color,\
+        background_color,board_color_1,board_color_2,allowed_move_color')
+    def _on_change(self):
+        set_config(self.trait_get())

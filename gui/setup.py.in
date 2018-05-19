@@ -1,1 +1,18 @@
-# TODO
+from setuptools import setup
+
+setup(
+    name='ToonChess',
+    author='Martin Renou',
+    version='${TOONCHESS_VERSION}',
+    package_dir={ '': '${CMAKE_CURRENT_SOURCE_DIR}' },
+    install_requires=[
+        "traitsui",
+        "pyqt5"
+    ],
+    packages=['toonchess'],
+    entry_points={
+        'gui_scripts': [
+            'toonchess = toonchess.__main__:main'
+        ]
+    },
+)

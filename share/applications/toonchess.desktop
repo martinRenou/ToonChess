@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=ToonChess
+Comment=ToonChess: Open-source 3D chess game
+Exec=toonchess
+Icon=ToonChess
+Terminal=false

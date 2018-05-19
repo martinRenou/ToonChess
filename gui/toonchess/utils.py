@@ -1,4 +1,4 @@
-from get_config_path import get_config_path
+from toonchess.get_config_path import get_config_path
 
 
 def get_config():
