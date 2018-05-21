@@ -7,7 +7,9 @@
 
 #include <GLFW/glfw3.h>
 
+#include "../constants.hxx"
 #include "utils.hxx"
+#include "math.hxx"
 
 std::string loadFile(const std::string& path){
   std::ifstream in(path);
@@ -153,6 +155,160 @@ std::vector<std::string> split(const std::string &s, char delim){
 
   return elems;
 }
+
+bool str_equal(const std::string& str1, const std::string& str2){
+  return str1.compare(str2) == 0;
+}
+
+Vector4f extractColor(const std::string& str){
+  std::vector<std::string> strColors = split(str, ',');
+  std::vector<float> colors;
+
+  for(const auto& strColor: strColors){
+    float value = 0;
+    if(not str_equal(strColor, "0")){
+      value = std::stof(strColor) / 255.;
+    }
+    colors.push_back(value);
+  }
+
+  return Vector4f(colors.at(0), colors.at(1), colors.at(2), 1.0);
+}
+
+Config loadConfig(const std::string& path){
+  Config config;
+
+  std::ifstream fobj(path);
+  std::string line;
+
+  while(std::getline(fobj, line)){
+    std::vector<std::string> splittedLine = split(line, ' ');
+
+    if(str_equal(splittedLine.at(0), "mode")){
+      if(str_equal(splittedLine.at(1), "window")){
+        config.mode = WINDOW;
+      }
+      else if(str_equal(splittedLine.at(1), "fullscreen")){
+        config.mode = FULLSCREEN;
+      }
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "shadows")){
+      if(str_equal(splittedLine.at(1), "high")){
+        config.shadows = SHADOWMAPPING_HIGH;
+      }
+      else if(str_equal(splittedLine.at(1), "low")){
+        config.shadows = SHADOWMAPPING_LOW;
+      }
+      else if(str_equal(splittedLine.at(1), "very") and
+              str_equal(splittedLine.at(2), "low")){
+        config.shadows = SHADOWMAPPING_VERY_LOW;
+      }
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "antialiasing")){
+      if(str_equal(splittedLine.at(1), "high")){
+        config.antialiasing = ANTIALIASING_HIGH;
+      }
+      else if(str_equal(splittedLine.at(1), "low")){
+        config.antialiasing = ANTIALIASING_LOW;
+      }
+      else if(str_equal(splittedLine.at(1), "none")){
+        config.antialiasing = ANTIALIASING_NONE;
+      }
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "difficulty")){
+      if(str_equal(splittedLine.at(1), "impossible")){
+        config.difficulty = DIFFICULTY_IMPOSSIBLE;
+      }
+      else if(str_equal(splittedLine.at(1), "hard")){
+        config.difficulty = DIFFICULTY_HARD;
+      }
+      else if(str_equal(splittedLine.at(1), "normal")){
+        config.difficulty = DIFFICULTY_NORMAL;
+      }
+      else if(str_equal(splittedLine.at(1), "easy")){
+        config.difficulty = DIFFICULTY_EASY;
+      }
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "ai")){
+      config.ai = splittedLine.at(1);
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "show_suggested_move")){
+      if(str_equal(splittedLine.at(1), "true")){
+        config.show_suggested_move = true;
+      }
+      else if(str_equal(splittedLine.at(1), "false")){
+        config.show_suggested_move = false;
+      }
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "user_pieces_color")){
+      config.user_pieces_color = extractColor(splittedLine.at(1));
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "user_smoke_color")){
+      config.user_smoke_color = extractColor(splittedLine.at(1));
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "ai_pieces_color")){
+      config.ai_pieces_color = extractColor(splittedLine.at(1));
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "ai_smoke_color")){
+      config.ai_smoke_color = extractColor(splittedLine.at(1));
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "background_color")){
+      config.background_color = extractColor(splittedLine.at(1));
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "board_color_1")){
+      config.board_color_1 = extractColor(splittedLine.at(1));
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "board_color_2")){
+      config.board_color_2 = extractColor(splittedLine.at(1));
+
+      continue;
+    }
+
+    if(str_equal(splittedLine.at(0), "allowed_move_color")){
+      config.allowed_move_color = extractColor(splittedLine.at(1));
+
+      continue;
+    }
+
+    return config;
+  }
+};
 
 bool _displayGLErrors(const char *file, int line){
   GLenum errorCode;

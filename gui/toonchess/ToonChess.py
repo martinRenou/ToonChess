@@ -12,7 +12,7 @@ from toonchess.utils import get_config, set_config
 
 default = {
     'mode': 'fullscreen',
-    'shadows': 'high',
+    'shadows': 'low',
     'antialiasing': 'high',
     'difficulty': 'easy',
     'ai': 'stockfish',

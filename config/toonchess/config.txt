@@ -1,5 +1,5 @@
 mode fullscreen
-shadows high
+shadows low
 antialiasing high
 difficulty easy
 ai stockfish

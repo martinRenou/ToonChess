@@ -40,7 +40,7 @@ const int CHILD_PROCESS_ID = 21;
 // ShadowMapping
 const int SHADOWMAPPING_HIGH = 1024;
 const int SHADOWMAPPING_LOW = 512;
-const int SHADOWMAPPING_VERYLOW = 256;
+const int SHADOWMAPPING_VERY_LOW = 256;
 
 // Antialiasing level
 const int ANTIALIASING_HIGH = 4;
@@ -48,9 +48,13 @@ const int ANTIALIASING_LOW = 2;
 const int ANTIALIASING_NONE = 0;
 
 // Game difficulty
-const int DIFFICULTY_VERY_HIGH = 20;
-const int DIFFICULTY_HIGH = 15;
+const int DIFFICULTY_IMPOSSIBLE = 20;
+const int DIFFICULTY_HARD = 15;
 const int DIFFICULTY_NORMAL = 5;
 const int DIFFICULTY_EASY = 0;
+
+// Game mode
+const int WINDOW = 30;
+const int FULLSCREEN = 31;
 
 #endif

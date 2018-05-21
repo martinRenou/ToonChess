@@ -1,22 +1,23 @@
 #include "../Event/Event.hxx"
 #include "../Event/EventStack.hxx"
 
-#include "StockfishConnector.hxx"
+#include "AIConnector.hxx"
 #include "GameException.hxx"
 
 #include "ChessGame.hxx"
 
 
-ChessGame::ChessGame(){
-  // Start communication with stockfish
-  stockfishConnector = new StockfishConnector();
+ChessGame::ChessGame(const std::string& ai, const int& difficulty, bool show_suggested_move)
+    : show_suggested_move{show_suggested_move}{
+  // Start communication with the AI
+  aiConnector = new AIConnector(ai, difficulty);
 
   lastUserMove = "";
   clock = new Clock();
 };
 
 void ChessGame::start(){
-  stockfishConnector->startCommunication();
+  aiConnector->startCommunication();
 }
 
 Vector2i ChessGame::uciFormatToPosition(std::string position){
@@ -364,7 +365,7 @@ void ChessGame::perform(){
   }
   else if(state == AI_TURN) {
     // Get AI decision according to the last user move
-    std::string aiMove = stockfishConnector->getNextAIMove(
+    std::string aiMove = aiConnector->getNextAIMove(
       lastUserMove);
 
     // If the AI tried to move one user's pawn, stop the game
@@ -386,18 +387,21 @@ void ChessGame::perform(){
     // Remove the piece from its old position
     board[aiMoveStartPosition.x][aiMoveStartPosition.y] = EMPTY;
 
-    // Get suggested user next move if available
-    if(stockfishConnector->suggestedUserMove.compare("(none)") != 0){
-      std::string startPosition_str = \
-        stockfishConnector->suggestedUserMove.substr(0, 2);
-      std::string endPosition_str = \
-        stockfishConnector->suggestedUserMove.substr(2, 2);
+    if(show_suggested_move)
+    {
+      // Get suggested user next move if available
+      if(aiConnector->suggestedUserMove.compare("(none)") != 0){
+        std::string startPosition_str = \
+        aiConnector->suggestedUserMove.substr(0, 2);
+        std::string endPosition_str = \
+        aiConnector->suggestedUserMove.substr(2, 2);
 
-      suggestedUserMoveStartPosition = uciFormatToPosition(startPosition_str);
-      suggestedUserMoveEndPosition = uciFormatToPosition(endPosition_str);
-    }else{
-      suggestedUserMoveStartPosition = {-1, -1};
-      suggestedUserMoveEndPosition = {-1, -1};
+        suggestedUserMoveStartPosition = uciFormatToPosition(startPosition_str);
+        suggestedUserMoveEndPosition = uciFormatToPosition(endPosition_str);
+      }else{
+        suggestedUserMoveStartPosition = {-1, -1};
+        suggestedUserMoveEndPosition = {-1, -1};
+      }
     }
 
     // Transition to AI_MOVING state
@@ -407,6 +411,6 @@ void ChessGame::perform(){
 };
 
 ChessGame::~ChessGame(){
-  delete stockfishConnector;
+  delete aiConnector;
   delete clock;
 };

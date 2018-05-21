@@ -1,8 +1,9 @@
 build/*
 *.gch
 src/get_share_path.cxx
+src/get_config_path.cxx
 gui/setup.py
-gui/toonchess/get_config_path.py
 gui/toonchess/get_share_path.py
+gui/toonchess/get_config_path.py
 gui/toonchess/__pycache__/*
 *egg-info

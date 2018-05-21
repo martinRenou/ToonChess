@@ -7,7 +7,7 @@
 #include "../constants.hxx"
 #include "../Clock/Clock.hxx"
 #include "../utils/math.hxx"
-#include "StockfishConnector.hxx"
+#include "AIConnector.hxx"
 
 
 // cppcheck-suppress noCopyConstructor
@@ -16,8 +16,8 @@ private:
   /* Last user move */
   std::string lastUserMove;
 
-  /* The connector with Stockfish */
-  StockfishConnector* stockfishConnector;
+  /* The connector with ai */
+  AIConnector* aiConnector;
 
   /* The state of the game, should be USER_TURN, AI_TURN or WAITING */
   int state = USER_TURN;
@@ -67,7 +67,7 @@ private:
 
 public:
   /* Constructor */
-  explicit ChessGame();
+  explicit ChessGame(const std::string& ai, const int& difficulty, bool show_suggested_move);
 
   /* The checkerboard */
   int board[8][8] = {
@@ -106,6 +106,8 @@ public:
   one was selected */
   Vector2i oldSelectedPiecePosition = {-1, -1};
 
+  bool show_suggested_move = true;
+
   /* Start position of the suggested user move, {-1, -1} if nothing is suggested
   */
   Vector2i suggestedUserMoveStartPosition = {-1, -1};
@@ -115,7 +117,7 @@ public:
   Vector2i suggestedUserMoveEndPosition = {-1, -1};
 
   /* Start the game engine
-    \throw ConnectionException if communication with Stockfish didn't start
+    \throw ConnectionException if communication with AI didn't start
     properly
   */
   void start();
@@ -126,7 +128,7 @@ public:
   /* Perform the chess rules depending on the game state, if it's the USER_TURN
     it will move one chess piece according to the currently clicked piece, if
     it's WAITING it will wait one second before changing to AI_TURN, if it's
-    AI_TURN it will ask Stockfish what is the next AI move
+    AI_TURN it will ask the AI what is the next AI move
     \throw GameException if chess rules are not respected
   */
   void perform();

@@ -39,6 +39,19 @@ class Vector3f
       : x{x_init}, y{y_init}, z{z_init} {};
 };
 
+class Vector4f
+{
+  public:
+
+    float x;
+    float y;
+    float z;
+    float w;
+
+    Vector4f(float x_init = 0.0, float y_init = 0.0, float z_init = 0.0, float w_init = 0.0)
+      : x{x_init}, y{y_init}, z{z_init}, w{w_init} {};
+};
+
 /* Generate and return a perspective matrix. Inspired from the gluPerspective
   function, but it only creates the matrix and returns it, it doesn't call
   glMultMatrix under the hood.

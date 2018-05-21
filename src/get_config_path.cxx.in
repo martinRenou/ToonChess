@@ -1,0 +1,9 @@
+#include <string>
+
+#include "get_config_path.hxx"
+
+std::string get_config_path()
+{
+    static std::string config_path = @TOONCHESS_CONFIG_PATH@;
+    return config_path;
+};

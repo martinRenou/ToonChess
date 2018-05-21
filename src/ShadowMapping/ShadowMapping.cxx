@@ -88,7 +88,9 @@ void shadowMappingRender(
   }
 };
 
-ShadowMapping::ShadowMapping(){}
+ShadowMapping::ShadowMapping(GLuint resolution) : resolution{resolution}
+{
+}
 
 void ShadowMapping::initBuffers(){
   // Create FBO for shadow mapping

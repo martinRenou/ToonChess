@@ -27,7 +27,7 @@ private:
 
 public:
   /* Constructor */
-  explicit ShadowMapping();
+  explicit ShadowMapping(GLuint resolution);
 
   /* Initialization of the buffer objects */
   void initBuffers();

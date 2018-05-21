@@ -17,6 +17,10 @@ configure_file (
     "${CMAKE_SOURCE_DIR}/src/get_share_path.cxx.in"
     "${CMAKE_SOURCE_DIR}/src/get_share_path.cxx"
 )
+configure_file (
+    "${CMAKE_SOURCE_DIR}/src/get_config_path.cxx.in"
+    "${CMAKE_SOURCE_DIR}/src/get_config_path.cxx"
+)
 
 # Add CXX files
 set(
@@ -24,7 +28,7 @@ set(
   ${CMAKE_SOURCE_DIR}/src/Camera/Camera.cxx
 
   ${CMAKE_SOURCE_DIR}/src/ChessGame/ConnectionException.cxx
-  ${CMAKE_SOURCE_DIR}/src/ChessGame/StockfishConnector.cxx
+  ${CMAKE_SOURCE_DIR}/src/ChessGame/AIConnector.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/GameException.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/ChessGame.cxx
 
@@ -54,6 +58,7 @@ set(
   ${CMAKE_SOURCE_DIR}/src/utils/utils.cxx
   ${CMAKE_SOURCE_DIR}/src/utils/math.cxx
 
+  ${CMAKE_SOURCE_DIR}/src/get_config_path.cxx
   ${CMAKE_SOURCE_DIR}/src/get_share_path.cxx
 )
 
