@@ -2,6 +2,6 @@
 Type=Application
 Name=ToonChess
 Comment=ToonChess: Open-source 3D chess game
-Exec=toonchess
+Exec=bash -c "source ~/.bashrc && toonchess"
 Icon=ToonChess
 Terminal=false
