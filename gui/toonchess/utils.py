@@ -21,4 +21,4 @@ def set_config(config):
                     str(key) + ' ' + str(r) + ',' +
                     str(g) + ',' + str(b) + '\n')
                 continue
-            fobj.write(str(key) + ' ' + str(value) + '\n')
+            fobj.write(str(key) + ' ' + str(value).lower() + '\n')

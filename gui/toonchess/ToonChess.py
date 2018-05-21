@@ -16,6 +16,7 @@ default = {
     'antialiasing': 'high',
     'difficulty': 'easy',
     'ai': 'stockfish',
+    'show_suggested_move': True,
     'user_pieces_color': '255,237,178',
     'user_smoke_color': '105,94,59',
     'ai_pieces_color': '130,20,20',
@@ -34,6 +35,7 @@ class ToonChess(HasStrictTraits):
 
     difficulty = Enum('impossible', 'hard', 'normal', 'easy')
     ai = Str('stockfish')
+    show_suggested_move = Bool(True)
 
     user_pieces_color = Color()
     ai_pieces_color = Color()
@@ -63,6 +65,7 @@ class ToonChess(HasStrictTraits):
             HGroup(
                 Item('ai', label='AI'),
                 Item('difficulty'),
+                Item('show_suggested_move'),
                 label='AI settings',
                 show_border=True
             ),
@@ -108,6 +111,9 @@ class ToonChess(HasStrictTraits):
             key: config.get(key, value)
             for key, value in default.items()
         }
+        # Special case for show_suggested_move
+        values['show_suggested_move'] = values.get(
+            'show_suggested_move', 'true') == 'true'
         self.set(**values)
 
         super(ToonChess, self).__init__(**traits)
@@ -115,7 +121,6 @@ class ToonChess(HasStrictTraits):
     @on_trait_change('play_button')
     def _on_play_click(self):
         set_config(self.trait_get())
-        self._changed = False
 
         self._game_running = True
         future = self._executor.submit(self._play)
@@ -135,7 +140,7 @@ class ToonChess(HasStrictTraits):
     def _on_reset_click(self):
         self.set(**default)
 
-    @on_trait_change('mode,shadows,antialiasing,difficulty,ai,\
+    @on_trait_change('mode,shadows,antialiasing,difficulty,ai,show_suggested_move,\
         user_pieces_color,user_smoke_color,ai_pieces_color,ai_smoke_color,\
         background_color,board_color_1,board_color_2,allowed_move_color')
     def _on_change(self):
