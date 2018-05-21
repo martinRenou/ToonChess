@@ -115,7 +115,6 @@ void AIConnector::startCommunication(){
   parentWritePipeF = fdopen(parentWritePipe, writeMode);
 
   std::string line;
-  std::vector<std::string> splittedLine;
 
   // Check that the AI properly started
   readLine(parentReadPipeF, true);
