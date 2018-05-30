@@ -12,6 +12,7 @@
 struct Config
 {
   int mode = FULLSCREEN;
+  Vector2i resolution = {1600, 900};
   int shadows = SHADOWMAPPING_LOW;
   int antialiasing = ANTIALIASING_HIGH;
   std::string ai = "stockfish";

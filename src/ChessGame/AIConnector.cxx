@@ -2,12 +2,11 @@
 #include <sys/wait.h>
 #include <iostream>
 #include <algorithm>
+#include <stdexcept>
 #include <vector>
 #include <string.h>
 
 #include "../utils/utils.hxx"
-
-#include "ConnectionException.hxx"
 
 #include "AIConnector.hxx"
 
@@ -64,14 +63,14 @@ void AIConnector::startCommunication(){
 
   int fd[2];
   if(pipe(fd) == -1){
-    throw ConnectionException("Failed to create pipes");
+    throw std::runtime_error("AI connection error: failed to create pipes");
   }
 
   int childReadPipe   = fd[0];
   int parentWritePipe = fd[1];
 
   if(pipe(fd) == -1){
-    throw ConnectionException("Failed to create pipes");
+    throw std::runtime_error("AI connection error: failed to create pipes");
   }
 
   int parentReadPipe = fd[0];
@@ -83,7 +82,7 @@ void AIConnector::startCommunication(){
 
   // If there is an error creating child process
   if(pid < 0){
-    throw ConnectionException("Failed to fork process");
+    throw std::runtime_error("AI connection error: failed to fork process");
   }
 
   // In the child process running AI
@@ -102,8 +101,7 @@ void AIConnector::startCommunication(){
     // If everything went fine, this code shouldn't be reached
     writeLine(fdopen(childWritePipe, writeMode), "stop\n", true);
     close(childWritePipe);
-    throw ConnectionException(
-      "Could not run the AI, please be sure it's installed: " + ai);
+    throw std::runtime_error("AI connection error: could not run the AI, please be sure \"" + ai + "\" is installed or in the path");
   }
 
   // In the parent process running the GUI
@@ -130,8 +128,7 @@ void AIConnector::startCommunication(){
 
   // Wait for AI answer
   line = readLine(parentReadPipeF, true);
-  if(line.compare("readyok\n") != 0) throw ConnectionException(
-    "AI not ready, closing");
+  if(line.compare("readyok\n") != 0) throw std::runtime_error("AI connection error: AI not ready, closing");
 }
 
 std::string AIConnector::getNextAIMove(std::string userMove){

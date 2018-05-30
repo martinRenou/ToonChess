@@ -195,6 +195,15 @@ Config loadConfig(const std::string& path){
       continue;
     }
 
+    if(str_equal(splittedLine.at(0), "resolution")){
+      std::vector<std::string> resolution = split(splittedLine.at(1), 'x');
+      config.resolution = {
+        std::stoi(resolution.at(0)), std::stoi(resolution.at(1))
+      };
+
+      continue;
+    }
+
     if(str_equal(splittedLine.at(0), "shadows")){
       if(str_equal(splittedLine.at(1), "high")){
         config.shadows = SHADOWMAPPING_HIGH;

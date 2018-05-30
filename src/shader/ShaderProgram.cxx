@@ -4,10 +4,9 @@
 
 #include <vector>
 #include <string>
-#include <exception>
+#include <stdexcept>
 
 #include "Shader.hxx"
-#include "LinkingException.hxx"
 
 #include "ShaderProgram.hxx"
 
@@ -55,7 +54,7 @@ void ShaderProgram::compile(){
     // Don't leak shaders either
     deleteShaders(&shaders);
 
-    throw LinkingException(&infoLog[0]);
+    throw std::runtime_error("Shader linking error: " + std::string(infoLog.begin(), infoLog.end()));
   }
 
   // Detach shaders from the program

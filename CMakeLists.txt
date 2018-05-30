@@ -27,9 +27,7 @@ set(
   CXX_FILES
   ${CMAKE_SOURCE_DIR}/src/Camera/Camera.cxx
 
-  ${CMAKE_SOURCE_DIR}/src/ChessGame/ConnectionException.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/AIConnector.cxx
-  ${CMAKE_SOURCE_DIR}/src/ChessGame/GameException.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/ChessGame.cxx
 
   ${CMAKE_SOURCE_DIR}/src/Clock/Clock.cxx
@@ -45,8 +43,6 @@ set(
   ${CMAKE_SOURCE_DIR}/src/PhysicsWorld/Fragment.cxx
   ${CMAKE_SOURCE_DIR}/src/PhysicsWorld/PhysicsWorld.cxx
 
-  ${CMAKE_SOURCE_DIR}/src/shader/CompilationException.cxx
-  ${CMAKE_SOURCE_DIR}/src/shader/LinkingException.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/Shader.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/ShaderProgram.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/shaderPrograms.cxx

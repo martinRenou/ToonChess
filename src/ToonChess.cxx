@@ -37,8 +37,8 @@
 
 // Globals
 bool resizing = false;
-int width = 1024;
-int height = 576;
+int width = 1600;
+int height = 900;
 bool cameraMoving = false;
 int dX = 0;
 int dY = 0;
@@ -114,12 +114,20 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 int main()
 {
+  int return_code = 0;
+
   // Load config
   Config config = loadConfig(get_config_path() + "config.txt");
 
+  width = config.resolution.x;
+  height = config.resolution.y;
+
   // Initialize glfw
   if (!glfwInit())
-    return 1;
+  {
+    return_code = 1;
+    return return_code;
+  }
 
   // Antialiasing level
   if(config.antialiasing != ANTIALIASING_NONE)
@@ -140,7 +148,8 @@ int main()
   if (!window)
   {
     glfwTerminate();
-    return 1;
+    return_code = 1;
+    return return_code;
   }
 
   // Make the window's context current
@@ -168,7 +177,8 @@ int main()
 
     glfwTerminate();
 
-    return 1;
+    return_code = 1;
+    return return_code;
   }
 
   // Create an instance of the Game (This starts the communication with
@@ -183,7 +193,8 @@ int main()
     deletePrograms(&programs);
     glfwTerminate();
 
-    return 1;
+    return_code = 1;
+    return return_code;
   }
 
   // Create SmokeGenerator
@@ -197,7 +208,8 @@ int main()
     deletePrograms(&programs);
     glfwTerminate();
 
-    return 1;
+    return_code = 1;
+    return return_code;
   }
   smokeGenerator->initBuffers();
 
@@ -286,6 +298,7 @@ int main()
     } catch(const std::exception& e){
       std::cerr << e.what() << std::endl;
 
+      return_code = 1;
       glfwSetWindowShouldClose(window, GL_TRUE);
     }
 
@@ -386,7 +399,7 @@ int main()
   delete physicsWorld;
   delete camera;
 
-  return 0;
+  return return_code;
 }
 
 void celShadingRender(

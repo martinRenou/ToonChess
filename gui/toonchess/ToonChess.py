@@ -2,16 +2,19 @@ import subprocess
 from concurrent import futures
 
 from traits.api import (
-    Button, Bool, Color, Instance, HasStrictTraits, Str, Enum, on_trait_change
+    Button, Bool, Color, Instance, HasStrictTraits, Str,
+    Enum, on_trait_change, Event
 )
 from traitsui.api import Item, UItem, VGroup, HGroup, View
 from pyface.image_resource import ImageResource
+from pyface.api import error
 
 from toonchess.get_share_path import get_share_path
 from toonchess.utils import get_config, set_config
 
 default = {
     'mode': 'fullscreen',
+    'resolution': '1600x900',
     'shadows': 'low',
     'antialiasing': 'high',
     'difficulty': 'easy',
@@ -30,6 +33,10 @@ default = {
 
 class ToonChess(HasStrictTraits):
     mode = Enum('fullscreen', 'window')
+    resolution = Enum(
+        '1024x576', '1152x648', '1280x720', '1280x800',
+        '1366x768', '1440x900', '1600x900', '1680x1050',
+        '1920x1080', '1920x1200', '2560x1440', '2560x1600')
     shadows = Enum('high', 'low', 'very low')
     antialiasing = Enum('high', 'low', 'none')
 
@@ -51,13 +58,19 @@ class ToonChess(HasStrictTraits):
 
     _game_running = Bool(False)
     _executor = Instance(futures.ThreadPoolExecutor)
+    _game_error_event = Event(Str)
 
     traits_view = View(
         VGroup(
             HGroup(
-                Item('mode'),
-                Item('shadows'),
-                Item('antialiasing'),
+                VGroup(
+                    Item('mode'),
+                    Item('shadows'),
+                ),
+                VGroup(
+                    Item('resolution'),
+                    Item('antialiasing'),
+                ),
                 label='Graphical settings',
                 show_border=True
             ),
@@ -127,8 +140,22 @@ class ToonChess(HasStrictTraits):
         future.add_done_callback(self._game_done)
 
     def _play(self):
-        process = subprocess.Popen("toonchess3d")
+        process = subprocess.Popen(
+            "toonchess3d", shell=True,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+            universal_newlines=True)
         out, err = process.communicate()
+
+        if err:
+            self._game_error_event = str(err)
+
+    @on_trait_change('_game_error_event', dispatch='ui')
+    def show_error(self, error_message):
+        error(
+            None,
+            error_message,
+            'Runtime error'
+        )
 
     def _game_done(self, future):
         self._game_running = False
@@ -142,6 +169,7 @@ class ToonChess(HasStrictTraits):
 
     @on_trait_change('mode,shadows,antialiasing,difficulty,ai,show_suggested_move,\
         user_pieces_color,user_smoke_color,ai_pieces_color,ai_smoke_color,\
-        background_color,board_color_1,board_color_2,allowed_move_color')
+        background_color,board_color_1,board_color_2,allowed_move_color,\
+        resolution')
     def _on_change(self):
         set_config(self.trait_get())

@@ -1,8 +1,9 @@
+#include <stdexcept>
+
 #include "../Event/Event.hxx"
 #include "../Event/EventStack.hxx"
 
 #include "AIConnector.hxx"
-#include "GameException.hxx"
 
 #include "ChessGame.hxx"
 
@@ -31,7 +32,7 @@ Vector2i ChessGame::uciFormatToPosition(std::string position){
     }
   }
 
-  if(not found) throw GameException("Oups, something went wrong...");
+  if(not found) throw std::runtime_error("Game error: Tried to access an out of bound position on the board");
 
   Vector2i outPosition = {x - 1, y - 1};
   return outPosition;
@@ -39,7 +40,7 @@ Vector2i ChessGame::uciFormatToPosition(std::string position){
 
 std::string ChessGame::positionToUciFormat(Vector2i position){
   if(boardAt(position.x, position.y) == OUT_OF_BOUND)
-    throw GameException("Oups, something went wrong...");
+    throw std::runtime_error("Game error: Tried to access an out of bound position on the board");
 
   return uciGrid[position.x][position.y];
 };
@@ -372,7 +373,7 @@ void ChessGame::perform(){
     Vector2i aiMoveStartPosition = uciFormatToPosition(
       aiMove.substr(0, 2));
     if(boardAt(aiMoveStartPosition.x, aiMoveStartPosition.y) >= 0){
-      throw GameException("A forbiden move has been performed!");
+      throw std::runtime_error("Game error: A forbiden move has been performed!");
     }
 
     // Set the currently moving piece

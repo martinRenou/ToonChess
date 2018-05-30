@@ -1,4 +1,5 @@
 mode fullscreen
+resolution 1600x900
 shadows low
 antialiasing high
 difficulty easy
