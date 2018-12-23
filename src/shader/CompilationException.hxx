@@ -4,17 +4,20 @@
 #include <exception>
 #include <string>
 
-class CompilationException : public std::exception{
-  private:
-    std::string msg;
+class CompilationException : public std::exception
+{
+public:
 
-  public:
     explicit CompilationException(
       const std::string& shaderPath, const std::string& msg);
 
     virtual ~CompilationException() throw();
 
     virtual const char* what() const throw();
+
+private:
+
+    std::string msg;
 };
 
 #endif

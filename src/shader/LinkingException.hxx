@@ -4,16 +4,19 @@
 #include <exception>
 #include <string>
 
-class LinkingException : public std::exception{
-  private:
-    std::string msg;
+class LinkingException : public std::exception
+{
+public:
 
-  public:
     explicit LinkingException(const std::string& msg);
 
     virtual ~LinkingException() throw();
 
     virtual const char* what() const throw();
+
+private:
+
+    std::string msg;
 };
 
 #endif

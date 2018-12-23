@@ -11,35 +11,36 @@
 
 #include "Shader.hxx"
 
-Shader::Shader(std::string& filePath, GLenum type) :
-  filePath{filePath}, type{type}{}
-
-void Shader::compile(){
-  // Create the shader
-  id = glCreateShader(type);
-
-  // Get the shader from the source file
-  std::string shaderString = loadFile(filePath);
-  const GLchar* source = (const GLchar*)shaderString.c_str();
-  glShaderSource(id, 1, &source, 0);
-
-  // Try to compile the shader
-  glCompileShader(id);
-
-  GLint isCompiled(0);
-  glGetShaderiv(id, GL_COMPILE_STATUS, &isCompiled);
-  if(isCompiled == GL_FALSE){
-    GLint maxLength(50);
-    glGetShaderiv(id, GL_INFO_LOG_LENGTH, &maxLength);
-
-    // Display compilation error
-    std::vector<GLchar> errorLog(maxLength);
-    glGetShaderInfoLog(id, maxLength, &maxLength, &errorLog[0]);
-
-    throw CompilationException(filePath, &errorLog[0]);
-  }
+Shader::Shader(const std::string& filePath, GLenum type) :
+    filePath(filePath), type(type)
+{
 }
 
-Shader::~Shader(){
-  glDeleteShader(id);
+void Shader::compile()
+{
+    id = glCreateShader(type);
+
+    std::string shaderString = loadFile(filePath);
+    auto c_str = shaderString.c_str();
+    glShaderSource(id, 1, &c_str, 0);
+
+    glCompileShader(id);
+
+    GLint isCompiled;
+    glGetShaderiv(id, GL_COMPILE_STATUS, &isCompiled);
+    if(isCompiled == GL_FALSE){
+        GLint info_length;
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &info_length);
+
+        // Display compilation error
+        std::vector<GLchar> errorLog(info_length);
+        glGetShaderInfoLog(id, info_length, &info_length, &errorLog[0]);
+
+        throw CompilationException(filePath, &errorLog[0]);
+    }
+}
+
+Shader::~Shader()
+{
+    glDeleteShader(id);
 }

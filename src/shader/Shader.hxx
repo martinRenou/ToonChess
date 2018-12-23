@@ -5,10 +5,12 @@
 
 #include <string>
 
-class Shader {
-  public:
+class Shader
+{
+public:
+
     /* The path of the file containing the GLSL code */
-    std::string filePath;
+    const std::string& filePath;
 
     /* The type of the shader, must be one of GL_VERTEX_SHADER,
       GL_TESS_CONTROL_SHADER, GL_TESS_EVALUATION_SHADER, GL_GEOMETRY_SHADER,
@@ -24,7 +26,7 @@ class Shader {
         GL_TESS_CONTROL_SHADER, GL_TESS_EVALUATION_SHADER, GL_GEOMETRY_SHADER,
         GL_FRAGMENT_SHADER, or GL_COMPUTE_SHADER
     */
-    explicit Shader(std::string& filePath, GLenum type);
+    explicit Shader(const std::string& filePath, GLenum type);
 
     /* Compilation method, this will load the GLSL code and compile it
       \throw CompilationException if the compilation failed
