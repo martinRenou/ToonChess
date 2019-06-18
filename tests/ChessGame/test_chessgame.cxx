@@ -4,7 +4,7 @@
 
 
 TEST(chess_game, initialization){
-  ChessGame* game = new ChessGame();
+  ChessGame* game = new ChessGame("stockfish", 0, true);
   game->start();
 
   EXPECT_EQ(game->oldSelectedPiecePosition.x, -1);
@@ -36,7 +36,7 @@ TEST(chess_game, initialization){
 };
 
 TEST(chess_game, unselect_piece){
-  ChessGame* game = new ChessGame();
+  ChessGame* game = new ChessGame("stockfish", 0, true);
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -74,7 +74,7 @@ TEST(chess_game, unselect_piece){
 };
 
 TEST(chess_game, pawn_move_1){
-  ChessGame* game = new ChessGame();
+  ChessGame* game = new ChessGame("stockfish", 0, true);
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -123,7 +123,7 @@ TEST(chess_game, pawn_move_1){
 };
 
 TEST(chess_game, pawn_move_2){
-  ChessGame* game = new ChessGame();
+  ChessGame* game = new ChessGame("stockfish", 0, true);
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -157,7 +157,7 @@ TEST(chess_game, pawn_move_2){
 };
 
 TEST(chess_game, pawn_forbiden_move){
-  ChessGame* game = new ChessGame();
+  ChessGame* game = new ChessGame("stockfish", 0, true);
   game->start();
 
   // Select PAWN (simulating click on a pawn)
@@ -191,7 +191,7 @@ TEST(chess_game, pawn_forbiden_move){
 };
 
 TEST(chess_game, knight_move_1){
-  ChessGame* game = new ChessGame();
+  ChessGame* game = new ChessGame("stockfish", 0, true);
   game->start();
 
   // Select KNIGHT (simulating click on a pawn)
@@ -225,7 +225,7 @@ TEST(chess_game, knight_move_1){
 };
 
 TEST(chess_game, knight_move_2){
-  ChessGame* game = new ChessGame();
+  ChessGame* game = new ChessGame("stockfish", 0, true);
   game->start();
 
   // Select KNIGHT (simulating click on a pawn)

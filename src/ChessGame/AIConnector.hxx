@@ -1,15 +1,17 @@
-#ifndef STOCKFISHCONNECTOR_HXX
-#define STOCKFISHCONNECTOR_HXX
+#ifndef AI_CONNECTOR_HXX
+#define AI_CONNECTOR_HXX
 
 #include <iostream>
 #include <string>
 
 #include "../constants.hxx"
 
-class StockfishConnector {
+class AIConnector {
 private:
+  std::string ai;
+
   /* Communication pipes between child and parent processes
-    (respectively stockfish and the GUI)
+    (respectively AI and the GUI)
   */
   FILE* parentWritePipeF;
   FILE* parentReadPipeF;
@@ -22,11 +24,11 @@ private:
 
 public:
   /* Constructor */
-  StockfishConnector();
+  AIConnector(const std::string& ai, const int& difficulty);
 
-  /* Function which starts Stockfish and initialize the communication
+  /* Function which starts the AI and initialize the communication
     /throw ConnectionException if something went wrong while initializing
-      connection with stockfish
+      connection with the AI
   */
   void startCommunication();
 
@@ -40,7 +42,7 @@ public:
   std::string suggestedUserMove = "(none)";
 
   /* Destructor, this will properly stop the communication */
-  ~StockfishConnector();
+  ~AIConnector();
 };
 
 #endif

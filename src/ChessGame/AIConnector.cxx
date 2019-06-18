@@ -2,14 +2,13 @@
 #include <sys/wait.h>
 #include <iostream>
 #include <algorithm>
+#include <stdexcept>
 #include <vector>
 #include <string.h>
 
 #include "../utils/utils.hxx"
 
-#include "ConnectionException.hxx"
-
-#include "StockfishConnector.hxx"
+#include "AIConnector.hxx"
 
 /* Read a complete line in a pipe and return it as a string
   \param readPipe FILE object in which you want to read a line
@@ -52,40 +51,41 @@ void writeLine(FILE* writePipe, std::string line, bool print){
   if(print) std::cout << line;
 };
 
-StockfishConnector::StockfishConnector() : moves{""}{
+AIConnector::AIConnector(const std::string& ai, const int& difficulty)
+    : moves{""}, ai{ai}, difficultyLevel{difficulty}{
   parentWritePipeF = NULL;
   parentReadPipeF = NULL;
 };
 
-void StockfishConnector::startCommunication(){
+void AIConnector::startCommunication(){
   const char* readMode = "r";
   const char* writeMode = "w";
 
   int fd[2];
   if(pipe(fd) == -1){
-    throw ConnectionException("Failed to create pipes");
+    throw std::runtime_error("AI connection error: failed to create pipes");
   }
 
   int childReadPipe   = fd[0];
   int parentWritePipe = fd[1];
 
   if(pipe(fd) == -1){
-    throw ConnectionException("Failed to create pipes");
+    throw std::runtime_error("AI connection error: failed to create pipes");
   }
 
   int parentReadPipe = fd[0];
   int childWritePipe = fd[1];
 
-  // Create a fork of the process, the child process runs stockfish while the
+  // Create a fork of the process, the child process runs AI while the
   // parent process runs the 3D view
   pid_t pid = fork();
 
   // If there is an error creating child process
   if(pid < 0){
-    throw ConnectionException("Failed to fork process");
+    throw std::runtime_error("AI connection error: failed to fork process");
   }
 
-  // In the child process running Stockfish
+  // In the child process running AI
   if(pid == 0){
     // Redirect stdin to child read pipe and stdout to child write pipe
     dup2(childReadPipe, fileno(stdin));
@@ -95,14 +95,13 @@ void StockfishConnector::startCommunication(){
     close(parentWritePipe);
     close(childReadPipe);
 
-    // Run stockfish
-    execlp("stockfish", "stockfish", (char *)NULL);
+    // Run AI
+    execlp(ai.c_str(), ai.c_str(), (char *)NULL);
 
     // If everything went fine, this code shouldn't be reached
     writeLine(fdopen(childWritePipe, writeMode), "stop\n", true);
     close(childWritePipe);
-    throw ConnectionException(
-      "Could not run stockfish, please be sure it's installed");
+    throw std::runtime_error("AI connection error: could not run the AI, please be sure \"" + ai + "\" is installed or in the path");
   }
 
   // In the parent process running the GUI
@@ -114,13 +113,9 @@ void StockfishConnector::startCommunication(){
   parentWritePipeF = fdopen(parentWritePipe, writeMode);
 
   std::string line;
-  std::vector<std::string> splittedLine;
 
-  // Check that stockfish properly started
-  line = readLine(parentReadPipeF, true);
-  splittedLine = split(line, ' ');
-  if(splittedLine.at(0).compare("Stockfish") != 0) throw ConnectionException(
-    "Communication with stockfish did'nt start properly, closing");
+  // Check that the AI properly started
+  readLine(parentReadPipeF, true);
 
   // Set the difficulty option
   std::string difficultyOption = "setoption name Skill Level value ";
@@ -128,16 +123,15 @@ void StockfishConnector::startCommunication(){
   difficultyOption.append("\n");
   writeLine(parentWritePipeF, difficultyOption, true);
 
-  // Say to stockfish that we are ready
+  // Say to AI that we are ready
   writeLine(parentWritePipeF, "isready\n", true);
 
-  // Wait for stockfish answer
+  // Wait for AI answer
   line = readLine(parentReadPipeF, true);
-  if(line.compare("readyok\n") != 0) throw ConnectionException(
-    "Stockfish not ready, closing");
+  if(line.compare("readyok\n") != 0) throw std::runtime_error("AI connection error: AI not ready, closing");
 }
 
-std::string StockfishConnector::getNextAIMove(std::string userMove){
+std::string AIConnector::getNextAIMove(std::string userMove){
   std::string line;
   std::vector<std::string> splittedLine;
 
@@ -148,7 +142,7 @@ std::string StockfishConnector::getNextAIMove(std::string userMove){
   moves.append(userMove);
   moves.append(" ");
 
-  // Send message to stockfish
+  // Send message to AI
   line = "position startpos moves ";
   line.append(moves);
   line.append("\ngo\n");
@@ -158,7 +152,7 @@ std::string StockfishConnector::getNextAIMove(std::string userMove){
   while(true){
     line = readLine(parentReadPipeF, false);
 
-    // Check if stockfish took a decision
+    // Check if AI took a decision
     splittedLine = split(line, ' ');
     if(splittedLine.at(0).compare("bestmove") == 0) break;
   }
@@ -186,8 +180,8 @@ std::string StockfishConnector::getNextAIMove(std::string userMove){
   return aiMove;
 }
 
-StockfishConnector::~StockfishConnector(){
-  // Say to stockfish that we are closing
+AIConnector::~AIConnector(){
+  // Say to AI that we are closing
   writeLine(parentWritePipeF, "quit\n", true);
 
   // Wait for the child process to die properly

@@ -1,18 +1,25 @@
-cmake_minimum_required (VERSION 2.8.2)
+cmake_minimum_required (VERSION 3.0.2)
 set(CMAKE_CXX_STANDARD 11)
 
 project(ToonChess)
 
 # The version number
-set(ToonChess_VERSION_MAJOR 0)
-set(ToonChess_VERSION_MINOR 1)
+set(TOONCHESS_VERSION_MAJOR 0)
+set(TOONCHESS_VERSION_MINOR 1)
+set(TOONCHESS_VERSION "${TOONCHESS_VERSION_MAJOR}.${TOONCHESS_VERSION_MINOR}")
 
 set(TOONCHESS_SHARE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/share)
+set(TOONCHESS_CONFIG_DIR ${CMAKE_CURRENT_SOURCE_DIR}/config)
 
 set(TOONCHESS_SHARE_PATH "\"${CMAKE_INSTALL_PREFIX}/share/toonchess/\"")
+set(TOONCHESS_CONFIG_PATH "\"$ENV{HOME}/.config/toonchess/\"")
 configure_file (
     "${CMAKE_SOURCE_DIR}/src/get_share_path.cxx.in"
     "${CMAKE_SOURCE_DIR}/src/get_share_path.cxx"
+)
+configure_file (
+    "${CMAKE_SOURCE_DIR}/src/get_config_path.cxx.in"
+    "${CMAKE_SOURCE_DIR}/src/get_config_path.cxx"
 )
 
 # Add CXX files
@@ -20,9 +27,7 @@ set(
   CXX_FILES
   ${CMAKE_SOURCE_DIR}/src/Camera/Camera.cxx
 
-  ${CMAKE_SOURCE_DIR}/src/ChessGame/ConnectionException.cxx
-  ${CMAKE_SOURCE_DIR}/src/ChessGame/StockfishConnector.cxx
-  ${CMAKE_SOURCE_DIR}/src/ChessGame/GameException.cxx
+  ${CMAKE_SOURCE_DIR}/src/ChessGame/AIConnector.cxx
   ${CMAKE_SOURCE_DIR}/src/ChessGame/ChessGame.cxx
 
   ${CMAKE_SOURCE_DIR}/src/Clock/Clock.cxx
@@ -38,8 +43,6 @@ set(
   ${CMAKE_SOURCE_DIR}/src/PhysicsWorld/Fragment.cxx
   ${CMAKE_SOURCE_DIR}/src/PhysicsWorld/PhysicsWorld.cxx
 
-  ${CMAKE_SOURCE_DIR}/src/shader/CompilationException.cxx
-  ${CMAKE_SOURCE_DIR}/src/shader/LinkingException.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/Shader.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/ShaderProgram.cxx
   ${CMAKE_SOURCE_DIR}/src/shader/shaderPrograms.cxx
@@ -51,15 +54,18 @@ set(
   ${CMAKE_SOURCE_DIR}/src/utils/utils.cxx
   ${CMAKE_SOURCE_DIR}/src/utils/math.cxx
 
+  ${CMAKE_SOURCE_DIR}/src/get_config_path.cxx
   ${CMAKE_SOURCE_DIR}/src/get_share_path.cxx
 )
 
-# Install assets
-install(DIRECTORY "${TOONCHESS_SHARE_DIR}/toonchess"
-        DESTINATION "share")
+# Define option for building python UI or not
+OPTION(TOONCHESS_BUILD_PYTHON_GUI "Python GUI for ToonChess" ON)
+set(EXECUTABLE_NAME "toonchess")
+if(TOONCHESS_BUILD_PYTHON_GUI)
+    set(EXECUTABLE_NAME "toonchess3d")
+endif()
 
 # Define sources and executable
-set(EXECUTABLE_NAME "ToonChess")
 add_executable(${EXECUTABLE_NAME} src/ToonChess.cxx ${CXX_FILES})
 
 # Tests
@@ -150,5 +156,22 @@ if(PNG_FOUND)
   endif()
 endif()
 
-install(TARGETS ToonChess
+# Install python gui
+add_subdirectory("${CMAKE_SOURCE_DIR}/gui")
+
+# Install assets, icons, config file
+install(DIRECTORY "${TOONCHESS_SHARE_DIR}/toonchess"
+        DESTINATION "share")
+install(DIRECTORY "${TOONCHESS_SHARE_DIR}/applications"
+        DESTINATION "$ENV{HOME}/.local/share"
+        USE_SOURCE_PERMISSIONS)
+install(DIRECTORY "${TOONCHESS_SHARE_DIR}/icons"
+        DESTINATION "$ENV{HOME}/.local/share"
+        USE_SOURCE_PERMISSIONS)
+install(DIRECTORY "${TOONCHESS_CONFIG_DIR}/toonchess"
+        DESTINATION "$ENV{HOME}/.config"
+        PATTERN "toonchess/config.txt"
+        PERMISSIONS WORLD_READ WORLD_WRITE)
+
+install(TARGETS ${EXECUTABLE_NAME}
         RUNTIME DESTINATION bin)

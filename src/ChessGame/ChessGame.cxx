@@ -1,22 +1,24 @@
+#include <stdexcept>
+
 #include "../Event/Event.hxx"
 #include "../Event/EventStack.hxx"
 
-#include "StockfishConnector.hxx"
-#include "GameException.hxx"
+#include "AIConnector.hxx"
 
 #include "ChessGame.hxx"
 
 
-ChessGame::ChessGame(){
-  // Start communication with stockfish
-  stockfishConnector = new StockfishConnector();
+ChessGame::ChessGame(const std::string& ai, const int& difficulty, bool show_suggested_move)
+    : show_suggested_move{show_suggested_move}{
+  // Start communication with the AI
+  aiConnector = new AIConnector(ai, difficulty);
 
   lastUserMove = "";
   clock = new Clock();
 };
 
 void ChessGame::start(){
-  stockfishConnector->startCommunication();
+  aiConnector->startCommunication();
 }
 
 Vector2i ChessGame::uciFormatToPosition(std::string position){
@@ -30,7 +32,7 @@ Vector2i ChessGame::uciFormatToPosition(std::string position){
     }
   }
 
-  if(not found) throw GameException("Oups, something went wrong...");
+  if(not found) throw std::runtime_error("Game error: Tried to access an out of bound position on the board");
 
   Vector2i outPosition = {x - 1, y - 1};
   return outPosition;
@@ -38,7 +40,7 @@ Vector2i ChessGame::uciFormatToPosition(std::string position){
 
 std::string ChessGame::positionToUciFormat(Vector2i position){
   if(boardAt(position.x, position.y) == OUT_OF_BOUND)
-    throw GameException("Oups, something went wrong...");
+    throw std::runtime_error("Game error: Tried to access an out of bound position on the board");
 
   return uciGrid[position.x][position.y];
 };
@@ -364,14 +366,14 @@ void ChessGame::perform(){
   }
   else if(state == AI_TURN) {
     // Get AI decision according to the last user move
-    std::string aiMove = stockfishConnector->getNextAIMove(
+    std::string aiMove = aiConnector->getNextAIMove(
       lastUserMove);
 
     // If the AI tried to move one user's pawn, stop the game
     Vector2i aiMoveStartPosition = uciFormatToPosition(
       aiMove.substr(0, 2));
     if(boardAt(aiMoveStartPosition.x, aiMoveStartPosition.y) >= 0){
-      throw GameException("A forbiden move has been performed!");
+      throw std::runtime_error("Game error: A forbiden move has been performed!");
     }
 
     // Set the currently moving piece
@@ -386,18 +388,21 @@ void ChessGame::perform(){
     // Remove the piece from its old position
     board[aiMoveStartPosition.x][aiMoveStartPosition.y] = EMPTY;
 
-    // Get suggested user next move if available
-    if(stockfishConnector->suggestedUserMove.compare("(none)") != 0){
-      std::string startPosition_str = \
-        stockfishConnector->suggestedUserMove.substr(0, 2);
-      std::string endPosition_str = \
-        stockfishConnector->suggestedUserMove.substr(2, 2);
+    if(show_suggested_move)
+    {
+      // Get suggested user next move if available
+      if(aiConnector->suggestedUserMove.compare("(none)") != 0){
+        std::string startPosition_str = \
+        aiConnector->suggestedUserMove.substr(0, 2);
+        std::string endPosition_str = \
+        aiConnector->suggestedUserMove.substr(2, 2);
 
-      suggestedUserMoveStartPosition = uciFormatToPosition(startPosition_str);
-      suggestedUserMoveEndPosition = uciFormatToPosition(endPosition_str);
-    }else{
-      suggestedUserMoveStartPosition = {-1, -1};
-      suggestedUserMoveEndPosition = {-1, -1};
+        suggestedUserMoveStartPosition = uciFormatToPosition(startPosition_str);
+        suggestedUserMoveEndPosition = uciFormatToPosition(endPosition_str);
+      }else{
+        suggestedUserMoveStartPosition = {-1, -1};
+        suggestedUserMoveEndPosition = {-1, -1};
+      }
     }
 
     // Transition to AI_MOVING state
@@ -407,6 +412,6 @@ void ChessGame::perform(){
 };
 
 ChessGame::~ChessGame(){
-  delete stockfishConnector;
+  delete aiConnector;
   delete clock;
 };

@@ -90,7 +90,7 @@ void SmokeGenerator::initBuffers(){
 void SmokeGenerator::generate(
     Vector3f position,
     int numberParticles,
-    Vector3f color,
+    Vector4f color,
     float sizeFactor){
   if(nbParticles + numberParticles > maxNbParticles){
     std::cout << "Cannot create more particles..." << std::endl;

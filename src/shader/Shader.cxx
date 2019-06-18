@@ -5,9 +5,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <stdexcept>
 
 #include "../utils/utils.hxx"
-#include "CompilationException.hxx"
 
 #include "Shader.hxx"
 
@@ -36,7 +36,7 @@ void Shader::compile(){
     std::vector<GLchar> errorLog(maxLength);
     glGetShaderInfoLog(id, maxLength, &maxLength, &errorLog[0]);
 
-    throw CompilationException(filePath, &errorLog[0]);
+    throw std::runtime_error("Shader compilation error: " + filePath + std::string(errorLog.begin(), errorLog.end()));
   }
 }
 

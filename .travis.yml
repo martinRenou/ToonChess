@@ -39,5 +39,7 @@ script:
   - cd build
   - cmake -DTOONCHESS_BUILD_TESTS=ON ..
   - sudo make -j6 install
+  - which toonchess
+  - which toonchess3d
   - ./toonchess_tests
   - valgrind --leak-check=full --track-origins=yes --error-exitcode=1 ./toonchess_tests

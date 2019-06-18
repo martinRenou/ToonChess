@@ -4,10 +4,9 @@
 
 #include <vector>
 #include <string>
-#include <exception>
+#include <stdexcept>
 
 #include "Shader.hxx"
-#include "LinkingException.hxx"
 
 #include "ShaderProgram.hxx"
 
@@ -55,7 +54,7 @@ void ShaderProgram::compile(){
     // Don't leak shaders either
     deleteShaders(&shaders);
 
-    throw LinkingException(&infoLog[0]);
+    throw std::runtime_error("Shader linking error: " + std::string(infoLog.begin(), infoLog.end()));
   }
 
   // Detach shaders from the program
@@ -71,18 +70,16 @@ void ShaderProgram::setInt(std::string name, GLfloat value){
   glUniform1i(location, value);
 };
 
-void ShaderProgram::setVector3f(
-    std::string name, GLfloat x, GLfloat y, GLfloat z){
+void ShaderProgram::setVector3f(std::string name, Vector3f vec){
   GLuint location = glGetUniformLocation(id, name.c_str());
 
-  glUniform3f(location, x, y, z);
+  glUniform3f(location, vec.x, vec.y, vec.z);
 };
 
-void ShaderProgram::setVector4f(
-    std::string name, GLfloat x, GLfloat y, GLfloat z, GLfloat w){
+void ShaderProgram::setVector4f(std::string name, Vector4f vec){
   GLuint location = glGetUniformLocation(id, name.c_str());
 
-  glUniform4f(location, x, y, z, w);
+  glUniform4f(location, vec.x, vec.y, vec.z, vec.w);
 };
 
 void ShaderProgram::setMatrix4fv(

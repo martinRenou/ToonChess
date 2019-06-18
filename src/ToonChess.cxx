@@ -31,12 +31,14 @@
 #include "utils/utils.hxx"
 #include "utils/math.hxx"
 
+#include "get_config_path.hxx"
+
 #include "ChessGame/ChessGame.hxx"
 
 // Globals
 bool resizing = false;
-int width = 1024;
-int height = 576;
+int width = 1600;
+int height = 900;
 bool cameraMoving = false;
 int dX = 0;
 int dY = 0;
@@ -59,6 +61,7 @@ void celShadingRender(
   ShadowMapping* shadowMapping,
   Camera* camera,
   DirectionalLight* light,
+  Config* config,
   float elapsedTime);
 
 void resize_callback(GLFWwindow* window, int new_width, int new_height)
@@ -101,28 +104,61 @@ void cursor_move_callback(GLFWwindow* window, double xpos, double ypos)
   mousePosition.y = yposi;
 }
 
+void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE)
+    {
+      glfwSetWindowShouldClose(window, GL_TRUE);
+    }
+}
+
 int main()
 {
+  int return_code = 0;
+
+  // Load config
+  Config config = loadConfig(get_config_path() + "config.txt");
+
+  width = config.resolution.x;
+  height = config.resolution.y;
+
   // Initialize glfw
   if (!glfwInit())
-    return 1;
+  {
+    return_code = 1;
+    return return_code;
+  }
 
   // Antialiasing level
-  glfwWindowHint(GLFW_SAMPLES, ANTIALIASING_LOW);
+  if(config.antialiasing != ANTIALIASING_NONE)
+  {
+    glfwWindowHint(GLFW_SAMPLES, config.antialiasing);
+  }
 
+  // Create a window and its OpenGL context
   GLFWwindow* window;
-  // Create a windowed mode window and its OpenGL context
-  window = glfwCreateWindow(width, height, "ToonChess", NULL, NULL);
+  if(config.mode == FULLSCREEN)
+  {
+    window = glfwCreateWindow(width, height, "ToonChess", glfwGetPrimaryMonitor(), NULL);
+  }
+  else
+  {
+    window = glfwCreateWindow(width, height, "ToonChess", NULL, NULL);
+  }
   if (!window)
   {
     glfwTerminate();
-    return 1;
+    return_code = 1;
+    return return_code;
   }
 
   // Make the window's context current
   glfwMakeContextCurrent(window);
 
-  glEnable(GL_MULTISAMPLE);
+  if(config.antialiasing != ANTIALIASING_NONE)
+  {
+    glEnable(GL_MULTISAMPLE);
+  }
 
   // Enable depth test
   glEnable(GL_DEPTH_TEST);
@@ -139,12 +175,15 @@ int main()
   } catch(const std::exception& e){
     std::cerr << e.what() << std::endl;
 
-    return 1;
+    glfwTerminate();
+
+    return_code = 1;
+    return return_code;
   }
 
   // Create an instance of the Game (This starts the communication with
-  // Stockfish and could fail)
-  ChessGame* game = new ChessGame();
+  // the AI and could fail)
+  ChessGame* game = new ChessGame(config.ai, config.difficulty, config.show_suggested_move);
   try{
     game->start();
   } catch(const std::exception& e){
@@ -152,8 +191,10 @@ int main()
 
     delete game;
     deletePrograms(&programs);
+    glfwTerminate();
 
-    return 1;
+    return_code = 1;
+    return return_code;
   }
 
   // Create SmokeGenerator
@@ -165,8 +206,10 @@ int main()
 
     delete game;
     deletePrograms(&programs);
+    glfwTerminate();
 
-    return 1;
+    return_code = 1;
+    return return_code;
   }
   smokeGenerator->initBuffers();
 
@@ -184,7 +227,7 @@ int main()
   colorPicking->initBuffers();
 
   // Initialize shadow mapping
-  ShadowMapping* shadowMapping = new ShadowMapping();
+  ShadowMapping* shadowMapping = new ShadowMapping(config.shadows);
   shadowMapping->initBuffers();
 
   // Main clock
@@ -212,10 +255,10 @@ int main()
   glfwSetFramebufferSizeCallback(window, resize_callback);
   glfwSetMouseButtonCallback(window, mouse_button_callback);
   glfwSetCursorPosCallback(window, cursor_move_callback);
+  glfwSetKeyCallback(window, key_callback);
 
   // Render loop
-  bool running = true;
-  while(running and !glfwWindowShouldClose(window))
+  while(!glfwWindowShouldClose(window))
   {
     // Get elapsed time since game started
     float elapsedTime = mainClock.getElapsedTime();
@@ -255,7 +298,8 @@ int main()
     } catch(const std::exception& e){
       std::cerr << e.what() << std::endl;
 
-      running = false;
+      return_code = 1;
+      glfwSetWindowShouldClose(window, GL_TRUE);
     }
 
     // Simulate dynamics world
@@ -270,8 +314,8 @@ int main()
           gameEvent.fragment.position,
           (int)round(gameEvent.fragment.volume),
           gameEvent.fragment.piece > 0 ?
-            Vector3f(0.41, 0.37, 0.23) :
-            Vector3f(0.30, 0.12, 0.40),
+            config.user_smoke_color :
+            config.ai_smoke_color,
           0.7
         );
       }
@@ -299,7 +343,7 @@ int main()
             0.0
           },
           1,
-          Vector3f(1.0, 1.0, 1.0),
+          Vector4f(1.0, 1.0, 1.0, 1.0),
           0.2
         );
       }
@@ -323,7 +367,10 @@ int main()
     // Do the cel-shading rendering
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-    glClearColor(1, 1, 1, 1);
+    glClearColor(
+      config.background_color.x, config.background_color.y,
+      config.background_color.z, config.background_color.w
+    );
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glViewport(0, 0, width, height);
@@ -331,7 +378,7 @@ int main()
     // Display all pieces on the screen using the cel-shading effect
     celShadingRender(
       game, physicsWorld, &pieces, &programs, shadowMapping, camera, &light,
-      elapsedTime);
+      &config, elapsedTime);
 
     // Display smoke particles
     smokeGenerator->draw(camera);
@@ -352,7 +399,7 @@ int main()
   delete physicsWorld;
   delete camera;
 
-  return 0;
+  return return_code;
 }
 
 void celShadingRender(
@@ -363,6 +410,7 @@ void celShadingRender(
     ShadowMapping* shadowMapping,
     Camera* camera,
     DirectionalLight* light,
+    Config* config,
     float elapsedTime){
   // The movement Matrix
   std::vector<GLfloat> movementMatrix;
@@ -473,10 +521,7 @@ void celShadingRender(
   );
 
   // Set lightDirection
-  celShadingProgram->setVector3f(
-    "lightDirection",
-    light->direction.x, light->direction.y, light->direction.z
-  );
+  celShadingProgram->setVector3f("lightDirection", light->direction);
 
   // Display fragments
   for(unsigned int i = 0; i < physicsWorld->fragmentPool.size(); i++){
@@ -493,8 +538,8 @@ void celShadingRender(
 
     // Compute color depending of the team
     physicsWorld->fragmentPool.at(i).first > 0 ?
-      celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
-      celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
+      celShadingProgram->setVector4f("color", config->user_pieces_color) :
+      celShadingProgram->setVector4f("color", config->ai_pieces_color);
 
     // Draw fragment
     fragment->mesh->draw();
@@ -515,12 +560,12 @@ void celShadingRender(
 
       // Draw the checkerboard
       (x + y) % 2 == 0 ?
-        celShadingProgram->setVector4f("color", 0.70, 0.60, 0.41, 1.0) :
-        celShadingProgram->setVector4f("color", 1.0, 1.0, 1.0, 1.0);
+        celShadingProgram->setVector4f("color", config->board_color_1) :
+        celShadingProgram->setVector4f("color", config->board_color_2);
       if((game->selectedPiecePosition.x == x and
           game->selectedPiecePosition.y == y) or
           game->allowedNextPositions[x][y]){
-        celShadingProgram->setVector4f("color", 0.94, 0.81, 0.34, 1.0);
+        celShadingProgram->setVector4f("color", config->allowed_move_color);
       }
 
       // Translate the piece
@@ -545,8 +590,8 @@ void celShadingRender(
       if(piece != EMPTY){
         // Display cel-shading mesh
         piece > 0 ?
-          celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
-          celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
+          celShadingProgram->setVector4f("color", config->user_pieces_color) :
+          celShadingProgram->setVector4f("color", config->ai_pieces_color);
 
         pieces->at(abs(piece))->draw();
       }
@@ -577,8 +622,8 @@ void celShadingRender(
     celShadingProgram->setNormalMatrix(&normalMatrix);
 
     game->movingPiece > 0 ?
-      celShadingProgram->setVector4f("color", 1.0, 0.93, 0.70, 1.0) :
-      celShadingProgram->setVector4f("color", 0.51, 0.08, 0.08, 1.0);
+      celShadingProgram->setVector4f("color", config->user_pieces_color) :
+      celShadingProgram->setVector4f("color", config->ai_pieces_color);
 
     pieces->at(abs(game->movingPiece))->draw();
   }

@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "../utils/math.hxx"
 #include "Shader.hxx"
 
 class ShaderProgram {
@@ -38,23 +39,17 @@ class ShaderProgram {
       glUseProgram before using this method, otherwise there will be undefined
       behavior depending on the context
       \param name The uniform name
-      \param x First component of the vec3
-      \param y Second component of the vec3
-      \param z Third component of the vec3
+      \param vec
     */
-    void setVector3f(std::string name, GLfloat x, GLfloat y, GLfloat z);
+    void setVector3f(std::string name, Vector3f vec);
 
     /* Set a vec4 uniform value, given its name. The program must be bound with
       glUseProgram before using this method, otherwise there will be undefined
       behavior depending on the context
       \param name The uniform name
-      \param x First component of the vec4
-      \param y Second component of the vec4
-      \param z Third component of the vec4
-      \param w Fourth component of the vec4
+      \param vec
     */
-    void setVector4f(
-      std::string name, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
+    void setVector4f(std::string name, Vector4f vec);
 
     /* Set a matrix uniform value, given its name. The program must be bound with
       glUseProgram before using this method, otherwise there will be undefined

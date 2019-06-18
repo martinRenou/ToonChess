@@ -89,7 +89,7 @@ public:
   void generate(
     Vector3f position,
     int numberParticles,
-    Vector3f color,
+    Vector4f color,
     float sizeFactor);
 
   /* Draw smoke in the currently bound framebuffer object */
